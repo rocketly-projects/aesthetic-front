@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLogin } from "@/hooks/useAuth";
+import { ApiError } from "@/lib/api/client";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
+  const { mutate: login, isPending, error } = useLogin();
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
+  const errorMsg = error instanceof ApiError ? error.message : error ? "Error al iniciar sesión" : null;
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    router.push("/dashboard");
+    login({ email, password });
   }
 
   return (
@@ -63,12 +66,17 @@ export default function LoginPage() {
             </label>
           </div>
 
+          {errorMsg && (
+            <p className="text-[12px] m-0" style={{ color: "var(--color-err)" }}>{errorMsg}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full flex justify-center items-center py-2.5 rounded-lg text-[13.5px] font-medium text-white border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
+            disabled={isPending}
+            className="w-full flex justify-center items-center py-2.5 rounded-lg text-[13.5px] font-medium text-white border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
             style={{ background: "var(--color-accent)", marginTop: 4 }}
           >
-            Ingresar
+            {isPending ? "Ingresando…" : "Ingresar"}
           </button>
         </form>
 

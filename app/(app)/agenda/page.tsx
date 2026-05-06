@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import NuevoTurnoModal from "@/components/NuevoTurnoModal";
 import { useGetAppointments } from "@/hooks/useAppointments";
 
 const HOUR_PX  = 56;
@@ -37,6 +38,7 @@ const statusBorder: Record<string, string> = {
 
 export default function AgendaPage() {
   const [anchor, setAnchor] = useState(new Date());
+  const [modalOpen, setModalOpen] = useState(false);
   const weekDates           = getWeekDates(anchor);
 
   const weekStart = toYMD(weekDates[0]);
@@ -55,7 +57,7 @@ export default function AgendaPage() {
       title="Agenda"
       subtitle={weekLabel}
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }}>
+        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Nuevo turno
         </button>
@@ -133,6 +135,7 @@ export default function AgendaPage() {
           </div>
         </div>
       </div>
+      <NuevoTurnoModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </AppShell>
   );
 }

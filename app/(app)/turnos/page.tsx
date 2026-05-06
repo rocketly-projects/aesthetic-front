@@ -3,10 +3,8 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import { statusChip } from "@/components/Chip";
-import Modal from "@/components/Modal";
-import { useGetAppointments, useCreateAppointment } from "@/hooks/useAppointments";
-import { useGetClients } from "@/hooks/useClients";
-import { useGetServices } from "@/hooks/useServices";
+import NuevoTurnoModal from "@/components/NuevoTurnoModal";
+import { useGetAppointments } from "@/hooks/useAppointments";
 import type { AppointmentStatus } from "@/lib/api/appointments";
 
 type Filter = "todos" | AppointmentStatus;
@@ -26,34 +24,13 @@ function formatDate(d: string) {
 export default function TurnosPage() {
   const [filter, setFilter]       = useState<Filter>("todos");
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm]           = useState({ clientId: "", serviceId: "", date: "", time: "", notes: "" });
 
   const { data: apptData, isLoading } = useGetAppointments({ limit: 100 });
-  const { data: clientData }          = useGetClients({ limit: 100 });
-  const { data: serviceData }         = useGetServices();
-  const createAppt                    = useCreateAppointment();
-
-  const allAppts  = apptData?.appointments ?? [];
-  const clients   = clientData?.clients ?? [];
-  const services  = serviceData ?? [];
-
-  const visible = filter === "todos" ? allAppts : allAppts.filter((a) => a.status === filter);
+  const allAppts = apptData?.appointments ?? [];
+  const visible  = filter === "todos" ? allAppts : allAppts.filter((a) => a.status === filter);
 
   function count(f: Filter) {
     return f === "todos" ? allAppts.length : allAppts.filter((a) => a.status === f).length;
-  }
-
-  function handleCreate(e: React.FormEvent) {
-    e.preventDefault();
-    createAppt.mutate(
-      { serviceId: form.serviceId, clientId: form.clientId || undefined, date: form.date, time: form.time, notes: form.notes || undefined },
-      {
-        onSuccess: () => {
-          setModalOpen(false);
-          setForm({ clientId: "", serviceId: "", date: "", time: "", notes: "" });
-        },
-      }
-    );
   }
 
   return (
@@ -117,47 +94,7 @@ export default function TurnosPage() {
         )}
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Nuevo turno">
-        <form onSubmit={handleCreate} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Cliente</label>
-            <select className="input" value={form.clientId} onChange={(e) => setForm({ ...form, clientId: e.target.value })}>
-              <option value="">Sin cliente asignado</option>
-              {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Servicio</label>
-            <select className="input" value={form.serviceId} onChange={(e) => setForm({ ...form, serviceId: e.target.value })} required>
-              <option value="">Seleccioná un servicio…</option>
-              {services.map((s) => <option key={s.id} value={s.id}>{s.name} — {s.duration} min — ${s.price.toLocaleString("es-AR")}</option>)}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Fecha</label>
-              <input className="input" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Hora</label>
-              <input className="input" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Notas</label>
-            <textarea className="input resize-y" rows={3} placeholder="Notas internas…" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-          </div>
-          {createAppt.error && (
-            <p className="text-[12px] text-err m-0">{(createAppt.error as Error).message}</p>
-          )}
-          <div className="flex gap-3 justify-end mt-1">
-            <button type="button" onClick={() => setModalOpen(false)} className="border border-line bg-transparent text-ink rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer hover:bg-bg transition-colors">Cancelar</button>
-            <button type="submit" disabled={createAppt.isPending} className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60" style={{ background: "var(--color-accent)" }}>
-              {createAppt.isPending ? "Creando…" : "Crear turno"}
-            </button>
-          </div>
-        </form>
-      </Modal>
+      <NuevoTurnoModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </AppShell>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import { statusChip } from "@/components/Chip";
+import NuevoClienteModal from "@/components/NuevoClienteModal";
 import { useGetClients, useGetClient } from "@/hooks/useClients";
 import { useGetAppointments } from "@/hooks/useAppointments";
 
@@ -15,8 +16,9 @@ function initials(name: string) {
 }
 
 export default function ClientesPage() {
-  const [search,   setSearch]   = useState("");
-  const [activeId, setActiveId] = useState<string>("");
+  const [search,    setSearch]    = useState("");
+  const [activeId,  setActiveId]  = useState<string>("");
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { data: clientData, isLoading } = useGetClients({ limit: 100 });
   const allClients = clientData?.clients ?? [];
@@ -45,7 +47,7 @@ export default function ClientesPage() {
       title="Clientes"
       subtitle={`${allClients.length} clientes`}
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }}>
+        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Nueva cliente
         </button>
@@ -157,6 +159,7 @@ export default function ClientesPage() {
           </div>
         )}
       </div>
+      <NuevoClienteModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </AppShell>
   );
 }

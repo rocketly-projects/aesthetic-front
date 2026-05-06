@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { login, register, clearToken } from "@/lib/api/auth";
 import type { LoginParams, RegisterParams } from "@/lib/api/auth";
@@ -28,10 +28,12 @@ export function useRegister() {
 }
 
 export function useLogout() {
-  const router = useRouter();
+  const router      = useRouter();
+  const queryClient = useQueryClient();
 
   return () => {
     clearToken();
+    queryClient.clear();
     router.push("/login");
   };
 }

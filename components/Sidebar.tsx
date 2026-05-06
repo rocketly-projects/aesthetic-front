@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLogout } from "@/hooks/useAuth";
 
 function SvgWrap({ children }: { children: React.ReactNode }) {
   return (
@@ -79,7 +80,17 @@ const configNav: NavItem[] = [
   { href: "/config",  id: "config",  label: "Configuración" },
 ];
 
+function IconLogout() {
+  return (
+    <SvgWrap>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+    </SvgWrap>
+  );
+}
+
 export default function Sidebar({ active }: { active: string }) {
+  const logout = useLogout();
+
   return (
     <aside
       className="flex flex-col overflow-y-auto overflow-x-hidden border-r border-line"
@@ -108,7 +119,7 @@ export default function Sidebar({ active }: { active: string }) {
       </Link>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-3">
+      <nav className="flex-1 flex flex-col px-3 py-3">
         <div className="px-1 py-1 text-[10.5px] font-semibold text-ink-3 uppercase tracking-widest mb-1">
           Gestión
         </div>
@@ -152,6 +163,15 @@ export default function Sidebar({ active }: { active: string }) {
             </Link>
           );
         })}
+
+        <div className="flex-1" />
+        <button
+          onClick={logout}
+          className="nav-item w-full border-none bg-transparent cursor-pointer text-ink-3 hover:text-err"
+        >
+          <IconLogout />
+          <span className="flex-1 text-left">Cerrar sesión</span>
+        </button>
       </nav>
 
       {/* User footer */}

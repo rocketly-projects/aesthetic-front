@@ -3,10 +3,12 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import KPI from "@/components/KPI";
+import NuevoServicioModal from "@/components/NuevoServicioModal";
 import { useGetServices } from "@/hooks/useServices";
 
 export default function ServiciosPage() {
-  const [hoverAdd, setHoverAdd] = useState(false);
+  const [hoverAdd,  setHoverAdd]  = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const { data: services = [], isLoading } = useGetServices();
   const visible    = services.filter((s) => s.visible);
@@ -19,7 +21,7 @@ export default function ServiciosPage() {
       title="Servicios"
       subtitle={`${services.length} servicios configurados`}
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }}>
+        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Agregar servicio
         </button>
@@ -65,6 +67,7 @@ export default function ServiciosPage() {
           <div
             onMouseEnter={() => setHoverAdd(true)}
             onMouseLeave={() => setHoverAdd(false)}
+            onClick={() => setModalOpen(true)}
             className="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-8 cursor-pointer transition-colors min-h-[180px]"
             style={{ borderColor: hoverAdd ? "var(--color-accent)" : "var(--color-line-2)", color: hoverAdd ? "var(--color-accent)" : "var(--color-ink-3)" }}
           >
@@ -73,6 +76,7 @@ export default function ServiciosPage() {
           </div>
         </div>
       )}
+      <NuevoServicioModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </AppShell>
   );
 }
