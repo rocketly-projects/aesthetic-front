@@ -11,7 +11,7 @@ interface AppShellProps {
 
 export default function AppShell({ active, title, subtitle, actions, children }: AppShellProps) {
   return (
-    <div className="grid h-screen overflow-hidden" style={{ gridTemplateColumns: "240px 1fr" }}>
+    <div className="grid h-screen overflow-hidden" style={{ gridTemplateColumns: "var(--sidebar-w) 1fr" }}>
       <Sidebar active={active} />
       <div className="flex flex-col overflow-hidden bg-bg">
         <Topbar title={title} subtitle={subtitle} actions={actions} />

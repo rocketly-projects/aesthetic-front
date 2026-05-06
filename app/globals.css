@@ -52,6 +52,12 @@
   --shadow-xl: 0 16px 48px rgba(39,42,37,.14), 0 8px 16px rgba(39,42,37,.07);
 }
 
+/* ── Layout tokens ────────────────────────────────────────────── */
+:root {
+  --sidebar-w: 15rem;   /* 240px @ 16px base */
+  --topbar-h:  3.5rem;  /* 56px  @ 16px base */
+}
+
 /* ── Base ─────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }

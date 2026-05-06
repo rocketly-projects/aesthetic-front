@@ -6,7 +6,7 @@ interface TopbarProps {
 
 export default function Topbar({ title, subtitle, actions }: TopbarProps) {
   return (
-    <div className="h-[56px] min-h-[56px] bg-surface border-b border-line flex items-center px-6 gap-4">
+    <div className="h-[var(--topbar-h)] min-h-[var(--topbar-h)] bg-surface border-b border-line flex items-center px-6 gap-4">
       {/* Title */}
       <div className="flex-1 min-w-0">
         <h1 className="m-0 text-[15px] font-semibold text-ink leading-tight">{title}</h1>
