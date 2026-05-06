@@ -1,15 +1,11 @@
+"use client";
+
 import AppShell from "@/components/AppShell";
 import KPI from "@/components/KPI";
 import Chip from "@/components/Chip";
+import { useGetAppointments } from "@/hooks/useAppointments";
 
-const TODAY_APPTS = [
-  { id: "1", time: "09:00", duration: 45,  client: "Lucía Fernández",  service: "Corte de cabello",         status: "confirmed" },
-  { id: "2", time: "10:00", duration: 120, client: "Camila Suárez",    service: "Coloración completa",      status: "confirmed" },
-  { id: "3", time: "12:30", duration: 30,  client: "Martín Acosta",    service: "Brushing",                 status: "pending"   },
-  { id: "4", time: "14:00", duration: 150, client: "Valentina López",  service: "Mechas / babylights",      status: "confirmed" },
-  { id: "5", time: "17:00", duration: 90,  client: "Sofía Romero",     service: "Tratamiento de keratina",  status: "pending"   },
-  { id: "6", time: "18:45", duration: 45,  client: "Tomás Quiroga",    service: "Corte + barba",            status: "cancelled" },
-];
+const TODAY = new Date().toISOString().slice(0, 10);
 
 const ACTIVITY = [
   {
@@ -39,10 +35,17 @@ function ArrowUp() {
 }
 
 export default function DashboardPage() {
-  const total = TODAY_APPTS.length;
-  const confirmed = TODAY_APPTS.filter((a) => a.status === "confirmed").length;
-  const pending = TODAY_APPTS.filter((a) => a.status === "pending").length;
-  const next = TODAY_APPTS.find((a) => a.status !== "cancelled");
+  const { data, isLoading } = useGetAppointments({ date: TODAY, limit: 100 });
+  const appts = data?.appointments ?? [];
+
+  const total     = appts.length;
+  const confirmed = appts.filter((a) => a.status === "confirmed").length;
+  const pending   = appts.filter((a) => a.status === "pending").length;
+  const revenue   = appts.filter((a) => a.status !== "cancelled").reduce((s, a) => s + a.price, 0);
+  const next      = appts.find((a) => a.status !== "cancelled");
+
+  const todayLabel = new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const todayFormatted = todayLabel.charAt(0).toUpperCase() + todayLabel.slice(1);
 
   return (
     <AppShell
@@ -71,37 +74,25 @@ export default function DashboardPage() {
             Buen día, <em className="not-italic text-accent">Marina</em>.
           </h2>
           <div className="muted text-sm">
-            Tenés <strong className="text-ink font-medium">{total}</strong> turnos hoy.
-            El próximo es a las <strong className="text-ink font-medium">{next?.time}</strong> con {next?.client}.
+            {isLoading ? "Cargando turnos…" : (
+              <>
+                Tenés <strong className="text-ink font-medium">{total}</strong> turnos hoy.
+                {next && <> El próximo es a las <strong className="text-ink font-medium">{next.time}</strong> con {next.serviceName}.</>}
+              </>
+            )}
           </div>
         </div>
         <div className="text-ink-3 text-[13.5px] font-mono uppercase tracking-wider">
-          Martes · 5 mayo 2026
+          {todayFormatted}
         </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <KPI
-          lbl="Turnos hoy"
-          val={total}
-          delta={<><ArrowUp /> +2 vs. ayer</>}
-        />
-        <KPI
-          lbl="Confirmados"
-          val={confirmed}
-          delta={<><span style={{ width:6,height:6,borderRadius:"50%",background:"var(--color-ok)",display:"inline-block",verticalAlign:"middle",marginRight:4 }}/> Listos</>}
-        />
-        <KPI
-          lbl="Pendientes"
-          val={pending}
-          delta={<><span style={{ width:6,height:6,borderRadius:"50%",background:"var(--color-warn)",display:"inline-block",verticalAlign:"middle",marginRight:4 }}/> A confirmar</>}
-        />
-        <KPI
-          lbl="Ingresos del día"
-          val="$71.000"
-          delta={<><ArrowUp /> estimado</>}
-        />
+        <KPI lbl="Turnos hoy"      val={isLoading ? "…" : total}     delta={<><ArrowUp /> +2 vs. ayer</>} />
+        <KPI lbl="Confirmados"     val={isLoading ? "…" : confirmed} delta={<><span style={{ width:6,height:6,borderRadius:"50%",background:"var(--color-ok)",display:"inline-block",verticalAlign:"middle",marginRight:4 }}/> Listos</>} />
+        <KPI lbl="Pendientes"      val={isLoading ? "…" : pending}   delta={<><span style={{ width:6,height:6,borderRadius:"50%",background:"var(--color-warn)",display:"inline-block",verticalAlign:"middle",marginRight:4 }}/> A confirmar</>} />
+        <KPI lbl="Ingresos del día" val={isLoading ? "…" : "$" + revenue.toLocaleString("es-AR")} delta={<><ArrowUp /> estimado</>} />
       </div>
 
       {/* 2-col grid */}
@@ -112,7 +103,7 @@ export default function DashboardPage() {
             <div>
               <h3 className="m-0 text-[14px] font-semibold text-ink">Agenda de hoy</h3>
               <span className="text-[12.5px] text-ink-3">
-                {total} turnos · 1 cancelado
+                {total} turnos · {appts.filter((a) => a.status === "cancelled").length} cancelado
               </span>
             </div>
             <a href="/agenda" className="flex items-center gap-1 text-[12.5px] text-ink-2 hover:text-ink transition-colors" style={{ textDecoration: "none" }}>
@@ -124,7 +115,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="timeline">
-            {TODAY_APPTS.map((appt) => (
+            {appts.map((appt) => (
               <div key={appt.id} className="tl-item">
                 <div className="tl-time">
                   {appt.time}
@@ -133,13 +124,14 @@ export default function DashboardPage() {
                 <div className={`tl-card ${appt.status}`}>
                   <div className="stripe" />
                   <div>
-                    <div className="who">{appt.client}</div>
-                    <div className="svc">{appt.service}</div>
+                    <div className="who">{appt.serviceName}</div>
+                    <div className="svc">{appt.clientId}</div>
                   </div>
                   <div className="right">
                     {appt.status === "confirmed" && <Chip variant="ok"   label="Confirmado" />}
-                    {appt.status === "pending"   && <Chip variant="warn"  label="Pendiente"  />}
-                    {appt.status === "cancelled" && <Chip variant="err"   label="Cancelado"  />}
+                    {appt.status === "pending"   && <Chip variant="warn" label="Pendiente"  />}
+                    {appt.status === "cancelled" && <Chip variant="err"  label="Cancelado"  />}
+                    {appt.status === "completed" && <Chip variant="info" label="Completado" />}
                   </div>
                 </div>
               </div>

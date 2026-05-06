@@ -1,31 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppShell from "@/components/AppShell";
+import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours } from "@/hooks/useBusiness";
 
 const DAYS = [
-  { key: "lun", label: "Lunes" }, { key: "mar", label: "Martes" },
-  { key: "mie", label: "Miércoles" }, { key: "jue", label: "Jueves" },
-  { key: "vie", label: "Viernes" }, { key: "sab", label: "Sábado" },
-  { key: "dom", label: "Domingo" },
+  { key: "lun", label: "Lunes",     dayOfWeek: 1 },
+  { key: "mar", label: "Martes",    dayOfWeek: 2 },
+  { key: "mie", label: "Miércoles", dayOfWeek: 3 },
+  { key: "jue", label: "Jueves",    dayOfWeek: 4 },
+  { key: "vie", label: "Viernes",   dayOfWeek: 5 },
+  { key: "sab", label: "Sábado",    dayOfWeek: 6 },
+  { key: "dom", label: "Domingo",   dayOfWeek: 0 },
 ];
 
 type DaySchedule = { open: boolean; from: string; to: string };
 
 const defaultSchedule: Record<string, DaySchedule> = {
-  lun: { open: true,  from: "09:00", to: "18:00" }, mar: { open: true,  from: "09:00", to: "18:00" },
-  mie: { open: true,  from: "09:00", to: "18:00" }, jue: { open: true,  from: "09:00", to: "18:00" },
-  vie: { open: true,  from: "09:00", to: "18:00" }, sab: { open: true,  from: "09:00", to: "14:00" },
+  lun: { open: true,  from: "09:00", to: "18:00" },
+  mar: { open: true,  from: "09:00", to: "18:00" },
+  mie: { open: true,  from: "09:00", to: "18:00" },
+  jue: { open: true,  from: "09:00", to: "18:00" },
+  vie: { open: true,  from: "09:00", to: "18:00" },
+  sab: { open: true,  from: "09:00", to: "14:00" },
   dom: { open: false, from: "10:00", to: "14:00" },
 };
 
 export default function NegocioPage() {
-  const [schedule, setSchedule] = useState(defaultSchedule);
-  const [form, setForm] = useState({ name: "Aesthetic Studio", phone: "+54 9 11 2233-4455", address: "Av. Santa Fe 1234, CABA", instagram: "@aesthetic.studio", website: "aesthetic.studio" });
+  const { data: business }  = useGetBusiness();
+  const { data: hoursData } = useGetHours();
+  const updateBusiness      = useUpdateBusiness();
+  const updateHours         = useUpdateHours();
 
-  function toggleDay(day: string) {
-    setSchedule((p) => ({ ...p, [day]: { ...p[day], open: !p[day].open } }));
+  const [schedule, setSchedule] = useState(defaultSchedule);
+  const [form, setForm] = useState({
+    name: "", phone: "", address: "", instagram: "", website: "",
+  });
+
+  // Inicializar form con datos del backend
+  useEffect(() => {
+    if (!business) return;
+    setForm({
+      name:      business.name       ?? "",
+      phone:     business.phone      ?? "",
+      address:   business.address    ?? "",
+      instagram: business.instagram  ?? "",
+      website:   business.website    ?? "",
+    });
+  }, [business]);
+
+  // Inicializar horarios con datos del backend
+  useEffect(() => {
+    if (!hoursData) return;
+    const next = { ...defaultSchedule };
+    for (const h of hoursData) {
+      const day = DAYS.find((d) => d.dayOfWeek === h.dayOfWeek);
+      if (day) next[day.key] = { open: h.open, from: h.fromTime, to: h.toTime };
+    }
+    setSchedule(next);
+  }, [hoursData]);
+
+  function toggleDay(key: string) {
+    setSchedule((p) => ({ ...p, [key]: { ...p[key], open: !p[key].open } }));
   }
+
+  function handleSave() {
+    updateBusiness.mutate({
+      name:      form.name      || undefined,
+      phone:     form.phone     || undefined,
+      address:   form.address   || undefined,
+      instagram: form.instagram || undefined,
+      website:   form.website   || undefined,
+    });
+    updateHours.mutate(
+      DAYS.map(({ key, dayOfWeek }) => ({
+        dayOfWeek,
+        open:     schedule[key].open,
+        fromTime: schedule[key].from,
+        toTime:   schedule[key].to,
+      }))
+    );
+  }
+
+  const isSaving = updateBusiness.isPending || updateHours.isPending;
 
   const botSample = `Hola! Soy el asistente de ${form.name || "tu estudio"} 🌿\nPara reservar escribí TURNO, o indicame:\n• Tu nombre\n• El servicio que buscás\n• Día y horario preferido\n\nHorario: Lun–Vie 9–18 · Sáb 9–14`;
 
@@ -35,7 +92,14 @@ export default function NegocioPage() {
       title="Mi negocio"
       subtitle="Información y configuración del estudio"
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }}>Guardar cambios</button>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
+          style={{ background: "var(--color-ink)" }}
+        >
+          {isSaving ? "Guardando…" : "Guardar cambios"}
+        </button>
       }
     >
       <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
@@ -57,7 +121,12 @@ export default function NegocioPage() {
               ].map((f) => (
                 <div key={f.key}>
                   <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">{f.label}</label>
-                  <input className="input" placeholder={f.placeholder} value={form[f.key as keyof typeof form]} onChange={(e) => setForm({ ...form, [f.key]: e.target.value })} />
+                  <input
+                    className="input"
+                    placeholder={f.placeholder}
+                    value={form[f.key as keyof typeof form]}
+                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                  />
                 </div>
               ))}
             </div>
@@ -77,9 +146,9 @@ export default function NegocioPage() {
                     </label>
                     {s.open ? (
                       <div className="flex items-center gap-2 flex-1">
-                        <input className="input" type="time" value={s.from} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], from: e.target.value } }))} style={{ width: 110 }} />
+                        <input className="input" type="time" value={s.from} style={{ width: "6.875rem" }} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], from: e.target.value } }))} />
                         <span className="text-xs text-ink-3">a</span>
-                        <input className="input" type="time" value={s.to} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], to: e.target.value } }))} style={{ width: 110 }} />
+                        <input className="input" type="time" value={s.to}   style={{ width: "6.875rem" }} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], to: e.target.value } }))} />
                       </div>
                     ) : <span className="text-xs text-ink-3">Cerrado</span>}
                   </div>

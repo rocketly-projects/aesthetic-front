@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, DM_Sans, Geist_Mono } from "next/font/google";
+import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${dmSans.variable} ${geistMono.variable}`}
       style={{ height: "100%" }}
     >
-      <body style={{ height: "100%", margin: 0 }}>{children}</body>
+      <body style={{ height: "100%", margin: 0 }}>
+          <QueryProvider>{children}</QueryProvider>
+        </body>
     </html>
   );
 }
