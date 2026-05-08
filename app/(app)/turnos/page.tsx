@@ -4,8 +4,9 @@ import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import { statusChip } from "@/components/Chip";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
-import { useGetAppointments } from "@/hooks/useAppointments";
-import type { AppointmentStatus } from "@/lib/api/appointments";
+import EditTurnoModal from "@/components/EditTurnoModal";
+import { useGetAppointments, useUpdateAppointment } from "@/hooks/useAppointments";
+import type { Appointment, AppointmentStatus } from "@/lib/api/appointments";
 
 type Filter = "todos" | AppointmentStatus;
 
@@ -21,13 +22,28 @@ function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+const QUICK_STATUSES: { status: AppointmentStatus; label: string }[] = [
+  { status: "confirmed", label: "Confirmar"   },
+  { status: "completed", label: "Completar"   },
+  { status: "cancelled", label: "Cancelar"    },
+  { status: "no_show",   label: "No asistió"  },
+];
+
 export default function TurnosPage() {
   const [filter, setFilter]       = useState<Filter>("todos");
   const [modalOpen, setModalOpen] = useState(false);
+  const [editAppt,  setEditAppt]  = useState<Appointment | null>(null);
+  const [menuId,    setMenuId]    = useState<string | null>(null);
 
   const { data: apptData, isLoading } = useGetAppointments({ limit: 100 });
   const allAppts = apptData?.appointments ?? [];
   const visible  = filter === "todos" ? allAppts : allAppts.filter((a) => a.status === filter);
+  const updateAppt = useUpdateAppointment();
+
+  function handleQuickStatus(appt: Appointment, status: AppointmentStatus) {
+    setMenuId(null);
+    updateAppt.mutate({ id: appt.id, status });
+  }
 
   function count(f: Filter) {
     return f === "todos" ? allAppts.length : allAppts.filter((a) => a.status === f).length;
@@ -82,9 +98,32 @@ export default function TurnosPage() {
                   <td><span className="font-mono text-[12px] font-semibold">${appt.price.toLocaleString("es-AR")}</span></td>
                   <td>{statusChip(appt.status)}</td>
                   <td>
-                    <div className="flex gap-1">
-                      <button className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors">✎</button>
-                      <button className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors">⋯</button>
+                    <div className="flex gap-1 relative">
+                      <button
+                        onClick={() => setEditAppt(appt)}
+                        className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        onClick={() => setMenuId(menuId === appt.id ? null : appt.id)}
+                        className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                      >
+                        ⋯
+                      </button>
+                      {menuId === appt.id && (
+                        <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-line rounded-lg shadow-lg overflow-hidden min-w-[130px]">
+                          {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
+                            <button
+                              key={q.status}
+                              onClick={() => handleQuickStatus(appt, q.status)}
+                              className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border-none bg-transparent cursor-pointer transition-colors"
+                            >
+                              {q.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -95,6 +134,13 @@ export default function TurnosPage() {
       </div>
 
       <NuevoTurnoModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {editAppt && (
+        <EditTurnoModal
+          open={!!editAppt}
+          onClose={() => setEditAppt(null)}
+          appointment={editAppt}
+        />
+      )}
     </AppShell>
   );
 }

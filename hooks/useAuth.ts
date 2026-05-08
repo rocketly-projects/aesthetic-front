@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { login, register, clearToken } from "@/lib/api/auth";
-import type { LoginParams, RegisterParams } from "@/lib/api/auth";
+import { login, register, clearToken, googleAuth } from "@/lib/api/auth";
+import type { LoginParams, RegisterParams, GoogleAuthParams } from "@/lib/api/auth";
 
 export function useLogin() {
   const router = useRouter();
@@ -23,6 +23,18 @@ export function useRegister() {
     mutationFn: (params: RegisterParams) => register(params),
     onSuccess: () => {
       router.push("/dashboard");
+    },
+  });
+}
+
+export function useGoogleAuth() {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: (params: GoogleAuthParams) => googleAuth(params),
+    onSuccess: (data) => {
+      if (!("needsOnboarding" in data)) {
+        router.push("/dashboard");
+      }
     },
   });
 }

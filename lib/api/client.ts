@@ -43,6 +43,13 @@ export async function apiFetch<T>(
       // body vacío o no-JSON, usamos statusText
     }
 
+    if (res.status === 401) {
+      Cookies.remove("token");
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+    }
+
     throw new ApiError(res.status, message, details);
   }
 

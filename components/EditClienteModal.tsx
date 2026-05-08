@@ -1,0 +1,121 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Modal from "./Modal";
+import { useUpdateClient } from "@/hooks/useClients";
+import type { Client } from "@/lib/api/clients";
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  client: Client;
+}
+
+export default function EditClienteModal({ open, onClose, client }: Props) {
+  const [form, setForm] = useState({
+    name:  client.name,
+    phone: client.phone,
+    email: client.email ?? "",
+    notes: client.notes ?? "",
+  });
+
+  useEffect(() => {
+    if (open) {
+      setForm({
+        name:  client.name,
+        phone: client.phone,
+        email: client.email ?? "",
+        notes: client.notes ?? "",
+      });
+    }
+  }, [open, client]);
+
+  const updateClient = useUpdateClient();
+
+  function handleClose() {
+    updateClient.reset();
+    onClose();
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    updateClient.mutate(
+      {
+        id:    client.id,
+        name:  form.name,
+        phone: form.phone,
+        email: form.email || undefined,
+        notes: form.notes || undefined,
+      },
+      { onSuccess: handleClose }
+    );
+  }
+
+  return (
+    <Modal open={open} onClose={handleClose} title="Editar cliente">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div>
+          <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Nombre</label>
+          <input
+            className="input"
+            placeholder="Ana García"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Teléfono</label>
+          <input
+            className="input"
+            type="tel"
+            placeholder="+54 9 11 0000-0000"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Email</label>
+          <input
+            className="input"
+            type="email"
+            placeholder="ana@email.com"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Notas privadas</label>
+          <textarea
+            className="input resize-y"
+            rows={3}
+            placeholder="Preferencias, alergias…"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          />
+        </div>
+        {updateClient.error && (
+          <p className="text-[12px] m-0 text-err">{(updateClient.error as Error).message}</p>
+        )}
+        <div className="flex gap-3 justify-end mt-1">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="border border-line bg-transparent text-ink rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer hover:bg-bg transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={updateClient.isPending}
+            className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
+            style={{ background: "var(--color-accent)" }}
+          >
+            {updateClient.isPending ? "Guardando…" : "Guardar cambios"}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}

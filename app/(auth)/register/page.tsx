@@ -1,20 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useLogin, useGoogleAuth } from "@/hooks/useAuth";
+import { useRegister, useGoogleAuth } from "@/hooks/useAuth";
 import { ApiError } from "@/lib/api/client";
 import CompleteGoogleRegisterModal from "@/components/CompleteGoogleRegisterModal";
 
-export default function LoginPage() {
-  const { mutate: login, isPending, error } = useLogin();
+export default function RegisterPage() {
+  const { mutate: register, isPending, error } = useRegister();
   const googleAuth = useGoogleAuth();
 
-  const [email,             setEmail]             = useState("");
-  const [password,          setPassword]          = useState("");
-  const [remember,          setRemember]          = useState(false);
-  const [googleCredential,  setGoogleCredential]  = useState<string | null>(null);
+  const [form,            setForm]            = useState({ name: "", businessName: "", email: "", password: "" });
+  const [googleCredential, setGoogleCredential] = useState<string | null>(null);
 
-  const errorMsg = error instanceof ApiError ? error.message : error ? "Error al iniciar sesión" : null;
+  const errorMsg       = error instanceof ApiError ? error.message : error ? "Error al crear la cuenta" : null;
   const googleErrorMsg = googleAuth.error instanceof ApiError ? googleAuth.error.message : googleAuth.error ? "Error con Google" : null;
   const needsOnboarding = googleAuth.data && "needsOnboarding" in googleAuth.data;
 
@@ -32,14 +30,18 @@ export default function LoginPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    login({ email, password });
+    register(form);
+  }
+
+  function set(key: keyof typeof form) {
+    return (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [key]: e.target.value });
   }
 
   return (
     <>
     <div className="grid grid-cols-[1fr_1.1fr] h-screen font-sans">
 
-      {/* ── Left panel — form ── */}
+      {/* Left panel */}
       <div className="flex flex-col bg-bg px-14 py-10">
 
         {/* Brand */}
@@ -52,61 +54,64 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* Form — vertically centered */}
+        {/* Form */}
         <div className="flex-1 flex flex-col justify-center w-full max-w-[380px] mx-auto">
           <h1 className="font-display text-[36px] leading-[1.05] tracking-[-0.03em] m-0 mb-2 font-normal text-ink">
-            Bienvenid@<br />de <em className="italic text-accent font-normal">vuelta</em>.
+            Creá tu<br />cuenta <em className="italic text-accent font-normal">gratis</em>.
           </h1>
           <p className="text-sm text-ink-3 mt-0 mb-7">
-            Entrá a tu agenda y empezá el día con todo en orden.
+            14 días de prueba. Sin tarjeta de crédito.
           </p>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3.5">
-              <label className="block text-[12.5px] font-medium text-ink-2 mb-1.5">
-                Email
-              </label>
+              <label className="block text-[12.5px] font-medium text-ink-2 mb-1.5">Tu nombre</label>
+              <input
+                className="input"
+                placeholder="Marina García"
+                value={form.name}
+                onChange={set("name")}
+                required
+                autoComplete="name"
+              />
+            </div>
+
+            <div className="mb-3.5">
+              <label className="block text-[12.5px] font-medium text-ink-2 mb-1.5">Nombre del negocio</label>
+              <input
+                className="input"
+                placeholder="Aesthetic Studio"
+                value={form.businessName}
+                onChange={set("businessName")}
+                required
+              />
+            </div>
+
+            <div className="mb-3.5">
+              <label className="block text-[12.5px] font-medium text-ink-2 mb-1.5">Email</label>
               <input
                 className="input"
                 type="email"
                 placeholder="marina@aesthetic.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={form.email}
+                onChange={set("email")}
                 required
                 autoComplete="email"
               />
             </div>
 
-            <div className="mb-3.5">
-              <label className="block text-[12.5px] font-medium text-ink-2 mb-1.5">
-                Contraseña
-              </label>
+            <div className="mb-[22px]">
+              <label className="block text-[12.5px] font-medium text-ink-2 mb-1.5">Contraseña</label>
               <input
                 className="input"
                 type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 8 caracteres"
+                value={form.password}
+                onChange={set("password")}
                 required
-                autoComplete="current-password"
+                minLength={8}
+                autoComplete="new-password"
               />
-            </div>
-
-            {/* Checkbox + forgot password */}
-            <div className="flex items-center justify-between mt-1 mb-[22px] text-[12.5px]">
-              <label className="inline-flex items-center gap-2 cursor-pointer text-ink-2">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="w-3.5 h-3.5"
-                  style={{ accentColor: "var(--color-accent)" }}
-                />
-                Mantener sesión
-              </label>
-              <a href="#" className="text-accent-ink no-underline hover:underline">
-                Olvidé mi contraseña
-              </a>
             </div>
 
             {errorMsg && (
@@ -118,7 +123,7 @@ export default function LoginPage() {
               disabled={isPending}
               className="w-full h-11 bg-ink text-bg border-0 rounded-md text-[14px] font-medium cursor-pointer tracking-[-0.005em] transition-colors hover:bg-[#1a1815] disabled:opacity-60"
             >
-              {isPending ? "Ingresando…" : "Entrar a aesthetic"}
+              {isPending ? "Creando cuenta…" : "Crear cuenta gratis"}
             </button>
           </form>
 
@@ -149,11 +154,10 @@ export default function LoginPage() {
             {googleAuth.isPending ? "Verificando…" : "Continuar con Google"}
           </button>
 
-          {/* Switch */}
           <div className="text-center text-[13px] text-ink-3 mt-7">
-            ¿Es tu primera vez?{" "}
-            <a href="/register" className="text-accent-ink font-medium no-underline hover:underline">
-              Crear cuenta
+            ¿Ya tenés cuenta?{" "}
+            <a href="/login" className="text-accent-ink font-medium no-underline hover:underline">
+              Iniciar sesión
             </a>
           </div>
         </div>
@@ -165,48 +169,32 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right panel — testimonial ── */}
-      <div className="relative overflow-hidden flex flex-col p-10 bg-[linear-gradient(160deg,var(--color-accent-pale)_0%,var(--color-bg-2)_60%,var(--color-accent-soft)_100%)]">
-
-        {/* Decorative circles */}
+      {/* Right panel */}
+      <div className="relative overflow-hidden flex flex-col justify-center p-10 bg-[linear-gradient(160deg,var(--color-accent-pale)_0%,var(--color-bg-2)_60%,var(--color-accent-soft)_100%)]">
         <div className="absolute -top-[120px] -right-[120px] w-[380px] h-[380px] rounded-full border border-accent opacity-[0.12] pointer-events-none" />
         <div className="absolute -bottom-[80px] -left-[80px] w-[240px] h-[240px] rounded-full bg-accent opacity-[0.06] pointer-events-none" />
 
-        {/* Top label */}
-        <div className="flex justify-end relative">
-          <span className="font-mono text-[11px] text-ink-3 uppercase tracking-[0.08em]">
-            testimonios · 4.9 ★
-          </span>
-        </div>
-
-        {/* Quote block */}
-        <div className="relative max-w-[460px] m-auto mb-10">
-          <div className="font-display text-[80px] leading-none text-accent opacity-40 -mb-4">
-            "
-          </div>
-          <blockquote className="font-display text-[28px] leading-[1.25] tracking-[-0.02em] text-ink font-normal m-0">
-            Antes anotaba los turnos en un cuaderno. Ahora{" "}
-            <em className="italic text-accent-ink">aesthetic</em>
-            {" "}me responde los whatsapps mientras corto. Ganamos tres horas por día.
+        <div className="relative max-w-[460px] mx-auto">
+          <div className="font-display text-[80px] leading-none text-accent opacity-40 -mb-4">"</div>
+          <blockquote className="font-display text-[26px] leading-[1.3] tracking-[-0.02em] text-ink font-normal m-0">
+            En dos semanas ya no atendía el teléfono yo. El bot tomaba los turnos solo, yo solo aparecía a trabajar.
           </blockquote>
 
-          {/* Author */}
           <div className="flex items-center gap-3 mt-6">
             <div className="grid place-items-center w-9 h-9 rounded-full bg-ink text-bg font-medium text-[13px] shrink-0">
-              PG
+              LM
             </div>
             <div className="text-[13px] text-ink">
-              Paula G.
-              <span className="block text-ink-3 text-[11.5px]">Estudio Paula · Palermo</span>
+              Laura M.
+              <span className="block text-ink-3 text-[11.5px]">Studio Laura · Villa Urquiza</span>
             </div>
           </div>
 
-          {/* Badges */}
-          <div className="flex gap-2 flex-wrap mt-6">
+          <div className="flex gap-2 flex-wrap mt-8">
             {[
-              { label: "+200 peluquerías", dot: true },
+              { label: "14 días gratis", dot: true },
               { label: "Sin tarjeta", dot: false },
-              { label: "14 días gratis", dot: false },
+              { label: "Cancelá cuando quieras", dot: false },
             ].map(({ label, dot }) => (
               <span
                 key={label}

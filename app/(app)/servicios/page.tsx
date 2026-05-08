@@ -4,11 +4,14 @@ import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import KPI from "@/components/KPI";
 import NuevoServicioModal from "@/components/NuevoServicioModal";
+import EditServicioModal from "@/components/EditServicioModal";
 import { useGetServices } from "@/hooks/useServices";
+import type { Service } from "@/lib/api/services";
 
 export default function ServiciosPage() {
-  const [hoverAdd,  setHoverAdd]  = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [hoverAdd,    setHoverAdd]    = useState(false);
+  const [modalOpen,   setModalOpen]   = useState(false);
+  const [editService, setEditService] = useState<Service | null>(null);
 
   const { data: services = [], isLoading } = useGetServices();
   const visible    = services.filter((s) => s.visible);
@@ -58,7 +61,12 @@ export default function ServiciosPage() {
                   <span className={`text-[11px] font-medium ${s.visible ? "text-ok" : "text-ink-3"}`}>
                     {s.visible ? "● Visible" : "○ Oculto"}
                   </span>
-                  <button className="bg-transparent border-none cursor-pointer text-[12px] text-ink-2 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 transition-colors">Editar</button>
+                  <button
+                    onClick={() => setEditService(s)}
+                    className="bg-transparent border-none cursor-pointer text-[12px] text-ink-2 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 transition-colors"
+                  >
+                    Editar
+                  </button>
                 </div>
               </div>
             </div>
@@ -77,6 +85,13 @@ export default function ServiciosPage() {
         </div>
       )}
       <NuevoServicioModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {editService && (
+        <EditServicioModal
+          open={!!editService}
+          onClose={() => setEditService(null)}
+          service={editService}
+        />
+      )}
     </AppShell>
   );
 }

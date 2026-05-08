@@ -10,6 +10,7 @@ export interface Business {
   instagram: string | null;
   website: string | null;
   logoUrl: string | null;
+  whatsappPhone: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,6 +31,7 @@ export interface UpdateBusinessParams {
   instagram?: string;
   website?: string;
   logoUrl?: string;
+  whatsappPhone?: string | null;
 }
 
 export interface UpdateHoursParam {

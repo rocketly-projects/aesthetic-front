@@ -34,18 +34,25 @@ export default function NegocioPage() {
 
   const [schedule, setSchedule] = useState(defaultSchedule);
   const [form, setForm] = useState({
-    name: "", phone: "", address: "", instagram: "", website: "",
+    name: "", phone: "", address: "", instagram: "", website: "", whatsappPhone: "",
   });
+  const [whatsappPhoneError, setWhatsappPhoneError] = useState("");
+
+  function validateWhatsappPhone(value: string): string {
+    if (!value) return "";
+    return /^\+\d{7,15}$/.test(value) ? "" : "Formato inválido. Usá el formato internacional: +54911234567";
+  }
 
   // Inicializar form con datos del backend
   useEffect(() => {
     if (!business) return;
     setForm({
-      name:      business.name       ?? "",
-      phone:     business.phone      ?? "",
-      address:   business.address    ?? "",
-      instagram: business.instagram  ?? "",
-      website:   business.website    ?? "",
+      name:          business.name          ?? "",
+      phone:         business.phone         ?? "",
+      address:       business.address       ?? "",
+      instagram:     business.instagram     ?? "",
+      website:       business.website       ?? "",
+      whatsappPhone: business.whatsappPhone ?? "",
     });
   }, [business]);
 
@@ -65,12 +72,18 @@ export default function NegocioPage() {
   }
 
   function handleSave() {
+    const wpError = validateWhatsappPhone(form.whatsappPhone);
+    if (wpError) {
+      setWhatsappPhoneError(wpError);
+      return;
+    }
     updateBusiness.mutate({
-      name:      form.name      || undefined,
-      phone:     form.phone     || undefined,
-      address:   form.address   || undefined,
-      instagram: form.instagram || undefined,
-      website:   form.website   || undefined,
+      name:          form.name          || undefined,
+      phone:         form.phone         || undefined,
+      address:       form.address       || undefined,
+      instagram:     form.instagram     || undefined,
+      website:       form.website       || undefined,
+      whatsappPhone: form.whatsappPhone || null,
     });
     updateHours.mutate(
       DAYS.map(({ key, dayOfWeek }) => ({
@@ -129,6 +142,29 @@ export default function NegocioPage() {
                   />
                 </div>
               ))}
+
+              <div>
+                <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">
+                  Número de WhatsApp del bot
+                </label>
+                <input
+                  className={`input${whatsappPhoneError ? " border-err" : ""}`}
+                  placeholder="+54911234567"
+                  value={form.whatsappPhone}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setForm({ ...form, whatsappPhone: v });
+                    setWhatsappPhoneError(validateWhatsappPhone(v));
+                  }}
+                />
+                {whatsappPhoneError ? (
+                  <p className="text-[11.5px] text-err mt-1">{whatsappPhoneError}</p>
+                ) : (
+                  <p className="text-[11.5px] text-ink-3 mt-1">
+                    Este es el número que usará el bot para comunicarse con tus clientes.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 

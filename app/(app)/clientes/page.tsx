@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import { statusChip } from "@/components/Chip";
 import NuevoClienteModal from "@/components/NuevoClienteModal";
+import EditClienteModal from "@/components/EditClienteModal";
 import { useGetClients, useGetClient } from "@/hooks/useClients";
 import { useGetAppointments } from "@/hooks/useAppointments";
 
@@ -16,9 +17,10 @@ function initials(name: string) {
 }
 
 export default function ClientesPage() {
-  const [search,    setSearch]    = useState("");
-  const [activeId,  setActiveId]  = useState<string>("");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [search,     setSearch]     = useState("");
+  const [activeId,   setActiveId]   = useState<string>("");
+  const [modalOpen,  setModalOpen]  = useState(false);
+  const [editOpen,   setEditOpen]   = useState(false);
 
   const { data: clientData, isLoading } = useGetClients({ limit: 100 });
   const allClients = clientData?.clients ?? [];
@@ -107,7 +109,12 @@ export default function ClientesPage() {
                     {active.email && <span className="font-mono text-xs text-ink-3">{active.email}</span>}
                   </div>
                 </div>
-                <button className="border border-line bg-transparent text-ink text-xs rounded-lg px-3 py-1.5 cursor-pointer hover:bg-bg transition-colors">Editar</button>
+                <button
+                  onClick={() => setEditOpen(true)}
+                  className="border border-line bg-transparent text-ink text-xs rounded-lg px-3 py-1.5 cursor-pointer hover:bg-bg transition-colors"
+                >
+                  Editar
+                </button>
               </div>
               <div className="grid grid-cols-4 gap-3 mt-5 pt-5 border-t border-line">
                 {[
@@ -160,6 +167,13 @@ export default function ClientesPage() {
         )}
       </div>
       <NuevoClienteModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {active && (
+        <EditClienteModal
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          client={active}
+        />
+      )}
     </AppShell>
   );
 }
