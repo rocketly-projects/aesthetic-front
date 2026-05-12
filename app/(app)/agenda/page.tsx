@@ -95,7 +95,7 @@ function DayColumn({ date, appts, isToday }: { date: Date; appts: Appointment[];
             padding:    "3px 6px",
           }}
         >
-          <div className="text-[11px] font-semibold text-ink leading-tight">{appt.serviceName}</div>
+          <div className="text-[11px] font-semibold text-ink leading-tight">{appt.clientName ?? "Sin cliente"}</div>
           {apptHeight(appt.duration) > 30 && (
             <div className="text-[10px] text-ink-3 mt-px">{appt.time} · {appt.serviceName}</div>
           )}
@@ -321,7 +321,7 @@ export default function AgendaPage() {
                             color:       "var(--color-ink)",
                           }}
                         >
-                          {appt.time} {appt.serviceName}
+                          {appt.time} {appt.clientName ?? appt.serviceName}
                         </div>
                       ))}
                       {overflow > 0 && (

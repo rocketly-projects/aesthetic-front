@@ -130,8 +130,8 @@ export default function DashboardPage() {
                 <div className={`tl-card ${appt.status}`}>
                   <div className="stripe" />
                   <div>
-                    <div className="who">{appt.serviceName}</div>
-                    <div className="svc">{appt.clientId}</div>
+                    <div className="who">{appt.clientName ?? "Sin cliente"}</div>
+                    <div className="svc">{appt.serviceName}</div>
                   </div>
                   <div className="right">
                     {appt.status === "confirmed" && <Chip variant="ok"   label="Confirmado" />}

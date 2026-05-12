@@ -7,9 +7,10 @@ export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancell
 export interface Appointment {
   id: string;
   businessId: string;
-  clientId: string;
+  clientId: string | null;
   serviceId: string | null;
   serviceName: string;
+  clientName: string | null;
   duration: number;  // minutos — snapshot
   price: number;     // ARS — snapshot
   date: string;      // YYYY-MM-DD
@@ -40,6 +41,7 @@ export interface AgendaSlot {
   duration: number;
   status: AppointmentStatus;
   serviceName: string;
+  clientName: string | null;
 }
 
 export interface AgendaResponse {
