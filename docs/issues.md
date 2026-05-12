@@ -78,7 +78,7 @@ Frontend completo con Google Identity Services (sin dependencias extra). Flujo:
 
 ---
 
-### [F-07] Config — preferencias no se guardan
+### [F-07] ~~Config — preferencias no se guardan~~ ✅
 **Archivo:** `app/(app)/config/page.tsx:39`
 
 El botón "Guardar" no tiene `onClick`. Paleta de color, tipografía, densidad y notificaciones son estado local que se pierde al navegar. No hay endpoint ni hook para persistir preferencias.
@@ -87,7 +87,7 @@ El botón "Guardar" no tiene `onClick`. Paleta de color, tipografía, densidad y
 
 ---
 
-### [F-08] Logo del negocio — upload no implementado
+### [F-08] ~~Logo del negocio — upload no implementado~~ ✅
 **Archivo:** `app/(app)/negocio/page.tsx:109-113`
 
 El área de "Subir logo" es un `div` estático sin `<input type="file">` ni lógica de upload.
@@ -290,11 +290,11 @@ En varios lugares se usa `style={{ background: "var(--color-ok)" }}` en lugar de
 | Categoria   | Cantidad |
 |-------------|----------|
 | Criticos    | 3        |
-| Funcionalidad rota | 9  |
+| Funcionalidad rota | 7  |
 | Datos hardcodeados | 7  |
 | UX / Experiencia   | 8  |
 | Tecnico / Deuda    | 5  |
-| **Total**   | **32**   |
+| **Total**   | **30**   |
 
 ### Prioridad sugerida de implementación
 
