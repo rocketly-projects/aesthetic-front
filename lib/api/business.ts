@@ -5,12 +5,15 @@ import { apiFetch } from "./client";
 export interface Business {
   id: string;
   name: string;
+  slug: string;
   phone: string | null;
   address: string | null;
   instagram: string | null;
   website: string | null;
   logoUrl: string | null;
   whatsappPhone: string | null;
+  depositRequired: boolean;
+  depositPercent: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +35,8 @@ export interface UpdateBusinessParams {
   website?: string;
   logoUrl?: string;
   whatsappPhone?: string | null;
+  depositRequired?: boolean;
+  depositPercent?: number;
 }
 
 export interface UpdateHoursParam {

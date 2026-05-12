@@ -37,6 +37,9 @@ export default function NegocioPage() {
     name: "", phone: "", address: "", instagram: "", website: "", whatsappPhone: "",
   });
   const [whatsappPhoneError, setWhatsappPhoneError] = useState("");
+  const [depositRequired, setDepositRequired] = useState(false);
+  const [depositPercent, setDepositPercent] = useState(30);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   function validateWhatsappPhone(value: string): string {
     if (!value) return "";
@@ -54,6 +57,8 @@ export default function NegocioPage() {
       website:       business.website       ?? "",
       whatsappPhone: business.whatsappPhone ?? "",
     });
+    setDepositRequired(business.depositRequired ?? false);
+    setDepositPercent(business.depositPercent ?? 30);
   }, [business]);
 
   // Inicializar horarios con datos del backend
@@ -78,12 +83,14 @@ export default function NegocioPage() {
       return;
     }
     updateBusiness.mutate({
-      name:          form.name          || undefined,
-      phone:         form.phone         || undefined,
-      address:       form.address       || undefined,
-      instagram:     form.instagram     || undefined,
-      website:       form.website       || undefined,
-      whatsappPhone: form.whatsappPhone || null,
+      name:           form.name          || undefined,
+      phone:          form.phone         || undefined,
+      address:        form.address       || undefined,
+      instagram:      form.instagram     || undefined,
+      website:        form.website       || undefined,
+      whatsappPhone:  form.whatsappPhone || null,
+      depositRequired,
+      depositPercent: depositRequired ? depositPercent : 0,
     });
     updateHours.mutate(
       DAYS.map(({ key, dayOfWeek }) => ({
@@ -195,6 +202,64 @@ export default function NegocioPage() {
         </div>
 
         <div className="flex flex-col gap-5">
+          {/* Reservas online */}
+          <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
+            <div className="font-semibold text-sm text-ink mb-4">Reservas online</div>
+            {business?.slug ? (
+              <div className="mb-4">
+                <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Tu link de reservas</label>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 input text-xs text-ink-3 select-all truncate" style={{ userSelect: "all" }}>
+                    {typeof window !== "undefined" ? window.location.origin : ""}/{business.slug}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const url = `${window.location.origin}/${business.slug}`;
+                      navigator.clipboard.writeText(url);
+                      setUrlCopied(true);
+                      setTimeout(() => setUrlCopied(false), 2000);
+                    }}
+                    className="shrink-0 text-[11.5px] font-medium px-3 py-2 rounded-md border border-line hover:border-accent hover:text-accent transition-colors text-ink-2"
+                  >
+                    {urlCopied ? "¡Copiado!" : "Copiar"}
+                  </button>
+                </div>
+                <p className="text-[11.5px] text-ink-3 mt-1.5">Compartí este link con tus clientes para que reserven online.</p>
+              </div>
+            ) : null}
+            <div className="border-t border-line pt-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <div className="text-[13px] font-medium text-ink">Requerir seña</div>
+                  <div className="text-xs text-ink-3 mt-0.5">El cliente deberá abonar una seña para confirmar el turno</div>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" checked={depositRequired} onChange={(e) => setDepositRequired(e.target.checked)} />
+                  <span className="toggle-track" /><span className="toggle-thumb" />
+                </label>
+              </div>
+              {depositRequired && (
+                <div>
+                  <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Porcentaje de seña</label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min={5}
+                      max={100}
+                      step={5}
+                      value={depositPercent}
+                      onChange={(e) => setDepositPercent(Number(e.target.value))}
+                      className="flex-1"
+                      style={{ accentColor: "var(--color-accent)" }}
+                    />
+                    <span className="text-sm font-semibold text-ink w-10 text-right">{depositPercent}%</span>
+                  </div>
+                  <p className="text-[11.5px] text-ink-3 mt-1">Por ej. para un servicio de $5.000 la seña sería ${Math.round(5000 * depositPercent / 100).toLocaleString("es-AR")}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-4">Vista previa del bot</div>
             <div className="bg-bg rounded-md p-4 border border-line">
