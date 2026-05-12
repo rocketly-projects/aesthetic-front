@@ -22,18 +22,18 @@ export function useRegister() {
   return useMutation({
     mutationFn: (params: RegisterParams) => register(params),
     onSuccess: () => {
-      router.push("/dashboard");
+      router.push("/planes");
     },
   });
 }
 
-export function useGoogleAuth() {
+export function useGoogleAuth(redirectTo = "/dashboard") {
   const router = useRouter();
   return useMutation({
     mutationFn: (params: GoogleAuthParams) => googleAuth(params),
     onSuccess: (data) => {
       if (!("needsOnboarding" in data)) {
-        router.push("/dashboard");
+        router.push(redirectTo);
       }
     },
   });

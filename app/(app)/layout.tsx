@@ -1,3 +1,5 @@
+import PlanGate from "@/components/PlanGate";
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <PlanGate>{children}</PlanGate>;
 }

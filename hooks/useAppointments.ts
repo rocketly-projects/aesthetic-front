@@ -53,8 +53,7 @@ export function useUpdateAppointment() {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
       qc.invalidateQueries({ queryKey: appointmentKeys.detail(id) });
       qc.invalidateQueries({ queryKey: appointmentKeys.agenda(data.date) });
-      // Si el turno se completó, el backend actualiza stats del cliente — invalidar
-      if (data.status === "completed") {
+      if (data.status === "completed" && data.clientId) {
         qc.invalidateQueries({ queryKey: clientKeys.detail(data.clientId) });
         qc.invalidateQueries({ queryKey: clientKeys.all });
       }

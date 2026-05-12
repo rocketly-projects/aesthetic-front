@@ -1,0 +1,1 @@
+- MERCADO PAGO: Lo que falta para producción: configurar la URL del webhook en el dashboard de Mercado Pago apuntando a https://aesthetic-back.aesthetic-rocketly.workers.dev/billing/webhook.

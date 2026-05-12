@@ -12,7 +12,7 @@ interface Props {
 
 export default function CompleteGoogleRegisterModal({ credential, onClose }: Props) {
   const [businessName, setBusinessName] = useState("");
-  const googleAuth = useGoogleAuth();
+  const googleAuth = useGoogleAuth("/planes");
 
   const errorMsg = googleAuth.error instanceof ApiError
     ? googleAuth.error.message

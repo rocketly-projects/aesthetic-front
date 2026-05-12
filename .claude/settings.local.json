@@ -11,7 +11,8 @@
       "Bash(python3 -c \"\nimport tarfile, os\nsrc = r'C:/Users/USER/.claude/projects/C--workspacePersonal-aesthetic-front/deba0c20-0748-42db-9395-79a9e64a9c82/tool-results/webfetch-1778002712556-31pk69.bin'\ndst = '/tmp/design_files'\nos.makedirs\\(dst, exist_ok=True\\)\nwith tarfile.open\\(src, 'r:gz'\\) as t:\n    t.extractall\\(dst\\)\nprint\\(os.listdir\\(dst\\)\\)\n\")",
       "Bash(node -e \"\nconst fs = require\\('fs'\\);\nconst zlib = require\\('zlib'\\);\nconst path = require\\('path'\\);\n\nconst src = 'C:/Users/USER/.claude/projects/C--workspacePersonal-aesthetic-front/deba0c20-0748-42db-9395-79a9e64a9c82/tool-results/webfetch-1778002712556-31pk69.bin';\nconst data = fs.readFileSync\\(src\\);\nconst decompressed = zlib.gunzipSync\\(data\\);\nfs.writeFileSync\\('/tmp/design_decompressed.tar', decompressed\\);\nconsole.log\\('Decompressed size:', decompressed.length\\);\n\")",
       "Read(//c/tmp/**)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(git add:*)"
     ]
   }
 }
