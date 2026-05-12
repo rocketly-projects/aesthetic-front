@@ -41,6 +41,8 @@ export default function DashboardPage() {
   const { data, isLoading } = useGetAppointments({ date: TODAY, limit: 100 });
   const appts = data?.appointments ?? [];
 
+  console.log("appts", appts);
+
   const total     = appts.length;
   const confirmed = appts.filter((a) => a.status === "confirmed").length;
   const pending   = appts.filter((a) => a.status === "pending").length;

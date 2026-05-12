@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import { usePreferences } from "@/hooks/usePreferences";
 
 function ToggleRow({ label, description, checked, onChange }: { label: string; description?: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -25,10 +25,20 @@ const PALETTE_OPTIONS = [
   { key: "sand",  label: "Arena",   color: "#9b8e7e" },
 ];
 
+const TYPOGRAPHY_OPTIONS = [
+  { key: "inter",  label: "Inter + DM Sans (predeterminada)" },
+  { key: "geist",  label: "Geist" },
+  { key: "dmsans", label: "DM Sans" },
+];
+
 export default function ConfigPage() {
-  const [palette, setPalette] = useState("sage");
-  const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
-  const [notifs, setNotifs] = useState({ turnos: true, recordatorios: true, pagos: false, resumen: true, marketing: false });
+  const { prefs, setPrefs, save, saved } = usePreferences();
+
+  const setPalette = (palette: string) => setPrefs((p) => ({ ...p, palette }));
+  const setTypography = (typography: string) => setPrefs((p) => ({ ...p, typography }));
+  const setDensity = (density: "comfortable" | "compact") => setPrefs((p) => ({ ...p, density }));
+  const setNotif = (key: keyof typeof prefs.notifications, value: boolean) =>
+    setPrefs((p) => ({ ...p, notifications: { ...p.notifications, [key]: value } }));
 
   return (
     <AppShell
@@ -36,7 +46,13 @@ export default function ConfigPage() {
       title="Configuración"
       subtitle="Preferencias de la aplicación"
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }}>Guardar</button>
+        <button
+          onClick={save}
+          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
+          style={{ background: saved ? "var(--color-ok)" : "var(--color-ink)" }}
+        >
+          {saved ? "Guardado" : "Guardar"}
+        </button>
       }
     >
       <div className="flex flex-col gap-5 max-w-[720px]">
@@ -46,7 +62,7 @@ export default function ConfigPage() {
             <label className="block text-[11px] font-semibold text-ink-2 mb-2 uppercase tracking-wider">Paleta de color</label>
             <div className="flex gap-3">
               {PALETTE_OPTIONS.map((p) => (
-                <button key={p.key} onClick={() => setPalette(p.key)} className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all ${palette === p.key ? "bg-surface shadow-sm" : "bg-bg hover:bg-surface"}`} style={{ border: `2px solid ${palette === p.key ? p.color : "var(--color-line)"}` }}>
+                <button key={p.key} onClick={() => setPalette(p.key)} className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all ${prefs.palette === p.key ? "bg-surface shadow-sm" : "bg-bg hover:bg-surface"}`} style={{ border: `2px solid ${prefs.palette === p.key ? p.color : "var(--color-line)"}` }}>
                   <span className="w-4 h-4 rounded-full shrink-0" style={{ background: p.color }} />
                   <span className="text-xs font-medium text-ink">{p.label}</span>
                 </button>
@@ -55,24 +71,28 @@ export default function ConfigPage() {
           </div>
           <div className="mb-5">
             <label className="block text-[11px] font-semibold text-ink-2 mb-2 uppercase tracking-wider">Tipografía</label>
-            <select className="input"><option>Inter + DM Sans (predeterminada)</option><option>Geist</option><option>DM Sans</option></select>
+            <select className="input" value={prefs.typography} onChange={(e) => setTypography(e.target.value)}>
+              {TYPOGRAPHY_OPTIONS.map((t) => (
+                <option key={t.key} value={t.key}>{t.label}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-[11px] font-semibold text-ink-2 mb-2 uppercase tracking-wider">Densidad</label>
             <div className="seg">
-              <button className={`seg-item${density === "comfortable" ? " active" : ""}`} onClick={() => setDensity("comfortable")}>Cómoda</button>
-              <button className={`seg-item${density === "compact" ? " active" : ""}`} onClick={() => setDensity("compact")}>Compacta</button>
+              <button className={`seg-item${prefs.density === "comfortable" ? " active" : ""}`} onClick={() => setDensity("comfortable")}>Cómoda</button>
+              <button className={`seg-item${prefs.density === "compact" ? " active" : ""}`} onClick={() => setDensity("compact")}>Compacta</button>
             </div>
           </div>
         </div>
 
         <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
           <div className="font-semibold text-sm text-ink mb-2">Notificaciones</div>
-          <ToggleRow label="Nuevos turnos"        description="Notificación al recibir un turno nuevo"          checked={notifs.turnos}        onChange={(v) => setNotifs({ ...notifs, turnos: v })}        />
-          <ToggleRow label="Recordatorios enviados" description="Confirmación cuando se envía un recordatorio"   checked={notifs.recordatorios} onChange={(v) => setNotifs({ ...notifs, recordatorios: v })} />
-          <ToggleRow label="Pagos recibidos"       description="Alerta al registrar un pago"                    checked={notifs.pagos}         onChange={(v) => setNotifs({ ...notifs, pagos: v })}         />
-          <ToggleRow label="Resumen diario"        description="Reporte de cierre de jornada por email"         checked={notifs.resumen}       onChange={(v) => setNotifs({ ...notifs, resumen: v })}       />
-          <ToggleRow label="Emails de marketing"   description="Novedades y actualizaciones del producto"       checked={notifs.marketing}     onChange={(v) => setNotifs({ ...notifs, marketing: v })}     />
+          <ToggleRow label="Nuevos turnos"          description="Notificación al recibir un turno nuevo"        checked={prefs.notifications.turnos}        onChange={(v) => setNotif("turnos", v)}        />
+          <ToggleRow label="Recordatorios enviados" description="Confirmación cuando se envía un recordatorio"  checked={prefs.notifications.recordatorios} onChange={(v) => setNotif("recordatorios", v)} />
+          <ToggleRow label="Pagos recibidos"        description="Alerta al registrar un pago"                   checked={prefs.notifications.pagos}         onChange={(v) => setNotif("pagos", v)}         />
+          <ToggleRow label="Resumen diario"         description="Reporte de cierre de jornada por email"        checked={prefs.notifications.resumen}       onChange={(v) => setNotif("resumen", v)}       />
+          <ToggleRow label="Emails de marketing"    description="Novedades y actualizaciones del producto"      checked={prefs.notifications.marketing}     onChange={(v) => setNotif("marketing", v)}     />
         </div>
 
         <div className="rounded-lg p-5" style={{ background: "linear-gradient(135deg, #272a25 0%, #3a4535 100%)" }}>

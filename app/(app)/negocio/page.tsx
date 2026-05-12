@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AppShell from "@/components/AppShell";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours } from "@/hooks/useBusiness";
 
@@ -40,6 +40,10 @@ export default function NegocioPage() {
   const [depositRequired, setDepositRequired] = useState(false);
   const [depositPercent, setDepositPercent] = useState(30);
   const [urlCopied, setUrlCopied] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoError, setLogoError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function validateWhatsappPhone(value: string): string {
     if (!value) return "";
@@ -59,6 +63,7 @@ export default function NegocioPage() {
     });
     setDepositRequired(business.depositRequired ?? false);
     setDepositPercent(business.depositPercent ?? 30);
+    if (business.logoUrl) setLogoPreview(business.logoUrl);
   }, [business]);
 
   // Inicializar horarios con datos del backend
@@ -76,12 +81,28 @@ export default function NegocioPage() {
     setSchedule((p) => ({ ...p, [key]: { ...p[key], open: !p[key].open } }));
   }
 
-  function handleSave() {
+  async function handleSave() {
     const wpError = validateWhatsappPhone(form.whatsappPhone);
     if (wpError) {
       setWhatsappPhoneError(wpError);
       return;
     }
+
+    let logoUrl: string | undefined = undefined;
+    if (logoFile) {
+      setLogoError("");
+      const fd = new FormData();
+      fd.append("file", logoFile);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) {
+        const { error } = await res.json();
+        setLogoError(error ?? "Error al subir el logo");
+        return;
+      }
+      const data = await res.json();
+      logoUrl = data.url;
+    }
+
     updateBusiness.mutate({
       name:           form.name          || undefined,
       phone:          form.phone         || undefined,
@@ -91,6 +112,7 @@ export default function NegocioPage() {
       whatsappPhone:  form.whatsappPhone || null,
       depositRequired,
       depositPercent: depositRequired ? depositPercent : 0,
+      ...(logoUrl ? { logoUrl } : {}),
     });
     updateHours.mutate(
       DAYS.map(({ key, dayOfWeek }) => ({
@@ -126,11 +148,36 @@ export default function NegocioPage() {
         <div className="flex flex-col gap-5">
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-4">Datos del negocio</div>
-            <div className="border-2 border-dashed border-line-2 rounded-lg p-6 text-center mb-5 cursor-pointer bg-bg hover:border-accent transition-colors">
-              <div className="text-3xl">🖼</div>
-              <div className="text-xs text-ink-3 mt-2">Subir logo del negocio</div>
+            <div
+              className="border-2 border-dashed border-line-2 rounded-lg p-6 text-center mb-5 cursor-pointer bg-bg hover:border-accent transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {logoPreview ? (
+                <img src={logoPreview} alt="Logo" className="h-16 w-auto mx-auto object-contain rounded mb-2" />
+              ) : (
+                <div className="text-3xl">🖼</div>
+              )}
+              <div className="text-xs text-ink-3 mt-2">{logoPreview ? "Cambiar logo" : "Subir logo del negocio"}</div>
               <div className="text-[11px] text-ink-3 mt-0.5">PNG, JPG — máx 2MB</div>
+              {logoError && <div className="text-[11.5px] text-err mt-1">{logoError}</div>}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                  setLogoError("El archivo supera el límite de 2MB");
+                  return;
+                }
+                setLogoError("");
+                setLogoFile(file);
+                setLogoPreview(URL.createObjectURL(file));
+              }}
+            />
             <div className="flex flex-col gap-4">
               {[
                 { key: "name",      label: "Nombre del negocio", placeholder: "Aesthetic Studio"       },
