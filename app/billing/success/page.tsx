@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api/client";
 
 export default function BillingSuccessPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "ok" | "pending">("loading");
 
   useEffect(() => {
-    apiFetch<{ confirmed: boolean }>("/billing/confirm", { method: "POST" })
+    const preapprovalId = searchParams.get("preapproval_id");
+    apiFetch<{ confirmed: boolean }>("/billing/confirm", {
+      method: "POST",
+      body: JSON.stringify({ preapprovalId }),
+    })
       .then((data) => {
         setStatus(data.confirmed ? "ok" : "pending");
         queryClient.invalidateQueries({ queryKey: ["billing", "status"] });
@@ -21,7 +26,7 @@ export default function BillingSuccessPage() {
         setStatus("pending");
         setTimeout(() => router.push("/dashboard"), 3000);
       });
-  }, [router, queryClient]);
+  }, [router, queryClient, searchParams]);
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center gap-5 px-6">
