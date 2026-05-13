@@ -54,7 +54,7 @@ export type GoogleAuthResponse = AuthResponse | { needsOnboarding: true };
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 export function saveToken(token: string) {
-  Cookies.set("token", token, { expires: 7, sameSite: "strict" });
+  Cookies.set("token", token, { expires: 7, sameSite: "lax" });
 }
 
 export function clearToken() {
