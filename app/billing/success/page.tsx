@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api/client";
 
-export default function BillingSuccessPage() {
+function BillingSuccessContent() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -55,5 +55,13 @@ export default function BillingSuccessPage() {
         <p className="text-[12.5px] text-ink-3">Redirigiendo al panel...</p>
       )}
     </div>
+  );
+}
+
+export default function BillingSuccessPage() {
+  return (
+    <Suspense>
+      <BillingSuccessContent />
+    </Suspense>
   );
 }
