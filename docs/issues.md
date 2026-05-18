@@ -96,7 +96,7 @@ El área de "Subir logo" es un `div` estático sin `<input type="file">` ni lóg
 
 ---
 
-### [F-09] "quick-add" del dashboard sin onClick
+### [F-09] ~~"quick-add" del dashboard sin onClick~~ ✅
 **Archivo:** `app/(app)/dashboard/page.tsx:145-150`
 
 El botón "Agregar un turno para hoy" en la sección "Agenda de hoy" es un `div` sin `onClick`. No abre el modal.
@@ -107,39 +107,28 @@ El botón "Agregar un turno para hoy" en la sección "Agenda de hoy" es un `div`
 
 ## DATOS HARDCODEADOS
 
-### [D-01] Actividad reciente es mock data
-**Archivo:** `app/(app)/dashboard/page.tsx:12-29`
+### [D-01] ~~Actividad reciente es mock data~~ ✅
+**Archivo:** `app/(app)/dashboard/page.tsx`
 
-El array `ACTIVITY` está hardcodeado con datos ficticios. No viene de ninguna API.
-
-**Solución:** Crear endpoint `/activity` en el backend (o derivarlo de appointmnets/messages recientes) y un hook `useGetActivity`. Mientras no exista el endpoint, se puede omitir la sección o marcarla claramente como demo.
+Eliminado el array `ACTIVITY` hardcodeado. La actividad ahora se deriva de los `appts` ya cargados mediante `deriveActivity()`: ordena pasados desc y futuros asc, toma hasta 4, y genera un item por status con color y tiempo relativo ("Hace X min/h" o "a las HH:MM"). Sin turnos muestra empty state. Sin endpoint nuevo.
 
 ---
 
-### [D-02] Ocupación del día es hardcodeada
-**Archivo:** `app/(app)/dashboard/page.tsx:178-190`
+### [D-02] ~~Ocupación del día es hardcodeada~~ ✅
+**Archivo:** `app/(app)/dashboard/page.tsx`
 
-El porcentaje `78%`, el tiempo `7h 35m de 9h 30m` y los bloques libres son strings fijos. No calculados a partir de turnos reales ni del horario del negocio.
-
-**Solución:** Calcular ocupación a partir de `appts` (ya disponibles) + `hoursData` del negocio. La lógica: sumar duración de turnos no cancelados / total horas del día configuradas.
+Porcentaje, tiempo usado y bloques libres ahora calculados en tiempo real. Se usa `useGetHours` para obtener el horario del día actual y `appts` ya cargados. Helpers: `toMin`, `fromMin`, `formatMinutes`, `calcFreeBlocks` (gaps ≥ 30 min entre turnos activos). Maneja: negocio cerrado hoy, sin bloques libres, estado de carga.
 
 ---
 
-### [D-03] Delta KPIs hardcodeados
-**Archivo:** `app/(app)/dashboard/page.tsx:96`
-
-`"+2 vs. ayer"` es texto fijo. Los demás KPIs también tienen deltas estáticos.
-
-**Solución:** Fetchear también los turnos de ayer (`date: YESTERDAY`) y calcular la diferencia, o eliminar los deltas hasta tener el dato real.
+### [D-03] ~~Delta KPIs hardcodeados~~ ✅
 
 ---
 
-### [D-04] Nombre del usuario hardcodeado en dashboard y sidebar
-**Archivos:** `app/(app)/dashboard/page.tsx:78`, `components/Sidebar.tsx:186-191`
+### [D-04] ~~Nombre del usuario hardcodeado en dashboard y sidebar~~ ✅
+**Archivos:** `lib/api/auth.ts`, `hooks/useAuth.ts`, `components/Sidebar.tsx`, `app/(app)/dashboard/page.tsx`
 
-"Marina" en el saludo y "Marina V." / "Plan Pro" en el footer del sidebar son strings fijos. No provienen de sesión ni perfil de usuario.
-
-**Solución:** Crear un hook `useCurrentUser` que lea el perfil desde el token JWT (claims) o desde un endpoint `/auth/me`, y consumirlo en ambos componentes.
+El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessName }` en `localStorage` al hacer login/register/googleAuth (y se limpia en logout). `useCurrentUser` lee ese dato de forma síncrona sin fetch. Sidebar muestra iniciales, nombre corto y rol ("Propietario"/"Colaborador"). Dashboard muestra el primer nombre real.
 
 ---
 

@@ -1,7 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useLogout } from "@/hooks/useAuth";
+import { useLogout, useCurrentUser } from "@/hooks/useAuth";
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function shortName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+}
 
 function SvgWrap({ children }: { children: React.ReactNode }) {
   return (
@@ -89,7 +101,9 @@ function IconLogout() {
 }
 
 export default function Sidebar({ active }: { active: string }) {
-  const logout = useLogout();
+  const logout  = useLogout();
+  const current = useCurrentUser();
+  const roleLabel = current?.role === "owner" ? "Propietario" : current?.role === "staff" ? "Colaborador" : "";
 
   return (
     <aside
@@ -184,11 +198,13 @@ export default function Sidebar({ active }: { active: string }) {
             background: "var(--color-accent)",
           }}
         >
-          MV
+          {current ? initials(current.name) : "…"}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-semibold text-ink truncate">Marina V.</div>
-          <div className="text-[11px] text-ink-3">Plan Pro</div>
+          <div className="text-[13px] font-semibold text-ink truncate">
+            {current ? shortName(current.name) : "…"}
+          </div>
+          <div className="text-[11px] text-ink-3">{roleLabel}</div>
         </div>
       </div>
     </aside>

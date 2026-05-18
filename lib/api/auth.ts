@@ -53,12 +53,31 @@ export type GoogleAuthResponse = AuthResponse | { needsOnboarding: true };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
+export interface StoredUser {
+  name:         string;
+  email:        string;
+  role:         "owner" | "staff";
+  businessName: string;
+}
+
 export function saveToken(token: string) {
   Cookies.set("token", token, { expires: 7, sameSite: "lax" });
 }
 
 export function clearToken() {
   Cookies.remove("token");
+  if (typeof window !== "undefined") localStorage.removeItem("aesthetic_user");
+}
+
+export function saveUser(user: AuthUser, business: AuthBusiness) {
+  if (typeof window === "undefined") return;
+  const stored: StoredUser = {
+    name:         user.name,
+    email:        user.email,
+    role:         user.role,
+    businessName: business.name,
+  };
+  localStorage.setItem("aesthetic_user", JSON.stringify(stored));
 }
 
 // ── Endpoints ──────────────────────────────────────────────────────────────
@@ -69,6 +88,7 @@ export async function login(params: LoginParams): Promise<AuthResponse> {
     body: JSON.stringify(params),
   });
   saveToken(data.token);
+  saveUser(data.user, data.business);
   return data;
 }
 
@@ -78,6 +98,7 @@ export async function register(params: RegisterParams): Promise<AuthResponse> {
     body: JSON.stringify(params),
   });
   saveToken(data.token);
+  saveUser(data.user, data.business);
   return data;
 }
 
@@ -92,7 +113,9 @@ export async function googleAuth(params: GoogleAuthParams): Promise<GoogleAuthRe
     body: JSON.stringify(params),
   });
   if (!("needsOnboarding" in data)) {
-    saveToken((data as AuthResponse).token);
+    const resp = data as AuthResponse;
+    saveToken(resp.token);
+    saveUser(resp.user, resp.business);
   }
   return data;
 }

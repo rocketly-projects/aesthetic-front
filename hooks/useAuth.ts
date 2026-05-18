@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { login, register, clearToken, googleAuth } from "@/lib/api/auth";
-import type { LoginParams, RegisterParams, GoogleAuthParams } from "@/lib/api/auth";
+import type { LoginParams, RegisterParams, GoogleAuthParams, StoredUser } from "@/lib/api/auth";
 
 export function useLogin() {
   const router = useRouter();
@@ -37,6 +38,19 @@ export function useGoogleAuth(redirectTo = "/dashboard") {
       }
     },
   });
+}
+
+export function useCurrentUser(): StoredUser | null {
+  const [user] = useState<StoredUser | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("aesthetic_user");
+      return raw ? (JSON.parse(raw) as StoredUser) : null;
+    } catch {
+      return null;
+    }
+  });
+  return user;
 }
 
 export function useLogout() {
