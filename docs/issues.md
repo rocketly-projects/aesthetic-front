@@ -141,24 +141,6 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ---
 
-### [D-06] Estado "En línea" hardcodeado en WhatsApp
-**Archivo:** `app/(app)/whatsapp/page.tsx:114`
-
-Todos los chats activos muestran "En línea" independientemente del estado real del contacto.
-
-**Solución:** Remover o mostrar solo si el campo `online` viene del backend. Por ahora mostrar el número de teléfono o la última conexión si está disponible.
-
----
-
-### [D-07] clientId crudo en agenda del dashboard
-**Archivo:** `app/(app)/dashboard/page.tsx:132`
-
-`{appt.clientId}` muestra un UUID en lugar del nombre del cliente.
-
-**Solución:** El tipo `Appointment` debería incluir `clientName: string | null`. Si el backend ya lo devuelve, actualizar la interfaz en `lib/api/appointments.ts`. Si no, solicitar que el backend incluya el campo en la respuesta.
-
----
-
 ## UX / EXPERIENCIA
 
 ### [U-01] Estado "no_show" falta en filtros de turnos

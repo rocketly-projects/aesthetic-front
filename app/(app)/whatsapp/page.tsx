@@ -19,9 +19,9 @@ function initials(name: string) {
 }
 
 function bubbleStyle(sender: MessageSender) {
-  if (sender === "owner")  return { background: "var(--color-ink)", color: "#fff", borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end" };
-  if (sender === "bot")    return { background: "transparent", border: "1.5px dashed var(--color-accent-soft)", color: "var(--color-accent-ink)", borderRadius: "10px", alignSelf: "flex-start" };
-  return { background: "var(--color-surface)", border: "1px solid var(--color-line-2)", color: "var(--color-ink)", borderRadius: "14px 14px 14px 4px", alignSelf: "flex-start" };
+  if (sender === "owner")  return { background: "var(--color-ink)",    color: "#fff",                   borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end"   };
+  if (sender === "bot")    return { background: "var(--color-accent)",  color: "#fff",                   borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end"   };
+  return                          { background: "var(--color-surface)", color: "var(--color-ink)", border: "1px solid var(--color-line-2)", borderRadius: "14px 14px 14px 4px", alignSelf: "flex-start" };
 }
 
 export default function WhatsAppPage() {
@@ -111,16 +111,16 @@ export default function WhatsAppPage() {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-semibold text-ink">{activeChat.clientName ?? activeChat.clientPhone}</div>
-                  <div className="text-[11px] text-ok">En línea</div>
+                  <div className="text-[11px] text-ok">{activeChat.clientPhone}</div>
                 </div>
                 <button className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded-md px-2 py-1 text-lg transition-colors">⋯</button>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
                 {[...messages].reverse().map((msg) => (
-                  <div key={msg.id} className="flex" style={{ justifyContent: msg.sender === "owner" ? "flex-end" : "flex-start" }}>
+                  <div key={msg.id} className="flex" style={{ justifyContent: msg.sender === "client" ? "flex-start" : "flex-end" }}>
                     <div className="max-w-[72%] px-4 py-3 text-[13px] leading-snug" style={bubbleStyle(msg.sender)}>
-                      {msg.sender === "bot" && <div className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: "var(--color-accent)" }}>BOT</div>}
+                      {msg.sender === "bot" && <div className="text-[9px] font-bold uppercase tracking-widest mb-1 opacity-70">BOT</div>}
                       {msg.content}
                       <div className="font-mono text-[10px] mt-1 text-right opacity-60">
                         {new Date(msg.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
