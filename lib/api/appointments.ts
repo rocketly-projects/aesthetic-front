@@ -2,7 +2,7 @@ import { apiFetch } from "./client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled" | "no_show";
+export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled" | "no_show" | "awaiting_payment";
 
 export interface Appointment {
   id: string;

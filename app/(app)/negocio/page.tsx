@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import AppShell from "@/components/AppShell";
-import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours } from "@/hooks/useBusiness";
+import { useSearchParams } from "next/navigation";
+import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect } from "@/hooks/useBusiness";
 
 const DAYS = [
   { key: "lun", label: "Lunes",     dayOfWeek: 1 },
@@ -27,23 +28,38 @@ const defaultSchedule: Record<string, DaySchedule> = {
 };
 
 export default function NegocioPage() {
+  const searchParams    = useSearchParams();
   const { data: business }  = useGetBusiness();
   const { data: hoursData } = useGetHours();
-  const updateBusiness      = useUpdateBusiness();
-  const updateHours         = useUpdateHours();
+  const updateBusiness  = useUpdateBusiness();
+  const updateHours     = useUpdateHours();
+  const mpConnect       = useMpConnect();
+  const mpDisconnect    = useMpDisconnect();
 
   const [schedule, setSchedule] = useState(defaultSchedule);
   const [form, setForm] = useState({
     name: "", phone: "", address: "", instagram: "", website: "", whatsappPhone: "",
   });
   const [whatsappPhoneError, setWhatsappPhoneError] = useState("");
-  const [depositRequired, setDepositRequired] = useState(false);
-  const [depositPercent, setDepositPercent] = useState(30);
-  const [urlCopied, setUrlCopied] = useState(false);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [webDepositRequired, setWebDepositRequired] = useState(false);
+  const [botDepositRequired, setBotDepositRequired] = useState(false);
+  const [depositPercent, setDepositPercent]         = useState(30);
+  const [urlCopied, setUrlCopied]   = useState(false);
+  const [logoFile, setLogoFile]     = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [logoError, setLogoError] = useState("");
+  const [logoError, setLogoError]   = useState("");
+  const [mpNotice, setMpNotice]     = useState<"connected" | "error" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Leer ?mp= param del callback OAuth
+  useEffect(() => {
+    const mp = searchParams.get("mp");
+    if (mp === "connected" || mp === "error") {
+      setMpNotice(mp);
+      // Limpiar el param de la URL sin recargar
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [searchParams]);
 
   function validateWhatsappPhone(value: string): string {
     if (!value) return "";
@@ -61,7 +77,8 @@ export default function NegocioPage() {
       website:       business.website       ?? "",
       whatsappPhone: business.whatsappPhone ?? "",
     });
-    setDepositRequired(business.depositRequired ?? false);
+    setWebDepositRequired(business.webDepositRequired ?? false);
+    setBotDepositRequired(business.botDepositRequired ?? false);
     setDepositPercent(business.depositPercent ?? 30);
     if (business.logoUrl) setLogoPreview(business.logoUrl);
   }, [business]);
@@ -104,14 +121,15 @@ export default function NegocioPage() {
     }
 
     updateBusiness.mutate({
-      name:           form.name          || undefined,
-      phone:          form.phone         || undefined,
-      address:        form.address       || undefined,
-      instagram:      form.instagram     || undefined,
-      website:        form.website       || undefined,
-      whatsappPhone:  form.whatsappPhone || null,
-      depositRequired,
-      depositPercent: depositRequired ? depositPercent : 0,
+      name:               form.name          || undefined,
+      phone:              form.phone         || undefined,
+      address:            form.address       || undefined,
+      instagram:          form.instagram     || undefined,
+      website:            form.website       || undefined,
+      whatsappPhone:      form.whatsappPhone || null,
+      webDepositRequired,
+      botDepositRequired,
+      depositPercent:     (webDepositRequired || botDepositRequired) ? depositPercent : 0,
       ...(logoUrl ? { logoUrl } : {}),
     });
     updateHours.mutate(
@@ -253,7 +271,7 @@ export default function NegocioPage() {
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-4">Reservas online</div>
             {business?.slug ? (
-              <div className="mb-4">
+              <div>
                 <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Tu link de reservas</label>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 input text-xs text-ink-3 select-all truncate" style={{ userSelect: "all" }}>
@@ -274,37 +292,103 @@ export default function NegocioPage() {
                 <p className="text-[11.5px] text-ink-3 mt-1.5">Compartí este link con tus clientes para que reserven online.</p>
               </div>
             ) : null}
-            <div className="border-t border-line pt-4">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="text-[13px] font-medium text-ink">Requerir seña</div>
-                  <div className="text-xs text-ink-3 mt-0.5">El cliente deberá abonar una seña para confirmar el turno</div>
+          </div>
+
+          {/* Pagos */}
+          <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
+            <div className="font-semibold text-sm text-ink mb-4">Pagos y señas</div>
+
+            {/* MercadoPago connection */}
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-line">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style={{ background: "#009EE3" }}>
+                  <svg width="18" height="12" viewBox="0 0 36 24" fill="white"><path d="M18 0C8.06 0 0 5.37 0 12s8.06 12 18 12 18-5.37 18-12S27.94 0 18 0zm0 20c-7.18 0-13-3.58-13-8s5.82-8 13-8 13 3.58 13 8-5.82 8-13 8z"/></svg>
                 </div>
-                <label className="toggle">
-                  <input type="checkbox" checked={depositRequired} onChange={(e) => setDepositRequired(e.target.checked)} />
-                  <span className="toggle-track" /><span className="toggle-thumb" />
-                </label>
+                <div>
+                  <div className="text-[13px] font-medium text-ink">MercadoPago</div>
+                  {business?.mpUserId ? (
+                    <div className="text-xs text-ok mt-0.5">● Conectado (ID: {business.mpUserId})</div>
+                  ) : (
+                    <div className="text-xs text-ink-3 mt-0.5">No conectado — necesario para cobrar señas</div>
+                  )}
+                </div>
               </div>
-              {depositRequired && (
-                <div>
-                  <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Porcentaje de seña</label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="range"
-                      min={5}
-                      max={100}
-                      step={5}
-                      value={depositPercent}
-                      onChange={(e) => setDepositPercent(Number(e.target.value))}
-                      className="flex-1"
-                      style={{ accentColor: "var(--color-accent)" }}
-                    />
-                    <span className="text-sm font-semibold text-ink w-10 text-right">{depositPercent}%</span>
-                  </div>
-                  <p className="text-[11.5px] text-ink-3 mt-1">Por ej. para un servicio de $5.000 la seña sería ${Math.round(5000 * depositPercent / 100).toLocaleString("es-AR")}</p>
-                </div>
+              {business?.mpUserId ? (
+                <button
+                  onClick={() => mpDisconnect.mutate()}
+                  disabled={mpDisconnect.isPending}
+                  className="text-[11.5px] font-medium px-3 py-1.5 rounded-md border border-line hover:border-err hover:text-err transition-colors text-ink-2 disabled:opacity-50"
+                >
+                  {mpDisconnect.isPending ? "Desconectando…" : "Desconectar"}
+                </button>
+              ) : (
+                <button
+                  onClick={() => mpConnect.mutate()}
+                  disabled={mpConnect.isPending}
+                  className="text-[11.5px] font-medium px-3 py-1.5 rounded-md border-none text-white cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50"
+                  style={{ background: "#009EE3" }}
+                >
+                  {mpConnect.isPending ? "Redirigiendo…" : "Conectar cuenta"}
+                </button>
               )}
             </div>
+
+            {/* Aviso del callback OAuth */}
+            {mpNotice === "connected" && (
+              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-ok" style={{ background: "var(--color-ok-pale, #f0fdf4)", border: "1px solid var(--color-ok)" }}>
+                ✓ MercadoPago conectado correctamente.
+              </div>
+            )}
+            {mpNotice === "error" && (
+              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-err" style={{ background: "var(--color-err-pale, #fef2f2)", border: "1px solid var(--color-err)" }}>
+                ✗ No se pudo conectar MercadoPago. Intentá de nuevo.
+              </div>
+            )}
+
+            {/* Toggles de seña */}
+            <div className="flex flex-col gap-3">
+              {[
+                { label: "Seña en reservas web", desc: "El cliente paga al reservar desde tu link público", val: webDepositRequired, set: setWebDepositRequired },
+                { label: "Seña en reservas por bot", desc: "El chatbot solicita el pago antes de confirmar", val: botDepositRequired, set: setBotDepositRequired },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between">
+                  <div>
+                    <div className="text-[13px] font-medium text-ink">{item.label}</div>
+                    <div className="text-xs text-ink-3 mt-0.5">{item.desc}</div>
+                  </div>
+                  <label className="toggle">
+                    <input type="checkbox" checked={item.val} onChange={(e) => item.set(e.target.checked)} disabled={!business?.mpUserId} />
+                    <span className="toggle-track" /><span className="toggle-thumb" />
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            {/* Porcentaje de seña */}
+            {(webDepositRequired || botDepositRequired) && (
+              <div className="mt-4 pt-4 border-t border-line">
+                <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Porcentaje de seña</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range" min={5} max={100} step={5}
+                    value={depositPercent}
+                    onChange={(e) => setDepositPercent(Number(e.target.value))}
+                    className="flex-1"
+                    style={{ accentColor: "var(--color-accent)" }}
+                  />
+                  <span className="text-sm font-semibold text-ink w-10 text-right">{depositPercent}%</span>
+                </div>
+                <p className="text-[11.5px] text-ink-3 mt-1">
+                  Por ej. para un servicio de $5.000 la seña sería ${Math.round(5000 * depositPercent / 100).toLocaleString("es-AR")}
+                </p>
+              </div>
+            )}
+
+            {!business?.mpUserId && (
+              <p className="text-[11.5px] text-ink-3 mt-3">
+                Conectá tu cuenta de MercadoPago para habilitar el cobro de señas.
+              </p>
+            )}
           </div>
 
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">

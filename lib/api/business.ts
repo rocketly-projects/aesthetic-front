@@ -12,8 +12,12 @@ export interface Business {
   website: string | null;
   logoUrl: string | null;
   whatsappPhone: string | null;
-  depositRequired: boolean;
+  // Depósitos
+  webDepositRequired: boolean;
+  botDepositRequired: boolean;
   depositPercent: number;
+  // MercadoPago OAuth (null = no conectado)
+  mpUserId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,7 +39,8 @@ export interface UpdateBusinessParams {
   website?: string;
   logoUrl?: string;
   whatsappPhone?: string | null;
-  depositRequired?: boolean;
+  webDepositRequired?: boolean;
+  botDepositRequired?: boolean;
   depositPercent?: number;
 }
 
@@ -72,4 +77,13 @@ export async function updateHours(hours: UpdateHoursParam[]): Promise<BusinessHo
     body: JSON.stringify(hours),
   });
   return data.hours;
+}
+
+export async function connectMp(): Promise<void> {
+  const { redirectUrl } = await apiFetch<{ redirectUrl: string }>("/billing/mp/connect");
+  window.location.href = redirectUrl;
+}
+
+export async function disconnectMp(): Promise<void> {
+  await apiFetch("/billing/mp/disconnect", { method: "DELETE" });
 }

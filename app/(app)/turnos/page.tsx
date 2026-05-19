@@ -11,11 +11,13 @@ import type { Appointment, AppointmentStatus } from "@/lib/api/appointments";
 type Filter = "todos" | AppointmentStatus;
 
 const FILTERS: { key: Filter; label: string }[] = [
-  { key: "todos",     label: "Todos"       },
-  { key: "confirmed", label: "Confirmados" },
-  { key: "pending",   label: "Pendientes"  },
-  { key: "completed", label: "Completados" },
-  { key: "cancelled", label: "Cancelados"  },
+  { key: "todos",            label: "Todos"          },
+  { key: "confirmed",        label: "Confirmados"    },
+  { key: "awaiting_payment", label: "Esperando pago" },
+  { key: "pending",          label: "Pendientes"     },
+  { key: "completed",        label: "Completados"    },
+  { key: "cancelled",        label: "Cancelados"     },
+  { key: "no_show",          label: "No asistió"     },
 ];
 
 function formatDate(d: string) {

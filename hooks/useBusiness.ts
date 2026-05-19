@@ -6,6 +6,8 @@ import {
   updateBusiness,
   getHours,
   updateHours,
+  connectMp,
+  disconnectMp,
 } from "@/lib/api/business";
 import type { UpdateBusinessParams, UpdateHoursParam } from "@/lib/api/business";
 
@@ -44,6 +46,20 @@ export function useUpdateHours() {
     mutationFn: (hours: UpdateHoursParam[]) => updateHours(hours),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: businessKeys.hours });
+    },
+  });
+}
+
+export function useMpConnect() {
+  return useMutation({ mutationFn: connectMp });
+}
+
+export function useMpDisconnect() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: disconnectMp,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: businessKeys.all });
     },
   });
 }

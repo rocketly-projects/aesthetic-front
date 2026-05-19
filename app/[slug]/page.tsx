@@ -375,6 +375,11 @@ export default function PublicBookingPage() {
       clientEmail: form.email || undefined,
     });
     setResult(res);
+    // Si requiere seña y MP está listo, redirigir al checkout
+    if (res.deposit.required && res.deposit.initPoint) {
+      window.location.href = res.deposit.initPoint;
+      return;
+    }
     setStep(5);
   }
 
@@ -637,7 +642,7 @@ export default function PublicBookingPage() {
               </div>
 
               {/* Seña notice */}
-              {business.depositRequired && (
+              {business.webDepositRequired && (
                 <div style={{
                   padding: "13px 16px", borderRadius: 12, marginBottom: 14,
                   background: "var(--color-warn-soft)", border: "1px solid rgba(160,120,64,.15)",
@@ -652,7 +657,7 @@ export default function PublicBookingPage() {
                     <div style={{ fontSize: 12, color: "var(--color-ink-2)", lineHeight: 1.5 }}>
                       {business.depositPercent}% del total —{" "}
                       <strong>{formatPrice(Math.round(svc.price * business.depositPercent / 100))}</strong>.
-                      El negocio te contactará para coordinar el pago.
+                      Serás redirigido a MercadoPago para completar el pago.
                     </div>
                   </div>
                 </div>

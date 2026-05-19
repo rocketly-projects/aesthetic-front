@@ -71,6 +71,11 @@ function deriveActivity(appts: Appointment[]): ActivityItem[] {
           color: "var(--color-warn)",
           text:  <><strong>{name}</strong> no se presentó a {svc}.<small>{lbl}</small></>,
         };
+      case "awaiting_payment":
+        return {
+          color: "var(--color-warn)",
+          text:  <><strong>{name}</strong> tiene un pago pendiente de seña para {svc}.<small>{lbl}</small></>,
+        };
     }
   });
 }

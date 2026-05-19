@@ -33,7 +33,7 @@ export interface PublicBusiness {
   phone: string | null;
   instagram: string | null;
   logoUrl: string | null;
-  depositRequired: boolean;
+  webDepositRequired: boolean;
   depositPercent: number;
 }
 
@@ -75,6 +75,8 @@ export interface BookingResult {
     required: boolean;
     percent: number;
     amount: number;
+    initPoint: string | null;   // URL de pago MP (null si no requiere seña)
+    expiresAt:  string | null;  // ISO timestamp — 30 min para pagar
   };
 }
 
