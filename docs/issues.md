@@ -166,12 +166,10 @@ Resuelto como parte de U-02. Búsqueda movida al servidor con debounce de 300ms 
 
 ---
 
-### [U-04] Clicks en turnos de la agenda no abren detalle
-**Archivo:** `app/(app)/agenda/page.tsx:116-127`
+### [U-04] ~~Clicks en turnos de la agenda no abren detalle~~ ✅
+**Archivo:** `app/(app)/agenda/page.tsx`
 
-Los bloques de turno en la vista de calendario tienen `cursor-pointer` pero no tienen `onClick`. No es posible ver detalles ni cambiar estado desde la agenda.
-
-**Solución:** Al hacer click, abrir un popover/modal con los datos del turno y acciones rápidas (Confirmar, Cancelar, etc.) usando `useUpdateAppointment`.
+Panel lateral fijo (`ApptDetailPanel`) que muestra cliente, servicio, fecha/hora, duración, precio, estado y acciones rápidas de cambio de estado. `selectedApptId` derivado del cache de React Query — el panel refleja cambios de status sin sync manual. En vista mes, `e.stopPropagation()` separa click en turno (panel) de click en celda (navegar al día). "Editar turno" abre `EditTurnoModal`.
 
 ---
 
