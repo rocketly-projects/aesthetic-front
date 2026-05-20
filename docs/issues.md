@@ -173,12 +173,10 @@ Panel lateral fijo (`ApptDetailPanel`) que muestra cliente, servicio, fecha/hora
 
 ---
 
-### [U-05] Click en celda vacía de la agenda no pre-llena el modal
-**Archivo:** `app/(app)/agenda/page.tsx:115`
+### [U-05] ~~Click en celda vacía de la agenda no pre-llena el modal~~ ✅
+**Archivos:** `app/(app)/agenda/page.tsx`, `components/NuevoTurnoModal.tsx`
 
-El `div` de cada día no tiene `onClick` para capturar el horario y pre-llenarlo en `NuevoTurnoModal`.
-
-**Solución:** Detectar el click en la columna del día, calcular la hora según posición Y y abrir el modal con `date` y `time` pre-seteados.
+`DayColumn` detecta click en espacio vacío (`onClick` en el contenedor, `stopPropagation` en bloques de turno). Tiempo calculado con `yToTime(e.clientY - rect.top)` snapeado a 15 min. `AgendaPage` guarda `preset: { date, time }` y lo pasa a `NuevoTurnoModal` via `initialDate`/`initialTime`. El modal sincroniza los valores con `useEffect` al abrirse.
 
 ---
 
@@ -192,7 +190,7 @@ Si se filtra por un estado y no hay resultados, la tabla queda vacía sin mensaj
 ---
 
 ### [U-07] Sin feedback de éxito en modales
-**Archivos:** `NuevoTurnoModal.tsx`, `NuevoClienteModal.tsx`, `NuevoServicioModal.tsx`
+**Archivos:** `NuevoTurnoModal.tsx`, `NuevoClienteModal.tsx`, `NuevoServicioModal.tsx`. Buscar otros archivos que necesiten esto.
 
 Los modales se cierran al crear exitosamente pero no hay ningún toast/snackbar de confirmación. El usuario no recibe feedback visual de que la acción se completó.
 

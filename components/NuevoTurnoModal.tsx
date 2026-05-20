@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { useGetClients } from "@/hooks/useClients";
 import { useGetServices } from "@/hooks/useServices";
@@ -9,12 +9,20 @@ import { useCreateAppointment } from "@/hooks/useAppointments";
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialDate?: string;
+  initialTime?: string;
 }
 
 const EMPTY = { clientId: "", serviceId: "", date: "", time: "", notes: "" };
 
-export default function NuevoTurnoModal({ open, onClose }: Props) {
-  const [form, setForm] = useState(EMPTY);
+export default function NuevoTurnoModal({ open, onClose, initialDate, initialTime }: Props) {
+  const [form, setForm] = useState({ ...EMPTY, date: initialDate ?? "", time: initialTime ?? "" });
+
+  // Sync initial values each time the modal opens
+  useEffect(() => {
+    if (open) setForm({ ...EMPTY, date: initialDate ?? "", time: initialTime ?? "" });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const { data: clientData } = useGetClients({ limit: 100 });
   const { data: services = [] } = useGetServices();

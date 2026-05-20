@@ -39,6 +39,13 @@ function apptTop(time: string) {
 }
 function apptHeight(duration: number) { return Math.max((duration / 60) * HOUR_PX - 2, 18); }
 
+function yToTime(y: number): string {
+  const snapped = Math.round((y / HOUR_PX) * 60 / 15) * 15;
+  const h = DAY_START + Math.floor(snapped / 60);
+  const m = snapped % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
 function getWeekDates(anchor: Date) {
   const day    = anchor.getDay();
   const monday = new Date(anchor);
@@ -200,19 +207,28 @@ function DayColumn({
   appts,
   isToday,
   onSelect,
+  onCellClick,
 }: {
   date: Date;
   appts: Appointment[];
   isToday: boolean;
   onSelect: (appt: Appointment) => void;
+  onCellClick: (date: string, time: string) => void;
 }) {
   return (
-    <div className="border-l border-line relative" style={isToday ? { background: "rgba(122,139,110,.03)" } : undefined}>
+    <div
+      className="border-l border-line relative"
+      style={isToday ? { background: "rgba(122,139,110,.03)" } : undefined}
+      onClick={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        onCellClick(toYMD(date), yToTime(e.clientY - rect.top));
+      }}
+    >
       {HOURS.map((h) => <div key={h} className="border-t border-line" style={{ height: HOUR_PX }} />)}
       {appts.map((appt) => (
         <div
           key={appt.id}
-          onClick={() => onSelect(appt)}
+          onClick={(e) => { e.stopPropagation(); onSelect(appt); }}
           className="absolute left-0.5 right-0.5 rounded-sm overflow-hidden cursor-pointer z-10 hover:brightness-95 transition-all"
           style={{
             top:        apptTop(appt.time),
@@ -249,6 +265,7 @@ export default function AgendaPage() {
   const [anchor,          setAnchor]         = useState(new Date());
   const [view,            setView]           = useState<View>("semana");
   const [modalOpen,       setModalOpen]      = useState(false);
+  const [preset,          setPreset]         = useState<{ date: string; time: string } | null>(null);
   const [selectedApptId,  setSelectedApptId] = useState<string | null>(null);
   const [editApptId,      setEditApptId]     = useState<string | null>(null);
 
@@ -267,6 +284,16 @@ export default function AgendaPage() {
 
   function handleSelect(appt: Appointment) {
     setSelectedApptId(appt.id);
+  }
+
+  function handleCellClick(date: string, time: string) {
+    setPreset({ date, time });
+    setModalOpen(true);
+  }
+
+  function handleModalClose() {
+    setModalOpen(false);
+    setPreset(null);
   }
 
   function handleStatusChange(status: AppointmentStatus) {
@@ -313,7 +340,7 @@ export default function AgendaPage() {
         <button
           className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
           style={{ background: "var(--color-ink)" }}
-          onClick={() => setModalOpen(true)}
+          onClick={() => { setPreset(null); setModalOpen(true); }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Nuevo turno
@@ -375,7 +402,7 @@ export default function AgendaPage() {
             <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
               <div className="grid" style={{ gridTemplateColumns: "60px 1fr" }}>
                 <HourGrid />
-                <DayColumn date={anchor} appts={dayAppts} isToday={isToday} onSelect={handleSelect} />
+                <DayColumn date={anchor} appts={dayAppts} isToday={isToday} onSelect={handleSelect} onCellClick={handleCellClick} />
               </div>
             </div>
           </div>
@@ -413,7 +440,7 @@ export default function AgendaPage() {
                   const ymd      = toYMD(d);
                   const isToday  = ymd === TODAY;
                   const dayAppts = weekAppts.filter((a) => a.date === ymd);
-                  return <DayColumn key={di} date={d} appts={dayAppts} isToday={isToday} onSelect={handleSelect} />;
+                  return <DayColumn key={di} date={d} appts={dayAppts} isToday={isToday} onSelect={handleSelect} onCellClick={handleCellClick} />;
                 })}
               </div>
             </div>
@@ -499,7 +526,12 @@ export default function AgendaPage() {
         />
       )}
 
-      <NuevoTurnoModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <NuevoTurnoModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        initialDate={preset?.date}
+        initialTime={preset?.time}
+      />
       {editAppt && (
         <EditTurnoModal
           open={!!editAppt}
