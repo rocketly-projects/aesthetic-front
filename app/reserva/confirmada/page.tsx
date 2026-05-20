@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function ReservaConfirmadaPage() {
+function ReservaConfirmadaContent() {
   const params          = useSearchParams();
   const paymentId       = params.get("payment_id");
   const externalRef     = params.get("external_reference");
@@ -51,5 +52,13 @@ export default function ReservaConfirmadaPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ReservaConfirmadaPage() {
+  return (
+    <Suspense>
+      <ReservaConfirmadaContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import AppShell from "@/components/AppShell";
 import { useSearchParams } from "next/navigation";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect } from "@/hooks/useBusiness";
@@ -27,7 +27,7 @@ const defaultSchedule: Record<string, DaySchedule> = {
   dom: { open: false, from: "10:00", to: "14:00" },
 };
 
-export default function NegocioPage() {
+function NegocioPageInner() {
   const searchParams    = useSearchParams();
   const { data: business }  = useGetBusiness();
   const { data: hoursData } = useGetHours();
@@ -427,5 +427,13 @@ export default function NegocioPage() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+export default function NegocioPage() {
+  return (
+    <Suspense>
+      <NegocioPageInner />
+    </Suspense>
   );
 }
