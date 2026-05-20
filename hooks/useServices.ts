@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/components/Toaster";
 import {
   getServices,
   getService,
@@ -37,6 +38,7 @@ export function useCreateService() {
     mutationFn: (params: CreateServiceParams) => createService(params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: serviceKeys.all });
+      toast.success("Servicio creado");
     },
   });
 }
@@ -49,6 +51,7 @@ export function useUpdateService() {
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: serviceKeys.all });
       qc.invalidateQueries({ queryKey: serviceKeys.detail(id) });
+      toast.success("Servicio actualizado");
     },
   });
 }
@@ -59,6 +62,7 @@ export function useDeleteService() {
     mutationFn: (id: string) => deleteService(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: serviceKeys.all });
+      toast.success("Servicio eliminado");
     },
   });
 }

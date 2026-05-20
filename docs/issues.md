@@ -187,7 +187,7 @@ Componente `EmptyState` reutilizable con SVG contextual, título y descripción.
 
 ---
 
-### [U-07] Sin feedback de éxito en modales
+### ✅ [U-07] Sin feedback de éxito en modales
 **Archivos:** `NuevoTurnoModal.tsx`, `NuevoClienteModal.tsx`, `NuevoServicioModal.tsx`. Buscar otros archivos que necesiten esto.
 
 Los modales se cierran al crear exitosamente pero no hay ningún toast/snackbar de confirmación. El usuario no recibe feedback visual de que la acción se completó.

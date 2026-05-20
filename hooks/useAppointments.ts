@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/appointments";
 import type { GetAppointmentsParams, CreateAppointmentParams, UpdateAppointmentParams } from "@/lib/api/appointments";
 import { clientKeys } from "./useClients";
+import { toast } from "@/components/Toaster";
 
 export const appointmentKeys = {
   all:    ["appointments"] as const,
@@ -40,6 +41,7 @@ export function useCreateAppointment() {
     mutationFn: (params: CreateAppointmentParams) => createAppointment(params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
+      toast.success("Turno creado");
     },
   });
 }
@@ -57,6 +59,7 @@ export function useUpdateAppointment() {
         qc.invalidateQueries({ queryKey: clientKeys.detail(data.clientId) });
         qc.invalidateQueries({ queryKey: clientKeys.all });
       }
+      toast.success("Turno actualizado");
     },
   });
 }
@@ -67,6 +70,7 @@ export function useDeleteAppointment() {
     mutationFn: (id: string) => deleteAppointment(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
+      toast.success("Turno cancelado");
     },
   });
 }
