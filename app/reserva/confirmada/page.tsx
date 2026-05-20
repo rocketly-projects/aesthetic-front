@@ -216,12 +216,12 @@ function ReservaConfirmadaContent() {
               textAlign: "center",
             }}
           >
-            Comprobante generado por Rocketly
+            Comprobante generado por aesthetic
           </p>
         </div>
 
         {/* Botones — fuera del card para que no aparezcan en la imagen */}
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <button
             onClick={handleSaveImage}
             disabled={saving || loading || !appt}
@@ -257,7 +257,7 @@ function ReservaConfirmadaContent() {
           <button
             onClick={() =>
               businessSlug
-                ? router.push(`/negocio/${businessSlug}`)
+                ? router.push(`/${businessSlug}`)
                 : router.push("/")
             }
             style={{
