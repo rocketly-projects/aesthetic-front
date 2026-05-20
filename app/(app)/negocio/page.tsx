@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
+import Image from "next/image";
 import AppShell from "@/components/AppShell";
 import { useSearchParams } from "next/navigation";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect } from "@/hooks/useBusiness";
@@ -301,17 +302,12 @@ function NegocioPageInner() {
             {/* MercadoPago connection */}
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-line">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style={{ background: "#009EE3" }}>
-                  <svg width="18" height="12" viewBox="0 0 36 24" fill="white"><path d="M18 0C8.06 0 0 5.37 0 12s8.06 12 18 12 18-5.37 18-12S27.94 0 18 0zm0 20c-7.18 0-13-3.58-13-8s5.82-8 13-8 13 3.58 13 8-5.82 8-13 8z"/></svg>
-                </div>
-                <div>
-                  <div className="text-[13px] font-medium text-ink">MercadoPago</div>
-                  {business?.mpUserId ? (
-                    <div className="text-xs text-ok mt-0.5">● Conectado (ID: {business.mpUserId})</div>
-                  ) : (
-                    <div className="text-xs text-ink-3 mt-0.5">No conectado — necesario para cobrar señas</div>
-                  )}
-                </div>
+                <Image src="/mpLogo.png" alt="MercadoPago" width={80} height={24} style={{ objectFit: "contain" }} />
+                {business?.mpUserId ? (
+                  <div className="text-xs text-ok">● Conectado (ID: {business.mpUserId})</div>
+                ) : (
+                  <div className="text-xs text-ink-3">No conectado — necesario para cobrar señas</div>
+                )}
               </div>
               {business?.mpUserId ? (
                 <button
