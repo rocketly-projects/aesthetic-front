@@ -159,12 +159,10 @@ Backend: agregado `total` al response de `GET /appointments`, `GET /clients` y `
 
 ---
 
-### [U-03] Búsqueda de clientes no usa la API
-**Archivo:** `app/(app)/clientes/page.tsx:26-28`
+### [U-03] ~~Búsqueda de clientes no usa la API~~ ✅
+**Archivo:** `app/(app)/clientes/page.tsx`
 
-El `search` filtra client-side sobre los 100 clientes ya cargados. El endpoint `getClients` acepta `params.search` pero no se usa.
-
-**Solución:** Hacer debounce del input y pasar `search` como parámetro a `useGetClients({ search, limit: 100 })` para que filtre en el servidor.
+Resuelto como parte de U-02. Búsqueda movida al servidor con debounce de 300ms y reset de página al buscar.
 
 ---
 
