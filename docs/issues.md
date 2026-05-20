@@ -152,12 +152,10 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ---
 
-### [U-02] Paginación ausente en todas las listas
-**Archivos:** `app/(app)/turnos/page.tsx:28`, `app/(app)/clientes/page.tsx:23`, `app/(app)/whatsapp/page.tsx:32`
+### [U-02] ~~Paginación ausente en todas las listas~~ ✅
+**Archivos:** `app/(app)/turnos/page.tsx`, `app/(app)/clientes/page.tsx`, `app/(app)/whatsapp/page.tsx`
 
-Todos los listados usan `limit: 100` sin paginación ni scroll infinito. Con bases de datos reales esto devuelve solo los primeros 100 registros sin aviso al usuario.
-
-**Solución:** Implementar paginación por cursor o página. El response ya incluye `page` y `limit` pero falta `total` para mostrar "X de Y". Agregar `total` al response del backend y controles de paginación en el frontend.
+Backend: agregado `total` al response de `GET /appointments`, `GET /clients` y `GET /whatsapp/chats` (este último también recibió soporte de `page`/`limit`). Frontend: componente `Pagination` reutilizable, paginación server-side en las tres páginas (20/página en turnos y clientes, 30/página en chats). Búsqueda de clientes movida al servidor con debounce de 300ms (resuelve también U-03). Empty states contextuales agregados.
 
 ---
 

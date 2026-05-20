@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppShell from "@/components/AppShell";
+import Pagination from "@/components/Pagination";
 import { statusChip } from "@/components/Chip";
 import NuevoClienteModal from "@/components/NuevoClienteModal";
 import EditClienteModal from "@/components/EditClienteModal";
 import { useGetClients, useGetClient } from "@/hooks/useClients";
 import { useGetAppointments } from "@/hooks/useAppointments";
+
+const PAGE_LIMIT = 20;
 
 function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
@@ -17,20 +20,28 @@ function initials(name: string) {
 }
 
 export default function ClientesPage() {
-  const [search,     setSearch]     = useState("");
-  const [activeId,   setActiveId]   = useState<string>("");
-  const [modalOpen,  setModalOpen]  = useState(false);
-  const [editOpen,   setEditOpen]   = useState(false);
+  const [searchInput,  setSearchInput]  = useState("");
+  const [search,       setSearch]       = useState("");
+  const [page,         setPage]         = useState(1);
+  const [activeId,     setActiveId]     = useState<string>("");
+  const [modalOpen,    setModalOpen]    = useState(false);
+  const [editOpen,     setEditOpen]     = useState(false);
 
-  const { data: clientData, isLoading } = useGetClients({ limit: 100 });
+  // Debounce search — resetea página al buscar
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const { data: clientData, isLoading } = useGetClients({ page, limit: PAGE_LIMIT, search: search || undefined });
   const allClients = clientData?.clients ?? [];
+  const total      = clientData?.total;
 
-  const filtered = allClients.filter(
-    (c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search)
-  );
-
-  const grouped: Record<string, typeof filtered> = {};
-  for (const c of filtered) {
+  const grouped: Record<string, typeof allClients> = {};
+  for (const c of allClients) {
     const l = c.name[0].toUpperCase();
     if (!grouped[l]) grouped[l] = [];
     grouped[l].push(c);
@@ -39,15 +50,15 @@ export default function ClientesPage() {
 
   const resolvedActiveId = activeId || allClients[0]?.id || "";
 
-  const { data: active }      = useGetClient(resolvedActiveId);
-  const { data: apptData }    = useGetAppointments({ clientId: resolvedActiveId, limit: 100 });
-  const clientAppts           = apptData?.appointments ?? [];
+  const { data: active }   = useGetClient(resolvedActiveId);
+  const { data: apptData } = useGetAppointments({ clientId: resolvedActiveId, limit: 100 });
+  const clientAppts        = apptData?.appointments ?? [];
 
   return (
     <AppShell
       active="clientes"
       title="Clientes"
-      subtitle={`${allClients.length} clientes`}
+      subtitle={total !== undefined ? `${total} cliente${total !== 1 ? "s" : ""}` : undefined}
       actions={
         <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -59,11 +70,20 @@ export default function ClientesPage() {
         {/* List */}
         <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col">
           <div className="p-3 border-b border-line">
-            <input className="input" placeholder="Buscar cliente…" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input
+              className="input"
+              placeholder="Buscar cliente…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
           </div>
           <div className="overflow-y-auto flex-1">
             {isLoading ? (
               <div className="p-6 text-center text-[13px] text-ink-3">Cargando clientes…</div>
+            ) : allClients.length === 0 ? (
+              <div className="p-6 text-center text-[13px] text-ink-3">
+                {search ? `Sin resultados para "${search}"` : "No hay clientes registrados"}
+              </div>
             ) : letters.map((letter) => (
               <div key={letter}>
                 <div className="px-4 py-1.5 text-[10.5px] font-semibold text-ink-3 uppercase tracking-widest bg-bg border-b border-line">
@@ -75,8 +95,8 @@ export default function ClientesPage() {
                     <div
                       key={c.id}
                       onClick={() => setActiveId(c.id)}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors ${isActive ? "border-l-[3px]" : "border-l-[3px] border-l-transparent hover:bg-bg"}`}
-                      style={isActive ? { background: "var(--color-accent-pale)", borderLeftColor: "var(--color-accent)" } : undefined}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors ${isActive ? "" : "border-l-[3px] border-l-transparent hover:bg-bg"}`}
+                      style={isActive ? { background: "var(--color-accent-pale)", borderLeft: "3px solid var(--color-accent)" } : undefined}
                     >
                       <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
                         {initials(c.name)}
@@ -91,6 +111,9 @@ export default function ClientesPage() {
                 })}
               </div>
             ))}
+          </div>
+          <div className="px-3 border-t border-line">
+            <Pagination page={page} total={total} limit={PAGE_LIMIT} count={allClients.length} onChange={setPage} />
           </div>
         </div>
 

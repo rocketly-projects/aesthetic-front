@@ -33,6 +33,7 @@ export interface GetAppointmentsResponse {
   appointments: Appointment[];
   page: number;
   limit: number;
+  total: number;
 }
 
 export interface AgendaSlot {

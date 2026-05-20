@@ -25,6 +25,18 @@ export interface WhatsappMessage {
   createdAt: string;
 }
 
+export interface GetChatsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface GetChatsResponse {
+  chats: WhatsappChat[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
 export interface GetMessagesParams {
   page?: number;
   limit?: number;
@@ -53,9 +65,12 @@ export interface SendMessageParams {
 
 // ── Endpoints ──────────────────────────────────────────────────────────────
 
-export async function getChats(): Promise<WhatsappChat[]> {
-  const data = await apiFetch<{ chats: WhatsappChat[] }>("/whatsapp/chats");
-  return data.chats;
+export async function getChats(params: GetChatsParams = {}): Promise<GetChatsResponse> {
+  const qs = new URLSearchParams();
+  if (params.page)  qs.set("page",  String(params.page));
+  if (params.limit) qs.set("limit", String(params.limit));
+  const query = qs.toString() ? `?${qs}` : "";
+  return apiFetch<GetChatsResponse>(`/whatsapp/chats${query}`);
 }
 
 export async function getChat(id: string): Promise<WhatsappChat> {

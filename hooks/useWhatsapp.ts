@@ -9,20 +9,20 @@ import {
   getMessages,
   sendMessage,
 } from "@/lib/api/whatsapp";
-import type { GetMessagesParams, CreateOrGetChatParams, PatchChatParams, SendMessageParams } from "@/lib/api/whatsapp";
+import type { GetChatsParams, GetMessagesParams, CreateOrGetChatParams, PatchChatParams, SendMessageParams } from "@/lib/api/whatsapp";
 
 export const whatsappKeys = {
   all:      ["whatsapp"] as const,
-  chats:    ["whatsapp", "chats"] as const,
+  chats:    (params: GetChatsParams) => ["whatsapp", "chats", params] as const,
   chat:     (id: string) => ["whatsapp", "chats", id] as const,
   messages: (chatId: string, params: GetMessagesParams) =>
     ["whatsapp", "chats", chatId, "messages", params] as const,
 };
 
-export function useGetChats() {
+export function useGetChats(params: GetChatsParams = {}) {
   return useQuery({
-    queryKey: whatsappKeys.chats,
-    queryFn:  getChats,
+    queryKey: whatsappKeys.chats(params),
+    queryFn:  () => getChats(params),
   });
 }
 
@@ -50,7 +50,7 @@ export function usePatchChat() {
     mutationFn: ({ id, ...params }: { id: string } & PatchChatParams) =>
       patchChat(id, params),
     onSuccess: (_, { id }) => {
-      qc.invalidateQueries({ queryKey: whatsappKeys.chats });
+      qc.invalidateQueries({ queryKey: ["whatsapp", "chats"] });
       qc.invalidateQueries({ queryKey: whatsappKeys.chat(id) });
     },
   });
@@ -73,7 +73,7 @@ export function useSendMessage() {
       // Invalidar todos los params de mensajes de este chat
       qc.invalidateQueries({ queryKey: ["whatsapp", "chats", chatId, "messages"] });
       // Actualizar lastMessage en la lista de chats
-      qc.invalidateQueries({ queryKey: whatsappKeys.chats });
+      qc.invalidateQueries({ queryKey: ["whatsapp", "chats"] });
     },
   });
 }

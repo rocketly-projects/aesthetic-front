@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import Pagination from "@/components/Pagination";
 import { statusChip } from "@/components/Chip";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
 import EditTurnoModal from "@/components/EditTurnoModal";
@@ -20,6 +21,8 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: "no_show",          label: "No asistió"     },
 ];
 
+const PAGE_LIMIT = 15;
+
 function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 }
@@ -33,13 +36,24 @@ const QUICK_STATUSES: { status: AppointmentStatus; label: string }[] = [
 
 export default function TurnosPage() {
   const [filter, setFilter]       = useState<Filter>("todos");
+  const [page,   setPage]         = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editAppt,  setEditAppt]  = useState<Appointment | null>(null);
   const [menuId,    setMenuId]    = useState<string | null>(null);
 
-  const { data: apptData, isLoading } = useGetAppointments({ limit: 100 });
-  const allAppts = apptData?.appointments ?? [];
-  const visible  = filter === "todos" ? allAppts : allAppts.filter((a) => a.status === filter);
+  function handleFilter(f: Filter) {
+    setFilter(f);
+    setPage(1);
+  }
+
+  const { data: apptData, isLoading } = useGetAppointments({
+    page,
+    limit: PAGE_LIMIT,
+    status: filter !== "todos" ? filter : undefined,
+  });
+  const appts = apptData?.appointments ?? [];
+  const total = apptData?.total;
+
   const updateAppt = useUpdateAppointment();
 
   function handleQuickStatus(appt: Appointment, status: AppointmentStatus) {
@@ -47,15 +61,11 @@ export default function TurnosPage() {
     updateAppt.mutate({ id: appt.id, status });
   }
 
-  function count(f: Filter) {
-    return f === "todos" ? allAppts.length : allAppts.filter((a) => a.status === f).length;
-  }
-
   return (
     <AppShell
       active="turnos"
       title="Turnos"
-      subtitle={`${allAppts.length} turnos en total`}
+      subtitle={total !== undefined ? `${total} turno${total !== 1 ? "s" : ""}` : undefined}
       actions={
         <button
           className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
@@ -70,11 +80,8 @@ export default function TurnosPage() {
       <div className="flex items-center gap-3 mb-4">
         <div className="seg">
           {FILTERS.map((f) => (
-            <button key={f.key} className={`seg-item${filter === f.key ? " active" : ""}`} onClick={() => setFilter(f.key)}>
+            <button key={f.key} className={`seg-item${filter === f.key ? " active" : ""}`} onClick={() => handleFilter(f.key)}>
               {f.label}
-              <span className={`ml-1.5 rounded-full text-[10px] font-semibold px-1.5 ${filter === f.key ? "bg-accent-pale text-accent-ink" : "bg-line text-ink-3"}`}>
-                {count(f.key)}
-              </span>
             </button>
           ))}
         </div>
@@ -83,6 +90,10 @@ export default function TurnosPage() {
       <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center text-[13px] text-ink-3">Cargando turnos…</div>
+        ) : appts.length === 0 ? (
+          <div className="p-10 text-center text-[13px] text-ink-3">
+            {filter === "todos" ? "No hay turnos registrados" : `No hay turnos con estado "${FILTERS.find(f => f.key === filter)?.label}"`}
+          </div>
         ) : (
           <table className="tbl">
             <thead>
@@ -91,7 +102,7 @@ export default function TurnosPage() {
               </tr>
             </thead>
             <tbody>
-              {visible.map((appt) => (
+              {appts.map((appt) => (
                 <tr key={appt.id} className="cursor-pointer">
                   <td><span className="font-mono text-[12px] text-ink-2">{formatDate(appt.date)}</span></td>
                   <td><span className="font-mono text-[12px] font-semibold">{appt.time}</span></td>
@@ -135,6 +146,8 @@ export default function TurnosPage() {
           </table>
         )}
       </div>
+
+      <Pagination page={page} total={total} limit={PAGE_LIMIT} count={appts.length} onChange={setPage} />
 
       <NuevoTurnoModal open={modalOpen} onClose={() => setModalOpen(false)} />
       {editAppt && (

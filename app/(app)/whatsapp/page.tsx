@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import Pagination from "@/components/Pagination";
 import { statusChip } from "@/components/Chip";
 import { useGetChats, useGetMessages, useSendMessage, usePatchChat } from "@/hooks/useWhatsapp";
 import { useGetClient } from "@/hooks/useClients";
@@ -9,6 +10,8 @@ import { useGetAppointments } from "@/hooks/useAppointments";
 import type { MessageSender } from "@/lib/api/whatsapp";
 
 type TabFilter = "todos" | "bot" | "yo";
+
+const CHATS_LIMIT = 30;
 
 function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
@@ -27,9 +30,12 @@ function bubbleStyle(sender: MessageSender) {
 export default function WhatsAppPage() {
   const [activeTab,    setActiveTab]    = useState<TabFilter>("todos");
   const [activeChatId, setActiveChatId] = useState<string>("");
+  const [chatsPage,    setChatsPage]    = useState(1);
   const [input,        setInput]        = useState("");
 
-  const { data: chats = [] }    = useGetChats();
+  const { data: chatsData }    = useGetChats({ page: chatsPage, limit: CHATS_LIMIT });
+  const chats                  = chatsData?.chats ?? [];
+  const chatsTotal             = chatsData?.total;
   const patchChat               = usePatchChat();
   const sendMessage             = useSendMessage();
 
@@ -98,6 +104,9 @@ export default function WhatsAppPage() {
                 </div>
               );
             })}
+          </div>
+          <div className="px-3 border-t border-line shrink-0">
+            <Pagination page={chatsPage} total={chatsTotal} limit={CHATS_LIMIT} count={chats.length} onChange={setChatsPage} />
           </div>
         </div>
 
