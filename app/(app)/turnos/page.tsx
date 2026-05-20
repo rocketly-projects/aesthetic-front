@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import Pagination from "@/components/Pagination";
+import EmptyState, { CalendarEmptyIcon, SearchEmptyIcon } from "@/components/EmptyState";
 import { statusChip } from "@/components/Chip";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
 import EditTurnoModal from "@/components/EditTurnoModal";
@@ -91,9 +92,11 @@ export default function TurnosPage() {
         {isLoading ? (
           <div className="p-8 text-center text-[13px] text-ink-3">Cargando turnos…</div>
         ) : appts.length === 0 ? (
-          <div className="p-10 text-center text-[13px] text-ink-3">
-            {filter === "todos" ? "No hay turnos registrados" : `No hay turnos con estado "${FILTERS.find(f => f.key === filter)?.label}"`}
-          </div>
+          <EmptyState
+            icon={filter === "todos" ? <CalendarEmptyIcon /> : <SearchEmptyIcon />}
+            title={filter === "todos" ? "Sin turnos registrados" : `Sin turnos "${FILTERS.find(f => f.key === filter)?.label}"`}
+            description={filter === "todos" ? "Creá tu primer turno usando el botón de arriba." : "No hay turnos con este estado en la página actual."}
+          />
         ) : (
           <table className="tbl">
             <thead>

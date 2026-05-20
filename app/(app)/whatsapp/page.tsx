@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import Pagination from "@/components/Pagination";
+import EmptyState, { ChatEmptyIcon } from "@/components/EmptyState";
 import { statusChip } from "@/components/Chip";
 import { useGetChats, useGetMessages, useSendMessage, usePatchChat } from "@/hooks/useWhatsapp";
 import { useGetClient } from "@/hooks/useClients";
@@ -84,6 +85,13 @@ export default function WhatsAppPage() {
             </div>
           </div>
           <div className="overflow-y-auto flex-1">
+            {visibleChats.length === 0 && (
+              <EmptyState
+                icon={<ChatEmptyIcon />}
+                title={activeTab === "bot" ? "Sin chats del bot" : activeTab === "yo" ? "Sin chats propios" : "Sin conversaciones"}
+                description={activeTab === "todos" ? "Los chats de tus clientes aparecerán acá." : "No hay chats en esta categoría."}
+              />
+            )}
             {visibleChats.map((c) => {
               const isActive = c.id === resolvedChatId;
               const name     = c.clientName ?? c.clientPhone;

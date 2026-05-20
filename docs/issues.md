@@ -180,12 +180,10 @@ Panel lateral fijo (`ApptDetailPanel`) que muestra cliente, servicio, fecha/hora
 
 ---
 
-### [U-06] No hay estados vacíos explícitos en listas filtradas
-**Archivo:** `app/(app)/turnos/page.tsx`
+### [U-06] ~~Estados vacíos son solo textos cortos~~ ✅
+**Archivos:** `components/EmptyState.tsx`, `turnos`, `clientes`, `whatsapp`, `servicios`
 
-Si se filtra por un estado y no hay resultados, la tabla queda vacía sin mensaje. El usuario no sabe si es un error o si realmente no hay datos.
-
-**Solución:** Mostrar un empty state con mensaje contextual cuando `visible.length === 0`.
+Componente `EmptyState` reutilizable con SVG contextual, título y descripción. Iconos específicos: `CalendarEmptyIcon` (turnos), `ClientEmptyIcon` (clientes), `ChatEmptyIcon` (whatsapp), `ScissorsEmptyIcon` (servicios), `SearchEmptyIcon` (búsquedas sin resultado). Servicios incluye CTA de acción.
 
 ---
 

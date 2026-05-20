@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import EmptyState, { ScissorsEmptyIcon } from "@/components/EmptyState";
 import KPI from "@/components/KPI";
 import NuevoServicioModal from "@/components/NuevoServicioModal";
 import EditServicioModal from "@/components/EditServicioModal";
@@ -39,6 +40,23 @@ export default function ServiciosPage() {
 
       {isLoading ? (
         <div className="text-center text-[13px] text-ink-3 py-12">Cargando servicios…</div>
+      ) : services.length === 0 ? (
+        <div className="bg-surface border border-line rounded-lg shadow-sm">
+          <EmptyState
+            icon={<ScissorsEmptyIcon />}
+            title="Sin servicios configurados"
+            description="Agregá tu primer servicio para empezar a recibir turnos."
+            action={
+              <button
+                onClick={() => setModalOpen(true)}
+                className="flex items-center gap-1.5 text-white text-[13px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity"
+                style={{ background: "var(--color-accent)" }}
+              >
+                Agregar servicio
+              </button>
+            }
+          />
+        </div>
       ) : (
         <div className="grid grid-cols-3 gap-4">
           {services.map((s) => (
