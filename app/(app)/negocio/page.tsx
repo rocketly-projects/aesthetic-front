@@ -300,8 +300,8 @@ function NegocioPageInner() {
 
             {/* MercadoPago connection */}
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-line">
-              <div className="flex items-center gap-3">
-                <img src="/mpLogo.png" alt="MercadoPago" style={{ height: 24, width: "auto", objectFit: "contain" }} />
+              <div className="flex items-start gap-3 flex-col">
+                <img src="/mpLogo.png" alt="MercadoPago" style={{ height: 34, width: "auto", objectFit: "contain" }} />
                 {business?.mpUserId ? (
                   <div className="text-xs text-ok">● Conectado (ID: {business.mpUserId})</div>
                 ) : (
