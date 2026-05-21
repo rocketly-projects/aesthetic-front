@@ -66,7 +66,7 @@ El link apunta a `href="#"`. No hay página ni endpoint de recuperación de cont
 
 ---
 
-### [F-06] ~~Login con Google no implementado~~ ✅ (frontend listo — requiere backend)
+### ✅ [F-06] ~~Login con Google no implementado~~ (frontend listo — backend implementado)
 **Archivos:** `types/google.d.ts`, `lib/api/auth.ts`, `hooks/useAuth.ts`, `components/CompleteGoogleRegisterModal.tsx`, `app/(auth)/layout.tsx`, `app/(auth)/login/page.tsx`, `app/(auth)/register/page.tsx`
 
 Frontend completo con Google Identity Services (sin dependencias extra). Flujo:
@@ -143,7 +143,7 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ## UX / EXPERIENCIA
 
-### [U-01] Estado "no_show" falta en filtros de turnos
+### ✅ [U-01] Estado "no_show" falta en filtros de turnos
 **Archivo:** `app/(app)/turnos/page.tsx:12-18`
 
 `AppointmentStatus` incluye `"no_show"` pero el array `FILTERS` no lo contempla. Los turnos con ese estado quedan atrapados en "Todos" sin filtro propio.
@@ -225,14 +225,14 @@ El hook `useGetAgenda(date)` —que llama a `/appointments/agenda/:date` y devue
 
 ---
 
-### [T-03] Layouts de grupos de rutas son pass-through vacíos
+### ✅ [T-03] Layouts de grupos de rutas son pass-through vacíos
 **Archivos:** `app/(app)/layout.tsx`, `app/(auth)/layout.tsx`
 
 Ambos layouts solo hacen `return <>{children}</>`. El de `(app)` debería ser donde viva el auth guard (ver C-01). El de `(auth)` podría verificar que el usuario NO esté autenticado y redirigir al dashboard.
 
 ---
 
-### [T-04] Dependencia circular implícita entre hooks
+### ✅ [T-04] Dependencia circular implícita entre hooks
 **Archivos:** `hooks/useAppointments.ts:13`, `hooks/useClients.ts`
 
 `useAppointments.ts` importa `clientKeys` de `useClients.ts`. Si `useClients.ts` alguna vez importara algo de `useAppointments.ts`, se crearía una dependencia circular. Considerar mover las query keys a un archivo separado `lib/queryKeys.ts`.
