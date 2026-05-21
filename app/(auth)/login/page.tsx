@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    login({ email, password });
+    login({ email, password, remember });
   }
 
   return (

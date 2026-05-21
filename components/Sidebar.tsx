@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLogout, useCurrentUser } from "@/hooks/useAuth";
+import { useGetChats } from "@/hooks/useWhatsapp";
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -75,7 +76,6 @@ interface NavItem {
   href: string;
   id: string;
   label: string;
-  badge?: number;
 }
 
 const gestionNav: NavItem[] = [
@@ -83,7 +83,7 @@ const gestionNav: NavItem[] = [
   { href: "/agenda",    id: "agenda",    label: "Agenda"    },
   { href: "/turnos",    id: "turnos",    label: "Turnos"    },
   { href: "/clientes",  id: "clientes",  label: "Clientes"  },
-  { href: "/whatsapp",  id: "whatsapp",  label: "WhatsApp", badge: 3 },
+  { href: "/whatsapp",  id: "whatsapp",  label: "WhatsApp" },
   { href: "/servicios", id: "servicios", label: "Servicios" },
 ];
 
@@ -104,6 +104,8 @@ export default function Sidebar({ active }: { active: string }) {
   const logout  = useLogout();
   const current = useCurrentUser();
   const roleLabel = current?.role === "owner" ? "Propietario" : current?.role === "staff" ? "Colaborador" : "";
+  const { data: chatsData } = useGetChats();
+  const unreadCount = chatsData?.chats.reduce((sum, c) => sum + (c.unread ?? 0), 0) ?? 0;
 
   return (
     <aside
@@ -148,12 +150,12 @@ export default function Sidebar({ active }: { active: string }) {
             >
               {IconComp && <IconComp />}
               <span className="flex-1">{item.label}</span>
-              {item.badge && (
+              {item.id === "whatsapp" && unreadCount > 0 && (
                 <span
                   className="text-white text-[10px] font-semibold leading-none px-1.5 py-0.5 rounded-full"
                   style={{ background: "var(--color-accent)" }}
                 >
-                  {item.badge}
+                  {unreadCount}
                 </span>
               )}
             </Link>

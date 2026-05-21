@@ -28,11 +28,13 @@ export interface AuthResponse {
   token: string;
   user: AuthUser;
   business: AuthBusiness;
+  expiresIn?: number;
 }
 
 export interface LoginParams {
   email: string;
   password: string;
+  remember?: boolean;
 }
 
 export interface RegisterParams {
@@ -60,8 +62,8 @@ export interface StoredUser {
   businessName: string;
 }
 
-export function saveToken(token: string) {
-  Cookies.set("token", token, { expires: 7, sameSite: "lax" });
+export function saveToken(token: string, days: number = 7) {
+  Cookies.set("token", token, { expires: days, sameSite: "lax" });
 }
 
 export function clearToken() {
@@ -87,7 +89,7 @@ export async function login(params: LoginParams): Promise<AuthResponse> {
     method: "POST",
     body: JSON.stringify(params),
   });
-  saveToken(data.token);
+  saveToken(data.token, data.expiresIn ?? 7);
   saveUser(data.user, data.business);
   return data;
 }

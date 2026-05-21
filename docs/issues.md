@@ -132,7 +132,7 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ---
 
-### [D-05] Badge de WhatsApp hardcodeado en sidebar
+### ✅ [D-05] Badge de WhatsApp hardcodeado en sidebar
 **Archivo:** `components/Sidebar.tsx:74`
 
 `badge: 3` es un número fijo. No refleja los mensajes no leídos reales.
@@ -207,7 +207,7 @@ El "mapa" es un `div` con un emoji. No es un mapa real.
 
 ## TECNICO / DEUDA
 
-### [T-01] `remember` en login no se usa
+### ✅ [T-01] `remember` en login no se usa
 **Archivo:** `app/(auth)/login/page.tsx:11,17`
 
 El estado `remember` se trackea y muestra en el checkbox "Mantener sesión", pero no se pasa al `login()` call ni afecta la duración del token/cookie.
@@ -216,7 +216,7 @@ El estado `remember` se trackea y muestra en el checkbox "Mantener sesión", per
 
 ---
 
-### [T-02] `useGetAgenda` existe pero no se usa
+### ✅ [T-02] `useGetAgenda` existe pero no se usa
 **Archivo:** `hooks/useAppointments.ts:75-81`
 
 El hook `useGetAgenda(date)` —que llama a `/appointments/agenda/:date` y devuelve `availableSlots`— está implementado pero ninguna página lo consume. La agenda fetcha todos los appointments y filtra client-side.

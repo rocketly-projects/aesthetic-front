@@ -36,21 +36,6 @@ export interface GetAppointmentsResponse {
   total: number;
 }
 
-export interface AgendaSlot {
-  id: string;
-  time: string;
-  duration: number;
-  status: AppointmentStatus;
-  serviceName: string;
-  clientName: string | null;
-}
-
-export interface AgendaResponse {
-  date: string;
-  appointments: AgendaSlot[];
-  availableSlots: string[];
-}
-
 export interface CreateAppointmentParams {
   serviceId: string;
   clientId?: string;
@@ -105,6 +90,3 @@ export async function deleteAppointment(id: string): Promise<void> {
   await apiFetch<void>(`/appointments/${id}`, { method: "DELETE" });
 }
 
-export async function getAgenda(date: string): Promise<AgendaResponse> {
-  return apiFetch<AgendaResponse>(`/appointments/agenda/${date}`);
-}

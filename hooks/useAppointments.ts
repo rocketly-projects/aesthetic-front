@@ -7,7 +7,6 @@ import {
   createAppointment,
   updateAppointment,
   deleteAppointment,
-  getAgenda,
 } from "@/lib/api/appointments";
 import type { GetAppointmentsParams, CreateAppointmentParams, UpdateAppointmentParams } from "@/lib/api/appointments";
 import { clientKeys } from "./useClients";
@@ -17,7 +16,6 @@ export const appointmentKeys = {
   all:    ["appointments"] as const,
   list:   (params: GetAppointmentsParams) => ["appointments", "list", params] as const,
   detail: (id: string) => ["appointments", "detail", id] as const,
-  agenda: (date: string) => ["appointments", "agenda", date] as const,
 };
 
 export function useGetAppointments(params: GetAppointmentsParams = {}) {
@@ -75,10 +73,3 @@ export function useDeleteAppointment() {
   });
 }
 
-export function useGetAgenda(date: string) {
-  return useQuery({
-    queryKey: appointmentKeys.agenda(date),
-    queryFn:  () => getAgenda(date),
-    enabled:  !!date,
-  });
-}
