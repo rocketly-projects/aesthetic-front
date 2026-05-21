@@ -400,12 +400,6 @@ function NegocioPageInner() {
             </div>
           </div>
 
-          <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
-            <div className="font-semibold text-sm text-ink mb-4">Ubicación</div>
-            <div className="h-44 rounded-md border border-line flex items-center justify-center text-[13px] text-ink-3" style={{ background: "linear-gradient(135deg, var(--color-bg-2) 0%, var(--color-line) 100%)" }}>
-              🗺 Mapa — {form.address || "Ingresá tu dirección"}
-            </div>
-          </div>
 
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-3">Links rápidos</div>

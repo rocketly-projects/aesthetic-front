@@ -196,7 +196,7 @@ Los modales se cierran al crear exitosamente pero no hay ningún toast/snackbar 
 
 ---
 
-### [U-08] Mapa en negocio es un placeholder
+### ✅ [U-08] Mapa en negocio es un placeholder
 **Archivo:** `app/(app)/negocio/page.tsx:178-181`
 
 El "mapa" es un `div` con un emoji. No es un mapa real.
