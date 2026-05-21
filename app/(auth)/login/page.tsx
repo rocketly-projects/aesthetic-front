@@ -104,7 +104,7 @@ export default function LoginPage() {
                 />
                 Mantener sesión
               </label>
-              <a href="https://mail.google.com/mail/?view=cm&to=aesthetic.rocketly@gmail.com&su=Recuperar+contrase%C3%B1a" target="_blank" rel="noopener noreferrer" className="text-accent-ink no-underline hover:underline">
+              <a href="https://mail.google.com/mail/?view=cm&to=aesthetic.rocketly@gmail.com&su=Recuperar+contrase%C3%B1a&body=Hola%2C+necesito+recuperar+el+acceso+a+mi+cuenta+de+aesthetic.+Mi+email+registrado+es%3A+" target="_blank" rel="noopener noreferrer" className="text-accent-ink no-underline hover:underline">
                 Olvidé mi contraseña
               </a>
             </div>
