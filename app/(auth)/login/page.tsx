@@ -104,7 +104,7 @@ export default function LoginPage() {
                 />
                 Mantener sesión
               </label>
-              <a href="#" className="text-accent-ink no-underline hover:underline">
+              <a href="mailto:aesthetic.rocketly@gmail.com?subject=Recuperar%20contrase%C3%B1a" className="text-accent-ink no-underline hover:underline">
                 Olvidé mi contraseña
               </a>
             </div>

@@ -57,7 +57,7 @@ Implementadas las tres vistas. Estado `view: "dia" | "semana" | "mes"` controla 
 
 ---
 
-### [F-05] "Olvidé mi contraseña" no tiene flujo
+### ✅ [F-05] "Olvidé mi contraseña" no tiene flujo
 **Archivo:** `app/(auth)/login/page.tsx:88`
 
 El link apunta a `href="#"`. No hay página ni endpoint de recuperación de contraseña.
