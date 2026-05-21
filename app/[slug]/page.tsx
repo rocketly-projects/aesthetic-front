@@ -154,9 +154,8 @@ const CSS = `
 function ProgressBar({ step }: { step: number }) {
   const pct = Math.round(((step + 1) / 5) * 100);
   return (
-    <div style={{ height: 2, background: "var(--color-line-2)" }}>
-      <div style={{
-        height: "100%", background: "var(--color-accent)",
+    <div className="h-0.5 bg-line-2">
+      <div className="h-full bg-accent" style={{
         width: `${pct}%`,
         transition: "width 0.45s cubic-bezier(0.4,0,0.2,1)",
       }} />
@@ -184,11 +183,8 @@ function Chips({ service, date, time }: {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 22 }}>
       {service && (
-        <span style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          padding: "4px 11px", borderRadius: 100,
-          background: "rgba(255,255,255,0.8)", border: "1px solid var(--color-line)",
-          fontSize: 12, color: "var(--color-ink-2)",
+        <span className="inline-flex items-center gap-1.5 px-[11px] py-1 rounded-full text-xs text-ink-2 border border-line" style={{
+          background: "rgba(255,255,255,0.8)",
           backdropFilter: "blur(4px)",
         }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: service.color, flexShrink: 0 }} />
@@ -196,24 +192,15 @@ function Chips({ service, date, time }: {
         </span>
       )}
       {date && (
-        <span style={{
-          display: "inline-flex", alignItems: "center",
-          padding: "4px 11px", borderRadius: 100,
-          background: "rgba(255,255,255,0.8)", border: "1px solid var(--color-line)",
-          fontSize: 12, color: "var(--color-ink-2)", textTransform: "capitalize",
+        <span className="inline-flex items-center px-[11px] py-1 rounded-full text-xs text-ink-2 border border-line capitalize" style={{
+          background: "rgba(255,255,255,0.8)",
           backdropFilter: "blur(4px)",
         }}>
           {formatDate(date)}
         </span>
       )}
       {time && (
-        <span style={{
-          display: "inline-flex", alignItems: "center",
-          padding: "4px 11px", borderRadius: 100,
-          background: "var(--color-accent-pale)", border: "1px solid var(--color-accent-soft)",
-          fontSize: 12, fontWeight: 700, color: "var(--color-accent-ink)",
-          fontFamily: "var(--font-mono)",
-        }}>
+        <span className="inline-flex items-center px-[11px] py-1 rounded-full text-xs font-bold text-accent-ink bg-accent-pale border border-accent-soft font-mono">
           {time}
         </span>
       )}
@@ -224,10 +211,10 @@ function Chips({ service, date, time }: {
 function StepHeading({ title, sub }: { title: string; sub: string }) {
   return (
     <>
-      <h2 style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 700, color: "var(--color-ink)", fontFamily: "var(--font-display)", lineHeight: 1.2 }}>
+      <h2 className="text-ink" style={{ margin: "0 0 6px", fontSize: 24, fontWeight: 700, fontFamily: "var(--font-display)", lineHeight: 1.2 }}>
         {title}
       </h2>
-      <p style={{ margin: "0 0 28px", fontSize: 13, color: "var(--color-ink-3)", lineHeight: 1.6 }}>
+      <p className="text-ink-3" style={{ margin: "0 0 28px", fontSize: 13, lineHeight: 1.6 }}>
         {sub}
       </p>
     </>
@@ -236,13 +223,13 @@ function StepHeading({ title, sub }: { title: string; sub: string }) {
 
 function ReceiptRow({ label, value, mono, bold }: { label: string; value: React.ReactNode; mono?: boolean; bold?: boolean }) {
   return (
-    <div style={{
+    <div className="border-b border-line-2" style={{
       display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-      gap: 16, padding: "9px 0", borderBottom: "1px solid var(--color-line-2)"
+      gap: 16, padding: "9px 0",
     }}>
-      <span style={{ fontSize: 12, color: "var(--color-ink-3)", whiteSpace: "nowrap" }}>{label}</span>
-      <span style={{
-        fontSize: 13, color: "var(--color-ink)", textAlign: "right",
+      <span className="text-ink-3" style={{ fontSize: 12, whiteSpace: "nowrap" }}>{label}</span>
+      <span className="text-ink" style={{
+        fontSize: 13, textAlign: "right",
         fontWeight: bold ? 700 : 500,
         fontFamily: mono ? "var(--font-mono)" : "var(--font-sans)",
       }}>
@@ -279,7 +266,7 @@ function Calendar({ openDays, selected, onSelect }: {
       {/* Nav */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <NavArrow onClick={prev} dir="left" />
-        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)", fontFamily: "var(--font-display)" }}>
+        <span className="text-ink" style={{ fontSize: 14, fontWeight: 600, fontFamily: "var(--font-display)" }}>
           {MONTHS[mo]} {yr}
         </span>
         <NavArrow onClick={next} dir="right" />
@@ -288,7 +275,7 @@ function Calendar({ openDays, selected, onSelect }: {
       {/* Day headers */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 6 }}>
         {DAYS.map(d => (
-          <div key={d} style={{ textAlign: "center", fontSize: 11, fontWeight: 600, color: "var(--color-ink-3)", letterSpacing: "0.04em", paddingBottom: 6 }}>
+          <div key={d} className="text-ink-3" style={{ textAlign: "center", fontSize: 11, fontWeight: 600, letterSpacing: "0.04em", paddingBottom: 6 }}>
             {d}
           </div>
         ))}
@@ -328,12 +315,7 @@ function NavArrow({ onClick, dir }: { onClick: () => void; dir: "left" | "right"
       onClick={onClick}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{
-        width: 32, height: 32, border: "none", cursor: "pointer", borderRadius: 8,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        background: hov ? "var(--color-bg-2)" : "transparent",
-        transition: "background 0.14s", color: "var(--color-ink-3)",
-      }}
+      className={`w-8 h-8 flex items-center justify-center rounded-lg border-none cursor-pointer text-ink-3 transition-[background] duration-[140ms] ${hov ? "bg-bg-2" : "bg-transparent"}`}
     >
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         {dir === "left"
@@ -387,10 +369,10 @@ export default function PublicBookingPage() {
 
   if (loadingBiz) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--color-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="min-h-screen bg-bg flex items-center justify-center">
         <div style={{ display: "flex", gap: 6 }}>
           {[0,1,2].map(i => (
-            <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-accent)", animation: `dotPulse 1.1s ease ${i * 0.18}s infinite` }} />
+            <div key={i} className="w-[7px] h-[7px] rounded-full bg-accent" style={{ animation: `dotPulse 1.1s ease ${i * 0.18}s infinite` }} />
           ))}
         </div>
       </div>
@@ -399,11 +381,11 @@ export default function PublicBookingPage() {
 
   if (bizError || !business) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--color-bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="min-h-screen bg-bg flex items-center justify-center">
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 36, marginBottom: 14, color: "var(--color-line)" }}>✦</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "var(--color-ink)", fontFamily: "var(--font-display)" }}>Negocio no encontrado</div>
-          <div style={{ fontSize: 13, color: "var(--color-ink-3)", marginTop: 6 }}>La URL que ingresaste no existe.</div>
+          <div className="text-line" style={{ fontSize: 36, marginBottom: 14 }}>✦</div>
+          <div className="text-ink" style={{ fontSize: 18, fontWeight: 700, fontFamily: "var(--font-display)" }}>Negocio no encontrado</div>
+          <div className="text-ink-3" style={{ fontSize: 13, marginTop: 6 }}>La URL que ingresaste no existe.</div>
         </div>
       </div>
     );
@@ -422,29 +404,25 @@ export default function PublicBookingPage() {
         {step < 5 && <ProgressBar step={step} />}
 
         {/* Header */}
-        <div style={{ background: "rgba(255,255,255,0.85)", borderBottom: "1px solid var(--color-line)", backdropFilter: "blur(8px)", position: "sticky", top: 0, zIndex: 10 }}>
+        <div className="border-b border-line sticky top-0 z-10" style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)" }}>
           <div style={{ maxWidth: 500, margin: "0 auto", padding: "16px 24px", display: "flex", alignItems: "center", gap: 13 }}>
             {business.logoUrl ? (
               <img src={business.logoUrl} alt={business.name}
                 style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "1.5px solid var(--color-line)", flexShrink: 0 }} />
             ) : (
-              <div style={{
-                width: 40, height: 40, borderRadius: "50%",
-                background: "var(--color-accent-pale)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "var(--color-accent)", fontWeight: 800, fontSize: 16,
-                flexShrink: 0, fontFamily: "var(--font-display)",
+              <div className="w-10 h-10 rounded-full bg-accent-pale flex items-center justify-center text-accent shrink-0" style={{
+                fontWeight: 800, fontSize: 16, fontFamily: "var(--font-display)",
               }}>
                 {business.name[0].toUpperCase()}
               </div>
             )}
 
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--color-ink)", fontFamily: "var(--font-display)", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div className="text-ink" style={{ fontSize: 15, fontWeight: 700, fontFamily: "var(--font-display)", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {business.name}
               </div>
               {business.address && (
-                <div style={{ fontSize: 11.5, color: "var(--color-ink-3)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div className="text-ink-3" style={{ fontSize: 11.5, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {business.address}
                 </div>
               )}
@@ -452,8 +430,8 @@ export default function PublicBookingPage() {
 
             {step < 5 && (
               <div style={{ flexShrink: 0, textAlign: "right" }}>
-                <div style={{ fontSize: 11.5, color: "var(--color-accent)", fontWeight: 700 }}>{STEP_NAMES[step]}</div>
-                <div style={{ fontSize: 10.5, color: "var(--color-ink-3)", marginTop: 1 }}>{step + 1} de 5</div>
+                <div className="text-accent font-bold" style={{ fontSize: 11.5 }}>{STEP_NAMES[step]}</div>
+                <div className="text-ink-3" style={{ fontSize: 10.5, marginTop: 1 }}>{step + 1} de 5</div>
               </div>
             )}
           </div>
@@ -471,15 +449,15 @@ export default function PublicBookingPage() {
               />
 
               {loadingSvcs ? (
-                <div style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Cargando...</div>
+                <div className="text-ink-3" style={{ fontSize: 13 }}>Cargando...</div>
               ) : services.length === 0 ? (
-                <div style={{ background: "white", border: "1px solid var(--color-line)", borderRadius: 14, padding: "44px 24px", textAlign: "center" }}>
-                  <p style={{ fontSize: 13, color: "var(--color-ink-3)", margin: 0 }}>
+                <div className="border border-line" style={{ background: "white", borderRadius: 14, padding: "44px 24px", textAlign: "center" }}>
+                  <p className="text-ink-3" style={{ fontSize: 13, margin: 0 }}>
                     Aún no hay servicios disponibles.
                   </p>
                 </div>
               ) : (
-                <div style={{ background: "white", border: "1px solid var(--color-line)", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
+                <div className="border border-line" style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
                   {services.map((s, i) => (
                     <button
                       key={s.id}
@@ -494,14 +472,14 @@ export default function PublicBookingPage() {
                     >
                       <div style={{ width: 9, height: 9, borderRadius: "50%", background: s.color, flexShrink: 0 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>{s.name}</div>
-                        {s.category && <div style={{ fontSize: 11.5, color: "var(--color-ink-3)", marginTop: 2 }}>{s.category}</div>}
+                        <div className="text-ink" style={{ fontSize: 14, fontWeight: 500 }}>{s.name}</div>
+                        {s.category && <div className="text-ink-3" style={{ fontSize: 11.5, marginTop: 2 }}>{s.category}</div>}
                       </div>
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--color-ink)" }}>{formatPrice(s.price)}</div>
-                        <div style={{ fontSize: 11, color: "var(--color-ink-3)", marginTop: 2, fontFamily: "var(--font-mono)" }}>{s.duration} min</div>
+                        <div className="text-ink" style={{ fontSize: 14, fontWeight: 700 }}>{formatPrice(s.price)}</div>
+                        <div className="text-ink-3" style={{ fontSize: 11, marginTop: 2, fontFamily: "var(--font-mono)" }}>{s.duration} min</div>
                       </div>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ color: "var(--color-line)", flexShrink: 0 }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-line shrink-0">
                         <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
@@ -520,7 +498,7 @@ export default function PublicBookingPage() {
                 title="¿Qué día venís?"
                 sub="Los días atenuados no tienen atención."
               />
-              <div style={{ background: "white", border: "1px solid var(--color-line)", borderRadius: 16, padding: "24px 20px", boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
+              <div className="border border-line" style={{ background: "white", borderRadius: 16, padding: "24px 20px", boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
                 <Calendar
                   openDays={openDays}
                   selected={date}
@@ -538,13 +516,13 @@ export default function PublicBookingPage() {
               <StepHeading title="¿A qué hora?" sub="Elegí el horario que más te convenga." />
 
               {loadingSlots ? (
-                <div style={{ fontSize: 13, color: "var(--color-ink-3)" }}>Cargando horarios...</div>
+                <div className="text-ink-3" style={{ fontSize: 13 }}>Cargando horarios...</div>
               ) : slots.length === 0 ? (
-                <div style={{ background: "white", border: "1px solid var(--color-line)", borderRadius: 16, padding: "48px 24px", textAlign: "center", boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
+                <div className="border border-line" style={{ background: "white", borderRadius: 16, padding: "48px 24px", textAlign: "center", boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
                   <div style={{ fontSize: 32, marginBottom: 12, opacity: 0.3 }}>—</div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)", marginBottom: 4 }}>Sin horarios disponibles</div>
-                  <div style={{ fontSize: 13, color: "var(--color-ink-3)", marginBottom: 20 }}>Probá con otra fecha.</div>
-                  <button onClick={() => setStep(1)} style={{ fontSize: 13, color: "var(--color-accent)", background: "none", border: "none", cursor: "pointer", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>
+                  <div className="text-ink" style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>Sin horarios disponibles</div>
+                  <div className="text-ink-3" style={{ fontSize: 13, marginBottom: 20 }}>Probá con otra fecha.</div>
+                  <button onClick={() => setStep(1)} className="text-accent" style={{ fontSize: 13, background: "none", border: "none", cursor: "pointer", fontWeight: 600, textDecoration: "underline", textUnderlineOffset: 3 }}>
                     Elegir otra fecha
                   </button>
                 </div>
@@ -578,7 +556,7 @@ export default function PublicBookingPage() {
                   { key: "email", label: "Email",             placeholder: "maria@email.com", type: "email", req: false },
                 ] as const).map(f => (
                   <div key={f.key}>
-                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ink-3)", marginBottom: 0 }}>
+                    <label className="text-ink-3" style={{ display: "block", fontSize: 10.5, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 0 }}>
                       {f.label}
                       {!f.req && <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, fontSize: 11, marginLeft: 5, opacity: 0.6 }}>· opcional</span>}
                     </label>
@@ -610,15 +588,15 @@ export default function PublicBookingPage() {
               <StepHeading title="Confirmá tu turno" sub="Revisá los detalles antes de confirmar." />
 
               {/* Receipt card */}
-              <div style={{ background: "white", border: "1px solid var(--color-line)", borderRadius: 16, overflow: "hidden", marginBottom: 14, boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
+              <div className="border border-line" style={{ background: "white", borderRadius: 16, overflow: "hidden", marginBottom: 14, boxShadow: "0 2px 16px rgba(39,42,37,.05)" }}>
                 {/* Servicio highlight */}
-                <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--color-line-2)", display: "flex", alignItems: "center", gap: 12 }}>
+                <div className="border-b border-line-2" style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 9, height: 9, borderRadius: "50%", background: svc.color, flexShrink: 0 }} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)" }}>{svc.name}</div>
-                    <div style={{ fontSize: 11.5, color: "var(--color-ink-3)", marginTop: 2, fontFamily: "var(--font-mono)" }}>{svc.duration} min</div>
+                    <div className="text-ink" style={{ fontSize: 15, fontWeight: 600 }}>{svc.name}</div>
+                    <div className="text-ink-3" style={{ fontSize: 11.5, marginTop: 2, fontFamily: "var(--font-mono)" }}>{svc.duration} min</div>
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--color-ink)", fontFamily: "var(--font-display)" }}>
+                  <div className="text-ink" style={{ fontSize: 18, fontWeight: 800, fontFamily: "var(--font-display)" }}>
                     {formatPrice(svc.price)}
                   </div>
                 </div>
@@ -630,7 +608,7 @@ export default function PublicBookingPage() {
                   <div style={{ height: 4 }} />
                 </div>
 
-                <div style={{ height: 1, background: "var(--color-line)", margin: "0 20px" }} />
+                <div className="h-px bg-line" style={{ margin: "0 20px" }} />
 
                 {/* Datos */}
                 <div style={{ padding: "0 20px" }}>
@@ -643,18 +621,18 @@ export default function PublicBookingPage() {
 
               {/* Seña notice */}
               {business.webDepositRequired && (
-                <div style={{
+                <div className="bg-warn-soft" style={{
                   padding: "13px 16px", borderRadius: 12, marginBottom: 14,
-                  background: "var(--color-warn-soft)", border: "1px solid rgba(160,120,64,.15)",
+                  border: "1px solid rgba(160,120,64,.15)",
                   display: "flex", alignItems: "flex-start", gap: 11,
                 }}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: "var(--color-warn)", marginTop: 1, flexShrink: 0 }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-warn shrink-0" style={{ marginTop: 1 }}>
                     <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
                     <path d="M8 5v3.5M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ink)", marginBottom: 2 }}>Se requiere seña</div>
-                    <div style={{ fontSize: 12, color: "var(--color-ink-2)", lineHeight: 1.5 }}>
+                    <div className="text-ink" style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>Se requiere seña</div>
+                    <div className="text-ink-2" style={{ fontSize: 12, lineHeight: 1.5 }}>
                       {business.depositPercent}% del total —{" "}
                       <strong>{formatPrice(Math.round(svc.price * business.depositPercent / 100))}</strong>.
                       Serás redirigido a MercadoPago para completar el pago.
@@ -668,7 +646,7 @@ export default function PublicBookingPage() {
               </button>
 
               {createAppt.isError && (
-                <p style={{ fontSize: 12, color: "var(--color-err)", marginTop: 10, textAlign: "center" }}>
+                <p className="text-err" style={{ fontSize: 12, marginTop: 10, textAlign: "center" }}>
                   {(createAppt.error as Error)?.message ?? "Ocurrió un error. Intentá de nuevo."}
                 </p>
               )}
@@ -678,9 +656,8 @@ export default function PublicBookingPage() {
           {/* ── PASO 5: Éxito ── */}
           {step === 5 && result && (
             <div className="step-in" style={{ textAlign: "center", paddingTop: 12 }}>
-              <div className="success-ring" style={{
+              <div className="success-ring bg-ok-soft" style={{
                 width: 76, height: 76, borderRadius: "50%",
-                background: "var(--color-ok-soft)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 margin: "0 auto 26px",
               }}>
@@ -696,15 +673,15 @@ export default function PublicBookingPage() {
                 </svg>
               </div>
 
-              <h2 style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 800, color: "var(--color-ink)", fontFamily: "var(--font-display)" }}>
+              <h2 className="text-ink" style={{ margin: "0 0 6px", fontSize: 28, fontWeight: 800, fontFamily: "var(--font-display)" }}>
                 ¡Turno reservado!
               </h2>
-              <p style={{ margin: "0 0 32px", fontSize: 13, color: "var(--color-ink-3)", lineHeight: 1.6 }}>
+              <p className="text-ink-3" style={{ margin: "0 0 32px", fontSize: 13, lineHeight: 1.6 }}>
                 Tu reserva fue registrada exitosamente.<br />¡Te esperamos!
               </p>
 
-              <div style={{
-                background: "white", border: "1px solid var(--color-line)",
+              <div className="border border-line" style={{
+                background: "white",
                 borderRadius: 16, padding: "20px", textAlign: "left",
                 marginBottom: 28, boxShadow: "0 2px 16px rgba(39,42,37,.05)"
               }}>
@@ -714,10 +691,10 @@ export default function PublicBookingPage() {
                 <ReceiptRow label="Total"    value={formatPrice(result.appointment.price)} bold />
 
                 {result.deposit.required && (
-                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--color-line-2)" }}>
-                    <div style={{ fontSize: 12, color: "var(--color-ink-3)", lineHeight: 1.6 }}>
+                  <div className="border-t border-line-2" style={{ marginTop: 14, paddingTop: 14 }}>
+                    <div className="text-ink-3" style={{ fontSize: 12, lineHeight: 1.6 }}>
                       Seña a abonar:{" "}
-                      <strong style={{ color: "var(--color-ink)" }}>{formatPrice(result.deposit.amount)}</strong>
+                      <strong className="text-ink">{formatPrice(result.deposit.amount)}</strong>
                       {" "}({result.deposit.percent}%)
                       <br />El negocio se comunicará para coordinar el pago.
                     </div>
@@ -726,9 +703,9 @@ export default function PublicBookingPage() {
               </div>
 
               {business.instagram && (
-                <p style={{ fontSize: 12, color: "var(--color-ink-3)" }}>
+                <p className="text-ink-3" style={{ fontSize: 12 }}>
                   Seguinos en{" "}
-                  <span style={{ color: "var(--color-accent)", fontWeight: 600 }}>{business.instagram}</span>
+                  <span className="text-accent font-semibold">{business.instagram}</span>
                 </p>
               )}
             </div>
@@ -738,7 +715,7 @@ export default function PublicBookingPage() {
         {/* Footer */}
         {step < 5 && (
           <div style={{ textAlign: "center", paddingBottom: 36 }}>
-            <p style={{ fontSize: 11, color: "var(--color-ink-3)", margin: 0, opacity: 0.45, letterSpacing: "0.02em" }}>
+            <p className="text-ink-3" style={{ fontSize: 11, margin: 0, opacity: 0.45, letterSpacing: "0.02em" }}>
               Reservas online · <span style={{ fontWeight: 700 }}>aesthetic.</span>
             </p>
           </div>

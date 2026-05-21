@@ -48,8 +48,7 @@ export default function ConfigPage() {
       actions={
         <button
           onClick={save}
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-          style={{ background: saved ? "var(--color-ok)" : "var(--color-ink)" }}
+          className={`flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm ${saved ? "bg-ok" : "bg-ink"}`}
         >
           {saved ? "Guardado" : "Guardar"}
         </button>

@@ -96,10 +96,10 @@ export default function WhatsAppPage() {
               const isActive = c.id === resolvedChatId;
               const name     = c.clientName ?? c.clientPhone;
               return (
-                <div key={c.id} onClick={() => handleSelectChat(c.id)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "" : "border-l-transparent hover:bg-bg"}`} style={isActive ? { background: "var(--color-accent-pale)", borderLeftColor: "var(--color-accent)" } : undefined}>
-                  <div className="relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                <div key={c.id} onClick={() => handleSelectChat(c.id)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "bg-accent-pale border-l-accent" : "border-l-transparent hover:bg-bg"}`}>
+                  <div className="relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 bg-accent-pale text-accent-ink">
                     {initials(name)}
-                    {c.isBot && <span className="absolute -bottom-0.5 -right-0.5 text-white text-[8px] font-bold rounded-sm px-0.5" style={{ background: "var(--color-accent)" }}>BOT</span>}
+                    {c.isBot && <span className="absolute -bottom-0.5 -right-0.5 bg-accent text-white text-[8px] font-bold rounded-sm px-0.5">BOT</span>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
@@ -108,7 +108,7 @@ export default function WhatsAppPage() {
                     </div>
                     <div className="text-xs text-ink-3 truncate mt-0.5">{c.lastMessage}</div>
                   </div>
-                  {c.unread > 0 && <span className="text-white rounded-full text-[10px] font-semibold px-1.5 leading-relaxed shrink-0" style={{ background: "var(--color-accent)" }}>{c.unread}</span>}
+                  {c.unread > 0 && <span className="bg-accent text-white rounded-full text-[10px] font-semibold px-1.5 leading-relaxed shrink-0">{c.unread}</span>}
                 </div>
               );
             })}
@@ -123,7 +123,7 @@ export default function WhatsAppPage() {
           {activeChat ? (
             <>
               <div className="flex items-center gap-3 px-5 py-3.5 border-b border-line">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 bg-accent-pale text-accent-ink">
                   {initials(activeChat.clientName ?? activeChat.clientPhone)}
                 </div>
                 <div className="flex-1">
@@ -155,7 +155,7 @@ export default function WhatsAppPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 />
-                <button onClick={handleSend} disabled={sendMessage.isPending} className="shrink-0 text-white rounded-lg px-4 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-60" style={{ background: "var(--color-accent)" }}>
+                <button onClick={handleSend} disabled={sendMessage.isPending} className="shrink-0 bg-accent text-white rounded-lg px-4 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-60">
                   Enviar
                 </button>
               </div>
@@ -171,7 +171,7 @@ export default function WhatsAppPage() {
             <>
               <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
                 <div className="text-center mb-4">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-semibold mx-auto mb-3" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-semibold mx-auto mb-3 bg-accent-pale text-accent-ink">
                     {initials(activeChat.clientName ?? activeChat.clientPhone)}
                   </div>
                   <div className="text-[15px] font-semibold text-ink">{activeChat.clientName ?? activeChat.clientPhone}</div>

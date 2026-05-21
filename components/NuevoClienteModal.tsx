@@ -54,11 +54,11 @@ export default function NuevoClienteModal({ open, onClose }: Props) {
           <textarea className="input resize-y" rows={3} placeholder="Preferencias, alergias…" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
         </div>
         {createClient.error && (
-          <p className="text-[12px] m-0" style={{ color: "var(--color-err)" }}>{(createClient.error as Error).message}</p>
+          <p className="text-[12px] m-0 text-err">{(createClient.error as Error).message}</p>
         )}
         <div className="flex gap-3 justify-end mt-1">
           <button type="button" onClick={handleClose} className="border border-line bg-transparent text-ink rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer hover:bg-bg transition-colors">Cancelar</button>
-          <button type="submit" disabled={createClient.isPending} className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60" style={{ background: "var(--color-accent)" }}>
+          <button type="submit" disabled={createClient.isPending} className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60">
             {createClient.isPending ? "Creando…" : "Crear cliente"}
           </button>
         </div>

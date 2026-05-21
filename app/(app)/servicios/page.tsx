@@ -25,7 +25,7 @@ export default function ServiciosPage() {
       title="Servicios"
       subtitle={`${services.length} servicios configurados`}
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
+        <button className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Agregar servicio
         </button>
@@ -49,8 +49,7 @@ export default function ServiciosPage() {
             action={
               <button
                 onClick={() => setModalOpen(true)}
-                className="flex items-center gap-1.5 text-white text-[13px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity"
-                style={{ background: "var(--color-accent)" }}
+                className="flex items-center gap-1.5 bg-accent text-white text-[13px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity"
               >
                 Agregar servicio
               </button>
@@ -94,8 +93,7 @@ export default function ServiciosPage() {
             onMouseEnter={() => setHoverAdd(true)}
             onMouseLeave={() => setHoverAdd(false)}
             onClick={() => setModalOpen(true)}
-            className="border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-8 cursor-pointer transition-colors min-h-[180px]"
-            style={{ borderColor: hoverAdd ? "var(--color-accent)" : "var(--color-line-2)", color: hoverAdd ? "var(--color-accent)" : "var(--color-ink-3)" }}
+            className={`border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-8 cursor-pointer transition-colors min-h-[180px] ${hoverAdd ? "border-accent text-accent" : "border-line-2 text-ink-3"}`}
           >
             <span className="text-3xl leading-none">+</span>
             <span className="text-[13px] font-medium mt-2">Agregar servicio</span>

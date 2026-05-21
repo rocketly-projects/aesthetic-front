@@ -121,8 +121,7 @@ export default function EditServicioModal({ open, onClose, service }: Props) {
               id="edit-svc-visible"
               checked={form.visible}
               onChange={(e) => setForm({ ...form, visible: e.target.checked })}
-              className="w-3.5 h-3.5"
-              style={{ accentColor: "var(--color-accent)" }}
+              className="w-3.5 h-3.5 accent-accent"
             />
             <label htmlFor="edit-svc-visible" className="text-[13px] text-ink-2 cursor-pointer">
               Visible para reservas
@@ -143,8 +142,7 @@ export default function EditServicioModal({ open, onClose, service }: Props) {
           <button
             type="submit"
             disabled={updateService.isPending}
-            className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-            style={{ background: "var(--color-accent)" }}
+            className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
           >
             {updateService.isPending ? "Guardando…" : "Guardar cambios"}
           </button>

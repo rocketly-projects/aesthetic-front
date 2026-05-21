@@ -165,8 +165,7 @@ export default function DashboardPage() {
       subtitle="Tu día de un vistazo"
       actions={
         <button
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-          style={{ background: "var(--color-ink)" }}
+          className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
           onClick={() => setModalOpen(true)}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -202,8 +201,8 @@ export default function DashboardPage() {
       {/* KPIs */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <KPI lbl="Turnos hoy"      val={isLoading ? "…" : total}     delta={<></>} />
-        <KPI lbl="Confirmados"     val={isLoading ? "…" : confirmed} delta={<><span style={{ width:6,height:6,borderRadius:"50%",background:"var(--color-ok)",display:"inline-block",verticalAlign:"middle",marginRight:4 }}/> Listos</>} />
-        <KPI lbl="Pendientes"      val={isLoading ? "…" : pending}   delta={<><span style={{ width:6,height:6,borderRadius:"50%",background:"var(--color-warn)",display:"inline-block",verticalAlign:"middle",marginRight:4 }}/> A confirmar</>} />
+        <KPI lbl="Confirmados"     val={isLoading ? "…" : confirmed} delta={<><span className="w-1.5 h-1.5 rounded-full bg-ok inline-block align-middle mr-1"/> Listos</>} />
+        <KPI lbl="Pendientes"      val={isLoading ? "…" : pending}   delta={<><span className="w-1.5 h-1.5 rounded-full bg-warn inline-block align-middle mr-1"/> A confirmar</>} />
         <KPI lbl="Ingresos del día" val={isLoading ? "…" : "$" + revenue.toLocaleString("es-AR")} delta={<><ArrowUp /> estimado</>} />
       </div>
 

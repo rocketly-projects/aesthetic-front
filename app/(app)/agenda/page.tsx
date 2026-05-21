@@ -246,10 +246,9 @@ function DayColumn({
       ))}
       {isToday && (
         <div
-          className="absolute left-0 right-0 h-0.5 z-20"
+          className="absolute left-0 right-0 h-0.5 z-20 bg-accent"
           style={{
-            top:        (new Date().getHours() + new Date().getMinutes() / 60 - DAY_START) * HOUR_PX,
-            background: "var(--color-accent)",
+            top: (new Date().getHours() + new Date().getMinutes() / 60 - DAY_START) * HOUR_PX,
           }}
         />
       )}
@@ -338,8 +337,7 @@ export default function AgendaPage() {
       subtitle={subtitle}
       actions={
         <button
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-          style={{ background: "var(--color-ink)" }}
+          className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
           onClick={() => { setPreset(null); setModalOpen(true); }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -392,8 +390,7 @@ export default function AgendaPage() {
               <div className="py-3 px-2 text-center border-l border-line">
                 <div className="text-[11px] text-ink-3 uppercase tracking-wider">{DAY_NAMES[anchor.getDay()]}</div>
                 <div
-                  className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white" : "text-ink"}`}
-                  style={isToday ? { background: "var(--color-accent)" } : undefined}
+                  className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white bg-accent" : "text-ink"}`}
                 >
                   {anchor.getDate()}
                 </div>
@@ -424,8 +421,7 @@ export default function AgendaPage() {
                   <div key={i} className="py-3 px-2 text-center border-l border-line">
                     <div className="text-[11px] text-ink-3 uppercase tracking-wider">{DAY_NAMES[d.getDay()]}</div>
                     <div
-                      className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white" : "text-ink"}`}
-                      style={isToday ? { background: "var(--color-accent)" } : undefined}
+                      className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white bg-accent" : "text-ink"}`}
                     >
                       {d.getDate()}
                     </div>
@@ -483,8 +479,7 @@ export default function AgendaPage() {
                     className={`border-r border-b border-line last:border-r-0 min-h-[100px] p-2 cursor-pointer hover:bg-bg transition-colors ${isOtherM ? "opacity-40" : ""}`}
                   >
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-semibold mb-1 ${isToday ? "text-white" : "text-ink"}`}
-                      style={isToday ? { background: "var(--color-accent)" } : undefined}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-semibold mb-1 ${isToday ? "text-white bg-accent" : "text-ink"}`}
                     >
                       {cell.getDate()}
                     </div>
@@ -493,11 +488,10 @@ export default function AgendaPage() {
                         <div
                           key={appt.id}
                           onClick={(e) => { e.stopPropagation(); handleSelect(appt); }}
-                          className="text-[10.5px] font-medium px-1.5 py-0.5 rounded truncate cursor-pointer hover:brightness-95 transition-all"
+                          className="text-[10.5px] font-medium px-1.5 py-0.5 rounded truncate cursor-pointer hover:brightness-95 transition-all text-ink"
                           style={{
                             background: statusBg[appt.status],
                             borderLeft: `2px solid ${statusBorder[appt.status] ?? "var(--color-line)"}`,
-                            color:      "var(--color-ink)",
                           }}
                         >
                           {appt.time} {appt.clientName ?? appt.serviceName}

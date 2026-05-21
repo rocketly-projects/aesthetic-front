@@ -155,8 +155,7 @@ function NegocioPageInner() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-          style={{ background: "var(--color-ink)" }}
+          className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
         >
           {isSaving ? "Guardando…" : "Guardar cambios"}
         </button>
@@ -330,12 +329,12 @@ function NegocioPageInner() {
 
             {/* Aviso del callback OAuth */}
             {mpNotice === "connected" && (
-              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-ok" style={{ background: "var(--color-ok-pale, #f0fdf4)", border: "1px solid var(--color-ok)" }}>
+              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-ok bg-[#f0fdf4] border border-ok">
                 ✓ MercadoPago conectado correctamente.
               </div>
             )}
             {mpNotice === "error" && (
-              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-err" style={{ background: "var(--color-err-pale, #fef2f2)", border: "1px solid var(--color-err)" }}>
+              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-err bg-[#fef2f2] border border-err">
                 ✗ No se pudo conectar MercadoPago. Intentá de nuevo.
               </div>
             )}
@@ -368,8 +367,7 @@ function NegocioPageInner() {
                     type="range" min={5} max={100} step={5}
                     value={depositPercent}
                     onChange={(e) => setDepositPercent(Number(e.target.value))}
-                    className="flex-1"
-                    style={{ accentColor: "var(--color-accent)" }}
+                    className="flex-1 accent-accent"
                   />
                   <span className="text-sm font-semibold text-ink w-10 text-right">{depositPercent}%</span>
                 </div>
@@ -390,7 +388,7 @@ function NegocioPageInner() {
             <div className="font-semibold text-sm text-ink mb-4">Vista previa del bot</div>
             <div className="bg-bg rounded-md p-4 border border-line">
               <div className="flex items-center gap-2 pb-3 mb-3 border-b border-line">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shrink-0" style={{ background: "var(--color-accent)" }}>a</div>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shrink-0 bg-accent">a</div>
                 <div>
                   <div className="text-xs font-semibold text-ink">aesthetic. bot</div>
                   <div className="text-[10px] text-ok">En línea</div>
@@ -408,7 +406,7 @@ function NegocioPageInner() {
                 <span className="text-lg">{l.icon}</span>
                 <div>
                   <div className="text-[11px] text-ink-3">{l.label}</div>
-                  <div className="text-[13px] font-medium" style={{ color: "var(--color-accent)" }}>{l.val || "—"}</div>
+                  <div className="text-[13px] font-medium text-accent">{l.val || "—"}</div>
                 </div>
               </div>
             ))}

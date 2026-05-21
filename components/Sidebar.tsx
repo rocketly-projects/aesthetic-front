@@ -109,8 +109,7 @@ export default function Sidebar({ active }: { active: string }) {
 
   return (
     <aside
-      className="flex flex-col overflow-y-auto overflow-x-hidden border-r border-line"
-      style={{ background: "var(--color-bg)" }}
+      className="flex flex-col overflow-y-auto overflow-x-hidden border-r border-line bg-bg"
     >
       {/* Brand */}
       <Link
@@ -119,13 +118,7 @@ export default function Sidebar({ active }: { active: string }) {
         style={{ textDecoration: "none" }}
       >
         <span
-          className="flex items-center justify-center text-white font-semibold text-sm shrink-0"
-          style={{
-            width: 28, height: 28,
-            borderRadius: "50%",
-            background: "var(--color-accent)",
-            fontFamily: "var(--font-display)",
-          }}
+          className="flex items-center justify-center text-white font-semibold text-sm shrink-0 w-7 h-7 rounded-full bg-accent font-display"
         >
           a
         </span>
@@ -152,8 +145,7 @@ export default function Sidebar({ active }: { active: string }) {
               <span className="flex-1">{item.label}</span>
               {item.id === "whatsapp" && unreadCount > 0 && (
                 <span
-                  className="text-white text-[10px] font-semibold leading-none px-1.5 py-0.5 rounded-full"
-                  style={{ background: "var(--color-accent)" }}
+                  className="bg-accent text-white text-[10px] font-semibold leading-none px-1.5 py-0.5 rounded-full"
                 >
                   {unreadCount}
                 </span>
@@ -193,12 +185,7 @@ export default function Sidebar({ active }: { active: string }) {
       {/* User footer */}
       <div className="flex items-center gap-3 px-4 py-3.5 border-t border-line">
         <div
-          className="flex items-center justify-center text-[11px] font-semibold text-white shrink-0"
-          style={{
-            width: 30, height: 30,
-            borderRadius: "50%",
-            background: "var(--color-accent)",
-          }}
+          className="flex items-center justify-center text-[11px] font-semibold text-white shrink-0 w-[30px] h-[30px] rounded-full bg-accent"
         >
           {current ? initials(current.name) : "…"}
         </div>

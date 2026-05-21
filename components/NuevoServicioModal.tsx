@@ -63,16 +63,16 @@ export default function NuevoServicioModal({ open, onClose }: Props) {
             <input className="input" type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} style={{ height: "2.5rem", padding: "2px 6px", cursor: "pointer" }} />
           </div>
           <div className="flex items-center gap-2 pt-5">
-            <input type="checkbox" id="visible" checked={form.visible} onChange={(e) => setForm({ ...form, visible: e.target.checked })} className="w-3.5 h-3.5" style={{ accentColor: "var(--color-accent)" }} />
+            <input type="checkbox" id="visible" checked={form.visible} onChange={(e) => setForm({ ...form, visible: e.target.checked })} className="w-3.5 h-3.5 accent-accent" />
             <label htmlFor="visible" className="text-[13px] text-ink-2 cursor-pointer">Visible para reservas</label>
           </div>
         </div>
         {createService.error && (
-          <p className="text-[12px] m-0" style={{ color: "var(--color-err)" }}>{(createService.error as Error).message}</p>
+          <p className="text-[12px] m-0 text-err">{(createService.error as Error).message}</p>
         )}
         <div className="flex gap-3 justify-end mt-1">
           <button type="button" onClick={handleClose} className="border border-line bg-transparent text-ink rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer hover:bg-bg transition-colors">Cancelar</button>
-          <button type="submit" disabled={createService.isPending} className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60" style={{ background: "var(--color-accent)" }}>
+          <button type="submit" disabled={createService.isPending} className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60">
             {createService.isPending ? "Creando…" : "Crear servicio"}
           </button>
         </div>

@@ -239,7 +239,7 @@ Ambos layouts solo hacen `return <>{children}</>`. El de `(app)` debería ser do
 
 ---
 
-### [T-05] `var(--color-*)` usado directamente en algunos style inline
+### ✅ [T-05] `var(--color-*)` usado directamente en algunos style inline
 **Archivos:** múltiples componentes
 
 En varios lugares se usa `style={{ background: "var(--color-ok)" }}` en lugar de la clase Tailwind `bg-ok`. Inconsistente con la convención definida en el proyecto (usar clases Tailwind, no variables CSS directamente).

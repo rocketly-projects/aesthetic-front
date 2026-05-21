@@ -109,8 +109,7 @@ export default function EditClienteModal({ open, onClose, client }: Props) {
           <button
             type="submit"
             disabled={updateClient.isPending}
-            className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-            style={{ background: "var(--color-accent)" }}
+            className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
           >
             {updateClient.isPending ? "Guardando…" : "Guardar cambios"}
           </button>

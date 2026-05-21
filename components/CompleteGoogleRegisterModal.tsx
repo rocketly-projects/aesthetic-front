@@ -58,8 +58,7 @@ export default function CompleteGoogleRegisterModal({ credential, onClose }: Pro
           <button
             type="submit"
             disabled={googleAuth.isPending}
-            className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-            style={{ background: "var(--color-accent)" }}
+            className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
           >
             {googleAuth.isPending ? "Creando cuenta…" : "Crear cuenta"}
           </button>

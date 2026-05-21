@@ -99,12 +99,11 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="w-3.5 h-3.5"
-                  style={{ accentColor: "var(--color-accent)" }}
+                  className="w-3.5 h-3.5 accent-accent"
                 />
                 Mantener sesión
               </label>
-              <a href="https://mail.google.com/mail/?view=cm&to=aesthetic.rocketly@gmail.com&su=Recuperar+contrase%C3%B1a&body=Hola%2C+necesito+recuperar+el+acceso+a+mi+cuenta+de+aesthetic.+Mi+email+registrado+es%3A+" target="_blank" rel="noopener noreferrer" className="text-accent-ink no-underline hover:underline">
+              <a href="https://mail.google.com/mail/?view=cm&to=aesthetic.rocketly@gmail.com&su=Recuperar+contrase%C3%B1a&body=Hola%2C+necesito+recuperar+el+acceso+a+mi+cuenta+de+aesthetic.+Mi+email+registrado+es%3A+*reemplazar+por+tu+email*" target="_blank" rel="noopener noreferrer" className="text-accent-ink no-underline hover:underline">
                 Olvidé mi contraseña
               </a>
             </div>

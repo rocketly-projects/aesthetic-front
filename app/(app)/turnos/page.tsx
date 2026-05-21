@@ -69,8 +69,7 @@ export default function TurnosPage() {
       subtitle={total !== undefined ? `${total} turno${total !== 1 ? "s" : ""}` : undefined}
       actions={
         <button
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-          style={{ background: "var(--color-ink)" }}
+          className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
           onClick={() => setModalOpen(true)}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>

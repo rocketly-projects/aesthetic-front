@@ -61,7 +61,7 @@ export default function ClientesPage() {
       title="Clientes"
       subtitle={total !== undefined ? `${total} cliente${total !== 1 ? "s" : ""}` : undefined}
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
+        <button className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Nueva cliente
         </button>
@@ -98,10 +98,9 @@ export default function ClientesPage() {
                     <div
                       key={c.id}
                       onClick={() => setActiveId(c.id)}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors ${isActive ? "" : "border-l-[3px] border-l-transparent hover:bg-bg"}`}
-                      style={isActive ? { background: "var(--color-accent-pale)", borderLeft: "3px solid var(--color-accent)" } : undefined}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "bg-accent-pale border-l-accent" : "border-l-transparent hover:bg-bg"}`}
                     >
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 bg-accent-pale text-accent-ink">
                         {initials(c.name)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -125,7 +124,7 @@ export default function ClientesPage() {
           <div className="flex flex-col gap-4 overflow-y-auto">
             <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
               <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold shrink-0 bg-accent-pale text-accent-ink">
                   {initials(active.name)}
                 </div>
                 <div className="flex-1">
@@ -158,8 +157,8 @@ export default function ClientesPage() {
             </div>
 
             {active.notes && (
-              <div className="rounded-lg p-5 border" style={{ background: "var(--color-accent-pale)", borderColor: "var(--color-accent-soft)" }}>
-                <div className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--color-accent-ink)" }}>Notas privadas</div>
+              <div className="rounded-lg p-5 border bg-accent-pale border-accent-soft">
+                <div className="text-[11px] font-semibold uppercase tracking-wider mb-2 text-accent-ink">Notas privadas</div>
                 <p className="m-0 text-[13px] text-ink-2 leading-relaxed">{active.notes}</p>
               </div>
             )}
