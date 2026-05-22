@@ -33,10 +33,10 @@ export default function ServiciosPage() {
       }
     >
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <KPI lbl="Total servicios"   val={services.length} />
-        <KPI lbl="Activos"           val={visible.length}  delta={`${services.length - visible.length} ocultos`} />
-        <KPI lbl="Precio promedio"   val={"$" + avgPrice.toLocaleString("es-AR")} variant="dark" />
-        <KPI lbl="Duración promedio" val={`${avgDuration} min`} />
+        <KPI lbl="Total servicios"   val={services.length}                          variant="accent" />
+        <KPI lbl="Activos"           val={visible.length}  delta={`${services.length - visible.length} ocultos`} variant="accent" />
+        <KPI lbl="Precio promedio"   val={"$" + avgPrice.toLocaleString("es-AR")}   variant="dark"   />
+        <KPI lbl="Duración promedio" val={`${avgDuration} min`}                     variant="dark"   />
       </div>
 
       {isLoading ? (
