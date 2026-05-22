@@ -403,3 +403,9 @@ body {
 
 /* ── Muted text ───────────────────────────────────────────────── */
 .muted { color: var(--color-ink-3); }
+
+/* ── Landing marquee ─────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
