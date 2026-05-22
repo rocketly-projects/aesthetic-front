@@ -5,7 +5,7 @@
   /* Fonts */
   --font-sans:    var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    var(--font-geist-mono), ui-monospace, monospace;
+  --font-mono:    var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
 
   /* Colors — background (sage/nature palette) */
   --color-bg:   #f3f4f0;
@@ -55,7 +55,7 @@
 /* ── Layout tokens ────────────────────────────────────────────── */
 :root {
   --sidebar-w: 15rem;   /* 240px @ 16px base */
-  --topbar-h:  3.5rem;  /* 56px  @ 16px base */
+  --topbar-h:  3.8rem;  /* 56px  @ 16px base */
 }
 
 /* ── Base ─────────────────────────────────────────────────────── */
