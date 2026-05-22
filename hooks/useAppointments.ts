@@ -52,7 +52,7 @@ export function useUpdateAppointment() {
     onSuccess: (data, { id }) => {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
       qc.invalidateQueries({ queryKey: appointmentKeys.detail(id) });
-      qc.invalidateQueries({ queryKey: appointmentKeys.agenda(data.date) });
+      qc.invalidateQueries({ queryKey: appointmentKeys.all });
       if (data.status === "completed" && data.clientId) {
         qc.invalidateQueries({ queryKey: clientKeys.detail(data.clientId) });
         qc.invalidateQueries({ queryKey: clientKeys.all });

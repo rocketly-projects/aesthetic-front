@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import { useUpdateClient } from "@/hooks/useClients";
 import type { Client } from "@/lib/api/clients";
 
@@ -52,7 +52,7 @@ export default function EditClienteModal({ open, onClose, client }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Editar cliente">
+    <Drawer open={open} onClose={handleClose} title="Editar cliente">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Nombre</label>
@@ -115,6 +115,6 @@ export default function EditClienteModal({ open, onClose, client }: Props) {
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

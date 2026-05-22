@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import { useGetClients } from "@/hooks/useClients";
 import { useGetServices } from "@/hooks/useServices";
 import { useCreateAppointment } from "@/hooks/useAppointments";
@@ -51,7 +51,7 @@ export default function NuevoTurnoModal({ open, onClose, initialDate, initialTim
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Nuevo turno">
+    <Drawer open={open} onClose={handleClose} title="Nuevo turno">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Cliente</label>
@@ -91,6 +91,6 @@ export default function NuevoTurnoModal({ open, onClose, initialDate, initialTim
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

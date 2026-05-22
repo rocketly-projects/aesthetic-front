@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import EmptyState, { ScissorsEmptyIcon } from "@/components/EmptyState";
+import Skeleton from "@/components/Skeleton";
 import KPI from "@/components/KPI";
 import NuevoServicioModal from "@/components/NuevoServicioModal";
 import EditServicioModal from "@/components/EditServicioModal";
@@ -39,7 +40,18 @@ export default function ServiciosPage() {
       </div>
 
       {isLoading ? (
-        <div className="text-center text-[13px] text-ink-3 py-12">Cargando servicios…</div>
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-surface border border-line rounded-xl p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-8 h-8 rounded-full" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          ))}
+        </div>
       ) : services.length === 0 ? (
         <div className="bg-surface border border-line rounded-lg shadow-sm">
           <EmptyState

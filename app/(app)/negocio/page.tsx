@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import AppShell from "@/components/AppShell";
+import Skeleton from "@/components/Skeleton";
 import { useSearchParams } from "next/navigation";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect } from "@/hooks/useBusiness";
 
@@ -29,8 +30,8 @@ const defaultSchedule: Record<string, DaySchedule> = {
 
 function NegocioPageInner() {
   const searchParams    = useSearchParams();
-  const { data: business }  = useGetBusiness();
-  const { data: hoursData } = useGetHours();
+  const { data: business, isLoading: bizLoading }    = useGetBusiness();
+  const { data: hoursData, isLoading: hoursLoading } = useGetHours();
   const updateBusiness  = useUpdateBusiness();
   const updateHours     = useUpdateHours();
   const mpConnect       = useMpConnect();
@@ -161,6 +162,27 @@ function NegocioPageInner() {
         </button>
       }
     >
+      {(bizLoading || hoursLoading) ? (
+        <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+          <div className="flex flex-col gap-5">
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-4">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-24 rounded-lg" />
+              {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-9" />)}
+            </div>
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-3">
+              <Skeleton className="h-5 w-32" />
+              {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-9" />)}
+            </div>
+          </div>
+          <div className="flex flex-col gap-5">
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-3">
+              <Skeleton className="h-5 w-36" />
+              {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
         <div className="flex flex-col gap-5">
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
@@ -413,6 +435,7 @@ function NegocioPageInner() {
           </div>
         </div>
       </div>
+      )}
     </AppShell>
   );
 }

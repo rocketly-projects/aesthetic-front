@@ -39,7 +39,7 @@ export function useCreateOrGetChat() {
   return useMutation({
     mutationFn: (params: CreateOrGetChatParams) => createOrGetChat(params),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: whatsappKeys.chats });
+      qc.invalidateQueries({ queryKey: whatsappKeys.all });
     },
   });
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import Pagination from "@/components/Pagination";
 import EmptyState, { CalendarEmptyIcon, SearchEmptyIcon } from "@/components/EmptyState";
+import { SkeletonTableRows } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
 import EditTurnoModal from "@/components/EditTurnoModal";
@@ -89,7 +90,7 @@ export default function TurnosPage() {
 
       <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-8 text-center text-[13px] text-ink-3">Cargando turnos…</div>
+          <table className="tbl"><tbody><SkeletonTableRows cols={8} rows={10} /></tbody></table>
         ) : appts.length === 0 ? (
           <EmptyState
             icon={filter === "todos" ? <CalendarEmptyIcon /> : <SearchEmptyIcon />}

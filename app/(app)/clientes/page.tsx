@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import AppShell from "@/components/AppShell";
 import Pagination from "@/components/Pagination";
 import EmptyState, { ClientEmptyIcon, SearchEmptyIcon } from "@/components/EmptyState";
+import { SkeletonList } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
 import NuevoClienteModal from "@/components/NuevoClienteModal";
 import EditClienteModal from "@/components/EditClienteModal";
@@ -80,7 +81,7 @@ export default function ClientesPage() {
           </div>
           <div className="overflow-y-auto flex-1">
             {isLoading ? (
-              <div className="p-6 text-center text-[13px] text-ink-3">Cargando clientes…</div>
+              <div className="p-3"><SkeletonList rows={15} /></div>
             ) : allClients.length === 0 ? (
               <EmptyState
                 icon={search ? <SearchEmptyIcon /> : <ClientEmptyIcon />}

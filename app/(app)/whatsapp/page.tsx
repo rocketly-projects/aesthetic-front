@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import Pagination from "@/components/Pagination";
 import EmptyState, { ChatEmptyIcon } from "@/components/EmptyState";
+import { SkeletonList } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
 import { useGetChats, useGetMessages, useSendMessage, usePatchChat } from "@/hooks/useWhatsapp";
 import { useGetClient } from "@/hooks/useClients";
@@ -34,7 +35,7 @@ export default function WhatsAppPage() {
   const [chatsPage,    setChatsPage]    = useState(1);
   const [input,        setInput]        = useState("");
 
-  const { data: chatsData }    = useGetChats({ page: chatsPage, limit: CHATS_LIMIT });
+  const { data: chatsData, isLoading: chatsLoading } = useGetChats({ page: chatsPage, limit: CHATS_LIMIT });
   const chats                  = chatsData?.chats ?? [];
   const chatsTotal             = chatsData?.total;
   const patchChat               = usePatchChat();
@@ -85,14 +86,15 @@ export default function WhatsAppPage() {
             </div>
           </div>
           <div className="overflow-y-auto flex-1">
-            {visibleChats.length === 0 && (
+            {chatsLoading ? (
+              <div className="p-3"><SkeletonList rows={10} /></div>
+            ) : visibleChats.length === 0 ? (
               <EmptyState
                 icon={<ChatEmptyIcon />}
                 title={activeTab === "bot" ? "Sin chats del bot" : activeTab === "yo" ? "Sin chats propios" : "Sin conversaciones"}
                 description={activeTab === "todos" ? "Los chats de tus clientes aparecerán acá." : "No hay chats en esta categoría."}
               />
-            )}
-            {visibleChats.map((c) => {
+            ) : visibleChats.map((c) => {
               const isActive = c.id === resolvedChatId;
               const name     = c.clientName ?? c.clientPhone;
               return (

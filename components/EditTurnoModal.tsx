@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import { useUpdateAppointment } from "@/hooks/useAppointments";
 import type { Appointment, AppointmentStatus } from "@/lib/api/appointments";
 
@@ -60,7 +60,7 @@ export default function EditTurnoModal({ open, onClose, appointment }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Editar turno">
+    <Drawer open={open} onClose={handleClose} title="Editar turno">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Estado</label>
@@ -126,6 +126,6 @@ export default function EditTurnoModal({ open, onClose, appointment }: Props) {
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

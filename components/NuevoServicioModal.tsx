@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import { useCreateService } from "@/hooks/useServices";
 
 interface Props {
@@ -37,7 +37,7 @@ export default function NuevoServicioModal({ open, onClose }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Nuevo servicio">
+    <Drawer open={open} onClose={handleClose} title="Nuevo servicio">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Nombre</label>
@@ -77,6 +77,6 @@ export default function NuevoServicioModal({ open, onClose }: Props) {
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

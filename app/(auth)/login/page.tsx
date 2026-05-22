@@ -165,11 +165,21 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right panel — testimonial ── */}
-      <div className="relative overflow-hidden flex flex-col p-10 bg-[linear-gradient(160deg,var(--color-accent-pale)_0%,var(--color-bg-2)_60%,var(--color-accent-soft)_100%)]">
-
+      <div
+        className="relative overflow-hidden flex flex-col p-10"
+        style={{
+          background: `
+            radial-gradient(at 20% 20%, var(--color-accent-pale) 0%, transparent 50%),
+            radial-gradient(at 80% 0%,  var(--color-accent-soft) 0%, transparent 45%),
+            radial-gradient(at 70% 80%, var(--color-warn-soft)   0%, transparent 55%),
+            var(--color-bg-2)
+          `,
+        }}
+      >
         {/* Decorative circles */}
-        <div className="absolute -top-[120px] -right-[120px] w-[380px] h-[380px] rounded-full border border-accent opacity-[0.12] pointer-events-none" />
-        <div className="absolute -bottom-[80px] -left-[80px] w-[240px] h-[240px] rounded-full bg-accent opacity-[0.06] pointer-events-none" />
+        <div className="absolute -top-[100px] -right-[100px] w-[420px] h-[420px] rounded-full border border-accent opacity-[0.18] pointer-events-none" />
+        <div className="absolute top-[30%] -right-[60px] w-[180px] h-[180px] rounded-full border border-accent-soft opacity-[0.25] pointer-events-none" />
+        <div className="absolute -bottom-[60px] -left-[60px] w-[260px] h-[260px] rounded-full bg-accent opacity-[0.07] pointer-events-none" />
 
         {/* Top label */}
         <div className="flex justify-end relative">
@@ -179,29 +189,29 @@ export default function LoginPage() {
         </div>
 
         {/* Quote block */}
-        <div className="relative max-w-[460px] m-auto mb-10">
-          <div className="font-display text-[80px] leading-none text-accent opacity-40 -mb-4">
+        <div className="relative max-w-[480px] m-auto mb-10">
+          <div className="font-display leading-none text-accent opacity-30 -mb-6 select-none" style={{ fontSize: 140 }}>
             "
           </div>
-          <blockquote className="font-display text-[28px] leading-[1.25] tracking-[-0.02em] text-ink font-normal m-0">
+          <blockquote className="font-display leading-[1.15] tracking-[-0.025em] text-ink font-normal m-0" style={{ fontSize: 42 }}>
             Antes anotaba los turnos en un cuaderno. Ahora{" "}
             <em className="italic text-accent-ink">aesthetic</em>
             {" "}me responde los whatsapps mientras corto. Ganamos tres horas por día.
           </blockquote>
 
           {/* Author */}
-          <div className="flex items-center gap-3 mt-6">
-            <div className="grid place-items-center w-9 h-9 rounded-full bg-ink text-bg font-medium text-[13px] shrink-0">
+          <div className="flex items-center gap-3.5 mt-7">
+            <div className="grid place-items-center rounded-full bg-ink text-bg font-semibold text-[15px] shrink-0" style={{ width: 56, height: 56 }}>
               PG
             </div>
-            <div className="text-[13px] text-ink">
-              Paula G.
-              <span className="block text-ink-3 text-[11.5px]">Estudio Paula · Palermo</span>
+            <div>
+              <div className="text-[14px] font-semibold text-ink">Paula G.</div>
+              <div className="text-[12px] text-ink-3 mt-0.5">Estudio Paula · Palermo</div>
             </div>
           </div>
 
           {/* Badges */}
-          <div className="flex gap-2 flex-wrap mt-6">
+          <div className="flex gap-2 flex-wrap mt-7">
             {[
               { label: "+200 peluquerías", dot: true },
               { label: "Sin tarjeta", dot: false },
@@ -209,7 +219,8 @@ export default function LoginPage() {
             ].map(({ label, dot }) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] text-ink-2 bg-white/50 backdrop-blur-[8px] border border-ink/[0.08]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] text-ink-2 border border-ink/[0.08]"
+                style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)", boxShadow: "var(--shadow-md)" }}
               >
                 {dot && <span className="w-1.5 h-1.5 rounded-full bg-ok shrink-0" />}
                 {label}
