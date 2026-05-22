@@ -70,8 +70,15 @@ export default function ServiciosPage() {
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-4">
-          {services.map((s) => (
-            <div key={s.id} className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden ${!s.visible ? "opacity-60" : ""}`}>
+          {services.map((s, index) => (
+            <div
+              key={s.id}
+              className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden card-lift ${!s.visible ? "opacity-60" : ""}`}
+              style={{
+                animation: "fade-in-up var(--dur-base) var(--ease-out) both",
+                animationDelay: `${index * 40}ms`,
+              }}
+            >
               <div className="h-2" style={{ background: s.color }} />
               <div className="p-4">
                 <div className="text-[10px] font-semibold text-ink-3 uppercase tracking-widest mb-2">{s.category}</div>

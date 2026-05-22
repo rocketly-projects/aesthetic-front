@@ -154,7 +154,10 @@ export default function DashboardPage() {
       <div className="grid gap-4" style={{ gridTemplateColumns: "1.55fr 1fr", gridTemplateRows: "auto 1fr auto" }}>
 
         {/* HERO — Agenda de hoy */}
-        <div className="bg-surface border border-line rounded-2xl shadow-sm p-5 flex flex-col" style={{ gridRow: "1 / 4" }}>
+        <div
+          className="bg-surface border border-line rounded-2xl shadow-sm p-5 flex flex-col"
+          style={{ gridRow: "1 / 4", animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "0ms" }}
+        >
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="m-0 text-[14px] font-semibold text-ink">Agenda de hoy</h3>
@@ -228,9 +231,12 @@ export default function DashboardPage() {
         </div>
 
         {/* KPIs — 2 mini cards */}
-        <div className="grid grid-cols-2 gap-3">
+        <div
+          className="grid grid-cols-2 gap-3"
+          style={{ animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "60ms" }}
+        >
           {/* Turnos hoy — sage pale */}
-          <div className="bg-accent-pale rounded-2xl p-4 flex flex-col gap-1">
+          <div className="bg-accent-pale rounded-2xl p-4 flex flex-col gap-1 card-lift">
             <span className="text-[10.5px] font-semibold text-accent-ink uppercase tracking-widest">Turnos hoy</span>
             <span className="font-display text-[42px] font-light text-accent-ink leading-none mt-0.5">
               {isLoading ? "–" : total}
@@ -241,7 +247,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Ingresos — dark ink */}
-          <div className="bg-ink rounded-2xl p-4 flex flex-col gap-1">
+          <div className="bg-ink rounded-2xl p-4 flex flex-col gap-1 card-lift">
             <span className="text-[10.5px] font-semibold text-white/50 uppercase tracking-widest">Ingresos est.</span>
             <span className="font-display text-[28px] font-light text-white leading-none mt-0.5">
               {isLoading ? "–" : `$${revenue.toLocaleString("es-AR")}`}
@@ -251,7 +257,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Ocupación del día — arc progress */}
-        <div className="bg-surface border border-line rounded-2xl shadow-sm p-5">
+        <div
+          className="bg-surface border border-line rounded-2xl shadow-sm p-5 card-lift"
+          style={{ animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "120ms" }}
+        >
           <span className="text-[11px] font-semibold text-ink-3 uppercase tracking-widest">Ocupación del día</span>
           {isLoadingHours || isLoading ? (
             <div className="mt-3 animate-pulse flex items-center gap-4">
@@ -287,7 +296,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Actividad reciente */}
-        <div className="bg-surface border border-line rounded-2xl shadow-sm p-5">
+        <div
+          className="bg-surface border border-line rounded-2xl shadow-sm p-5 card-lift"
+          style={{ animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "180ms" }}
+        >
           <div className="flex items-baseline justify-between mb-3">
             <span className="text-[11px] font-semibold text-ink-3 uppercase tracking-widest">Actividad reciente</span>
             <span className="text-[11px] text-ink-3">Hoy</span>

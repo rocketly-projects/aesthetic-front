@@ -117,8 +117,15 @@ export default function TurnosPage() {
               </tr>
             </thead>
             <tbody>
-              {appts.map((appt) => (
-                <tr key={appt.id} className="cursor-pointer">
+              {appts.map((appt, index) => (
+                <tr
+                  key={appt.id}
+                  className="cursor-pointer"
+                  style={{
+                    animation: "fade-in-up var(--dur-base) var(--ease-out) both",
+                    animationDelay: `${index * 25}ms`,
+                  }}
+                >
                   <td style={{ borderLeft: `3px solid ${statusColor(appt.status)}` }}><span className="font-mono text-[12px] text-ink-2">{formatDate(appt.date)}</span></td>
                   <td><span className="font-mono text-[12px] font-semibold">{appt.time}</span></td>
                   <td className="text-ink font-medium">{appt.clientName ?? <span className="text-ink-3">—</span>}</td>

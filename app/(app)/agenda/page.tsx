@@ -246,11 +246,12 @@ function DayColumn({
       ))}
       {isToday && (
         <div
-          className="absolute left-0 right-0 h-0.5 z-20 bg-accent"
-          style={{
-            top: (new Date().getHours() + new Date().getMinutes() / 60 - DAY_START) * HOUR_PX,
-          }}
-        />
+          className="absolute left-0 right-0 z-20 pointer-events-none"
+          style={{ top: (new Date().getHours() + new Date().getMinutes() / 60 - DAY_START) * HOUR_PX }}
+        >
+          <div className="absolute -left-1 -top-[3px] w-2 h-2 rounded-full bg-err" />
+          <div className="h-px bg-err" />
+        </div>
       )}
     </div>
   );
