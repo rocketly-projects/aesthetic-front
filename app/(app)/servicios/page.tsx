@@ -35,7 +35,7 @@ export default function ServiciosPage() {
       <div className="grid grid-cols-4 gap-4 mb-6">
         <KPI lbl="Total servicios"   val={services.length} />
         <KPI lbl="Activos"           val={visible.length}  delta={`${services.length - visible.length} ocultos`} />
-        <KPI lbl="Precio promedio"   val={"$" + avgPrice.toLocaleString("es-AR")} />
+        <KPI lbl="Precio promedio"   val={"$" + avgPrice.toLocaleString("es-AR")} variant="dark" />
         <KPI lbl="Duración promedio" val={`${avgDuration} min`} />
       </div>
 
@@ -72,7 +72,7 @@ export default function ServiciosPage() {
         <div className="grid grid-cols-3 gap-4">
           {services.map((s) => (
             <div key={s.id} className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden ${!s.visible ? "opacity-60" : ""}`}>
-              <div className="h-1.5" style={{ background: s.color }} />
+              <div className="h-2" style={{ background: s.color }} />
               <div className="p-4">
                 <div className="text-[10px] font-semibold text-ink-3 uppercase tracking-widest mb-2">{s.category}</div>
                 <h3 className="m-0 mb-3 text-[15px] font-semibold text-ink">{s.name}</h3>

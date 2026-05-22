@@ -25,7 +25,7 @@ function initials(name: string) {
 
 function bubbleStyle(sender: MessageSender) {
   if (sender === "owner")  return { background: "var(--color-ink)",    color: "#fff",                   borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end"   };
-  if (sender === "bot")    return { background: "var(--color-accent)",  color: "#fff",                   borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end"   };
+  if (sender === "bot")    return { background: "var(--color-accent-pale)", color: "var(--color-accent-ink)", border: "1px solid var(--color-accent-soft)", borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end" };
   return                          { background: "var(--color-surface)", color: "var(--color-ink)", border: "1px solid var(--color-line-2)", borderRadius: "14px 14px 14px 4px", alignSelf: "flex-start" };
 }
 

@@ -29,6 +29,18 @@ function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+function statusColor(s: AppointmentStatus): string {
+  switch (s) {
+    case "confirmed":        return "var(--color-ok)";
+    case "completed":        return "var(--color-info)";
+    case "cancelled":
+    case "no_show":          return "var(--color-err)";
+    case "pending":
+    case "awaiting_payment": return "var(--color-warn)";
+    default:                 return "transparent";
+  }
+}
+
 const QUICK_STATUSES: { status: AppointmentStatus; label: string }[] = [
   { status: "confirmed", label: "Confirmar"   },
   { status: "completed", label: "Completar"   },
@@ -107,7 +119,7 @@ export default function TurnosPage() {
             <tbody>
               {appts.map((appt) => (
                 <tr key={appt.id} className="cursor-pointer">
-                  <td><span className="font-mono text-[12px] text-ink-2">{formatDate(appt.date)}</span></td>
+                  <td style={{ borderLeft: `3px solid ${statusColor(appt.status)}` }}><span className="font-mono text-[12px] text-ink-2">{formatDate(appt.date)}</span></td>
                   <td><span className="font-mono text-[12px] font-semibold">{appt.time}</span></td>
                   <td className="text-ink font-medium">{appt.clientName ?? <span className="text-ink-3">—</span>}</td>
                   <td className="text-ink-2">{appt.serviceName}</td>

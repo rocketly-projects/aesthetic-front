@@ -143,17 +143,22 @@ export default function ClientesPage() {
                 </button>
               </div>
               <div className="grid grid-cols-4 gap-3 mt-5 pt-5 border-t border-line">
-                {[
-                  { label: "Visitas",       val: active.visits },
-                  { label: "Total gastado", val: "$" + active.totalSpent.toLocaleString("es-AR") },
-                  { label: "Última visita", val: active.lastVisitAt ? formatDate(active.lastVisitAt) : "—" },
-                  { label: "Promedio",      val: active.visits > 0 ? "$" + Math.round(active.totalSpent / active.visits).toLocaleString("es-AR") : "—" },
-                ].map((s) => (
-                  <div key={s.label} className="text-center">
-                    <div className="text-base font-semibold text-ink">{s.val}</div>
-                    <div className="text-[11px] text-ink-3 mt-0.5">{s.label}</div>
-                  </div>
-                ))}
+                <div className="text-center">
+                  <div className="text-base font-semibold text-ink">{active.visits}</div>
+                  <div className="text-[11px] text-ink-3 mt-0.5">Visitas</div>
+                </div>
+                <div className="text-center bg-ink rounded-lg py-3">
+                  <div className="text-base font-semibold text-white">${active.totalSpent.toLocaleString("es-AR")}</div>
+                  <div className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>Total gastado</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-base font-semibold text-ink">{active.lastVisitAt ? formatDate(active.lastVisitAt) : "—"}</div>
+                  <div className="text-[11px] text-ink-3 mt-0.5">Última visita</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-base font-semibold text-ink">{active.visits > 0 ? "$" + Math.round(active.totalSpent / active.visits).toLocaleString("es-AR") : "—"}</div>
+                  <div className="text-[11px] text-ink-3 mt-0.5">Promedio</div>
+                </div>
               </div>
             </div>
 
