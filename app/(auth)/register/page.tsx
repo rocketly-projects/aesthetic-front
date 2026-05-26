@@ -170,27 +170,38 @@ export default function RegisterPage() {
       </div>
 
       {/* Right panel */}
-      <div className="relative overflow-hidden flex flex-col justify-center p-10 bg-[linear-gradient(160deg,var(--color-accent-pale)_0%,var(--color-bg-2)_60%,var(--color-accent-soft)_100%)]">
-        <div className="absolute -top-[120px] -right-[120px] w-[380px] h-[380px] rounded-full border border-accent opacity-[0.12] pointer-events-none" />
-        <div className="absolute -bottom-[80px] -left-[80px] w-[240px] h-[240px] rounded-full bg-accent opacity-[0.06] pointer-events-none" />
+      <div
+        className="relative overflow-hidden flex flex-col justify-center p-10"
+        style={{
+          background: `
+            radial-gradient(at 20% 20%, var(--color-accent-pale) 0%, transparent 50%),
+            radial-gradient(at 80% 0%,  var(--color-accent-soft) 0%, transparent 45%),
+            radial-gradient(at 70% 80%, var(--color-warn-soft)   0%, transparent 55%),
+            var(--color-bg-2)
+          `,
+        }}
+      >
+        <div className="absolute -top-[100px] -right-[100px] w-[420px] h-[420px] rounded-full border border-accent opacity-[0.18] pointer-events-none" />
+        <div className="absolute top-[30%] -right-[60px] w-[180px] h-[180px] rounded-full border border-accent-soft opacity-[0.25] pointer-events-none" />
+        <div className="absolute -bottom-[60px] -left-[60px] w-[260px] h-[260px] rounded-full bg-accent opacity-[0.07] pointer-events-none" />
 
-        <div className="relative max-w-[460px] mx-auto">
-          <div className="font-display text-[80px] leading-none text-accent opacity-40 -mb-4">"</div>
-          <blockquote className="font-display text-[26px] leading-[1.3] tracking-[-0.02em] text-ink font-normal m-0">
+        <div className="relative max-w-[480px] mx-auto">
+          <div className="font-display leading-none text-accent opacity-30 -mb-6 select-none" style={{ fontSize: 140 }}>"</div>
+          <blockquote className="font-display leading-[1.15] tracking-[-0.025em] text-ink font-normal m-0" style={{ fontSize: 42 }}>
             En dos semanas ya no atendía el teléfono yo. El bot tomaba los turnos solo, yo solo aparecía a trabajar.
           </blockquote>
 
-          <div className="flex items-center gap-3 mt-6">
-            <div className="grid place-items-center w-9 h-9 rounded-full bg-ink text-bg font-medium text-[13px] shrink-0">
+          <div className="flex items-center gap-3.5 mt-7">
+            <div className="grid place-items-center rounded-full bg-ink text-bg font-semibold text-[15px] shrink-0" style={{ width: 56, height: 56 }}>
               LM
             </div>
-            <div className="text-[13px] text-ink">
-              Laura M.
-              <span className="block text-ink-3 text-[11.5px]">Studio Laura · Villa Urquiza</span>
+            <div>
+              <div className="text-[14px] font-semibold text-ink">Laura M.</div>
+              <div className="text-[12px] text-ink-3 mt-0.5">Studio Laura · Villa Urquiza</div>
             </div>
           </div>
 
-          <div className="flex gap-2 flex-wrap mt-8">
+          <div className="flex gap-2 flex-wrap mt-7">
             {[
               { label: "14 días gratis", dot: true },
               { label: "Sin tarjeta", dot: false },
@@ -198,7 +209,8 @@ export default function RegisterPage() {
             ].map(({ label, dot }) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] text-ink-2 bg-white/50 backdrop-blur-[8px] border border-ink/[0.08]"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] text-ink-2 border border-ink/[0.08]"
+                style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)", boxShadow: "var(--shadow-md)" }}
               >
                 {dot && <span className="w-1.5 h-1.5 rounded-full bg-ok shrink-0" />}
                 {label}

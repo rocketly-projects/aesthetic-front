@@ -3,8 +3,10 @@
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
-import { useGetAppointments } from "@/hooks/useAppointments";
-import type { Appointment } from "@/lib/api/appointments";
+import EditTurnoModal from "@/components/EditTurnoModal";
+import { statusChip } from "@/components/Chip";
+import { useGetAppointments, useUpdateAppointment } from "@/hooks/useAppointments";
+import type { Appointment, AppointmentStatus } from "@/lib/api/appointments";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -16,15 +18,33 @@ const MON_NAMES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Ago
 
 type View = "dia" | "semana" | "mes";
 
+const QUICK_STATUSES: { status: AppointmentStatus; label: string }[] = [
+  { status: "confirmed", label: "Confirmar"  },
+  { status: "completed", label: "Completar"  },
+  { status: "cancelled", label: "Cancelar"   },
+  { status: "no_show",   label: "No asistió" },
+];
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function toYMD(d: Date) { return d.toISOString().slice(0, 10); }
+
+function formatDate(d: string) {
+  return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 function apptTop(time: string) {
   const [h, m] = time.split(":").map(Number);
   return (h - DAY_START + m / 60) * HOUR_PX;
 }
 function apptHeight(duration: number) { return Math.max((duration / 60) * HOUR_PX - 2, 18); }
+
+function yToTime(y: number): string {
+  const snapped = Math.round((y / HOUR_PX) * 60 / 15) * 15;
+  const h = DAY_START + Math.floor(snapped / 60);
+  const m = snapped % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
 
 function getWeekDates(anchor: Date) {
   const day    = anchor.getDay();
@@ -43,7 +63,7 @@ function getMonthGrid(anchor: Date): (Date | null)[] {
   const first = new Date(year, month, 1);
   const last  = new Date(year, month + 1, 0);
   const dow   = first.getDay();
-  const offset = dow === 0 ? 6 : dow - 1; // Monday-first
+  const offset = dow === 0 ? 6 : dow - 1;
   const cells: (Date | null)[] = Array(offset).fill(null);
   for (let d = 1; d <= last.getDate(); d++) cells.push(new Date(year, month, d));
   while (cells.length % 7 !== 0) cells.push(null);
@@ -51,19 +71,122 @@ function getMonthGrid(anchor: Date): (Date | null)[] {
 }
 
 const statusBg: Record<string, string> = {
-  confirmed: "var(--color-ok-soft)",
-  pending:   "var(--color-warn-soft)",
-  cancelled: "var(--color-err-soft)",
-  completed: "var(--color-info-soft)",
-  no_show:   "var(--color-err-soft)",
+  confirmed:        "var(--color-ok-soft)",
+  pending:          "var(--color-warn-soft)",
+  cancelled:        "var(--color-err-soft)",
+  completed:        "var(--color-info-soft)",
+  no_show:          "var(--color-err-soft)",
+  awaiting_payment: "var(--color-warn-soft)",
 };
 const statusBorder: Record<string, string> = {
-  confirmed: "var(--color-ok)",
-  pending:   "var(--color-warn)",
-  cancelled: "var(--color-err)",
-  completed: "var(--color-info)",
-  no_show:   "var(--color-err)",
+  confirmed:        "var(--color-ok)",
+  pending:          "var(--color-warn)",
+  cancelled:        "var(--color-err)",
+  completed:        "var(--color-info)",
+  no_show:          "var(--color-err)",
+  awaiting_payment: "var(--color-warn)",
 };
+
+// ── Detail panel ─────────────────────────────────────────────────────────────
+
+function ApptDetailPanel({
+  appt,
+  onClose,
+  onStatusChange,
+  onEdit,
+  isPending,
+}: {
+  appt: Appointment;
+  onClose: () => void;
+  onStatusChange: (status: AppointmentStatus) => void;
+  onEdit: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <>
+      {/* Backdrop — click outside to close */}
+      <div className="fixed inset-0 z-40" onClick={onClose} />
+
+      {/* Panel */}
+      <div className="fixed right-6 top-24 w-72 bg-surface border border-line rounded-xl shadow-xl z-50 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-line">
+          <div className="font-semibold text-[13.5px] text-ink truncate">
+            {appt.clientName ?? "Sin cliente"}
+          </div>
+          <button
+            onClick={onClose}
+            className="text-ink-3 hover:text-ink bg-transparent border-none cursor-pointer rounded-md p-1 transition-colors text-base leading-none"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 flex flex-col gap-3.5">
+          <div>
+            <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-0.5">Servicio</div>
+            <div className="text-[13px] text-ink font-medium">{appt.serviceName}</div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-0.5">Fecha</div>
+              <div className="font-mono text-[12px] text-ink">{formatDate(appt.date)}</div>
+            </div>
+            <div>
+              <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-0.5">Hora</div>
+              <div className="font-mono text-[12px] text-ink font-semibold">{appt.time}</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-0.5">Duración</div>
+              <div className="font-mono text-[12px] text-ink">{appt.duration} min</div>
+            </div>
+            <div>
+              <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-0.5">Precio</div>
+              <div className="font-mono text-[12px] text-ink font-semibold">${appt.price.toLocaleString("es-AR")}</div>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-1.5">Estado</div>
+            {statusChip(appt.status)}
+          </div>
+
+          {/* Quick actions */}
+          {QUICK_STATUSES.filter((q) => q.status !== appt.status).length > 0 && (
+            <div className="flex flex-col gap-1.5 pt-1 border-t border-line">
+              <div className="text-[10.5px] text-ink-3 uppercase tracking-wider mb-0.5">Cambiar estado</div>
+              {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
+                <button
+                  key={q.status}
+                  onClick={() => onStatusChange(q.status)}
+                  disabled={isPending}
+                  className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border border-line bg-surface rounded-lg cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 pb-4">
+          <button
+            onClick={onEdit}
+            className="w-full py-2 text-[13px] font-medium rounded-lg border border-line bg-transparent text-ink hover:bg-bg cursor-pointer transition-colors"
+          >
+            Editar turno
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
 
 // ── Sub-views ────────────────────────────────────────────────────────────────
 
@@ -79,14 +202,34 @@ function HourGrid() {
   );
 }
 
-function DayColumn({ date, appts, isToday }: { date: Date; appts: Appointment[]; isToday: boolean }) {
+function DayColumn({
+  date,
+  appts,
+  isToday,
+  onSelect,
+  onCellClick,
+}: {
+  date: Date;
+  appts: Appointment[];
+  isToday: boolean;
+  onSelect: (appt: Appointment) => void;
+  onCellClick: (date: string, time: string) => void;
+}) {
   return (
-    <div className="border-l border-line relative" style={isToday ? { background: "rgba(122,139,110,.03)" } : undefined}>
+    <div
+      className="border-l border-line relative"
+      style={isToday ? { background: "rgba(122,139,110,.03)" } : undefined}
+      onClick={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        onCellClick(toYMD(date), yToTime(e.clientY - rect.top));
+      }}
+    >
       {HOURS.map((h) => <div key={h} className="border-t border-line" style={{ height: HOUR_PX }} />)}
       {appts.map((appt) => (
         <div
           key={appt.id}
-          className="absolute left-0.5 right-0.5 rounded-sm overflow-hidden cursor-pointer z-10"
+          onClick={(e) => { e.stopPropagation(); onSelect(appt); }}
+          className="absolute left-0.5 right-0.5 rounded-sm overflow-hidden cursor-pointer z-10 hover:brightness-95 transition-all"
           style={{
             top:        apptTop(appt.time),
             height:     apptHeight(appt.duration),
@@ -103,12 +246,12 @@ function DayColumn({ date, appts, isToday }: { date: Date; appts: Appointment[];
       ))}
       {isToday && (
         <div
-          className="absolute left-0 right-0 h-0.5 z-20"
-          style={{
-            top:        (new Date().getHours() + new Date().getMinutes() / 60 - DAY_START) * HOUR_PX,
-            background: "var(--color-accent)",
-          }}
-        />
+          className="absolute left-0 right-0 z-20 pointer-events-none"
+          style={{ top: (new Date().getHours() + new Date().getMinutes() / 60 - DAY_START) * HOUR_PX }}
+        >
+          <div className="absolute -left-1 -top-[3px] w-2 h-2 rounded-full bg-err" />
+          <div className="h-px bg-err" />
+        </div>
       )}
     </div>
   );
@@ -119,12 +262,49 @@ function DayColumn({ date, appts, isToday }: { date: Date; appts: Appointment[];
 const TODAY = new Date().toISOString().slice(0, 10);
 
 export default function AgendaPage() {
-  const [anchor,    setAnchor]    = useState(new Date());
-  const [view,      setView]      = useState<View>("semana");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [anchor,          setAnchor]         = useState(new Date());
+  const [view,            setView]           = useState<View>("semana");
+  const [modalOpen,       setModalOpen]      = useState(false);
+  const [preset,          setPreset]         = useState<{ date: string; time: string } | null>(null);
+  const [selectedApptId,  setSelectedApptId] = useState<string | null>(null);
+  const [editApptId,      setEditApptId]     = useState<string | null>(null);
 
-  const { data } = useGetAppointments({ limit: 100 });
-  const allAppts  = data?.appointments ?? [];
+  const { data }   = useGetAppointments({ limit: 100 });
+  const allAppts   = data?.appointments ?? [];
+  const updateAppt = useUpdateAppointment();
+
+  // Derivar selectedAppt del cache — se actualiza automáticamente tras mutaciones
+  const selectedAppt = selectedApptId
+    ? (allAppts.find((a) => a.id === selectedApptId) ?? null)
+    : null;
+
+  const editAppt = editApptId
+    ? (allAppts.find((a) => a.id === editApptId) ?? null)
+    : null;
+
+  function handleSelect(appt: Appointment) {
+    setSelectedApptId(appt.id);
+  }
+
+  function handleCellClick(date: string, time: string) {
+    setPreset({ date, time });
+    setModalOpen(true);
+  }
+
+  function handleModalClose() {
+    setModalOpen(false);
+    setPreset(null);
+  }
+
+  function handleStatusChange(status: AppointmentStatus) {
+    if (!selectedApptId) return;
+    updateAppt.mutate({ id: selectedApptId, status });
+  }
+
+  function handleEdit() {
+    setEditApptId(selectedApptId);
+    setSelectedApptId(null);
+  }
 
   // Navigation
   function navigate(dir: 1 | -1) {
@@ -136,8 +316,8 @@ export default function AgendaPage() {
   }
 
   // Subtitle
-  const weekDates  = getWeekDates(anchor);
-  const anchorYMD  = toYMD(anchor);
+  const weekDates = getWeekDates(anchor);
+  const anchorYMD = toYMD(anchor);
   const subtitle =
     view === "dia"
       ? anchor.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }).replace(/^\w/, (c) => c.toUpperCase())
@@ -158,9 +338,8 @@ export default function AgendaPage() {
       subtitle={subtitle}
       actions={
         <button
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
-          style={{ background: "var(--color-ink)" }}
-          onClick={() => setModalOpen(true)}
+          className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
+          onClick={() => { setPreset(null); setModalOpen(true); }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Nuevo turno
@@ -212,8 +391,7 @@ export default function AgendaPage() {
               <div className="py-3 px-2 text-center border-l border-line">
                 <div className="text-[11px] text-ink-3 uppercase tracking-wider">{DAY_NAMES[anchor.getDay()]}</div>
                 <div
-                  className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white" : "text-ink"}`}
-                  style={isToday ? { background: "var(--color-accent)" } : undefined}
+                  className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white bg-accent" : "text-ink"}`}
                 >
                   {anchor.getDate()}
                 </div>
@@ -222,7 +400,7 @@ export default function AgendaPage() {
             <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
               <div className="grid" style={{ gridTemplateColumns: "60px 1fr" }}>
                 <HourGrid />
-                <DayColumn date={anchor} appts={dayAppts} isToday={isToday} />
+                <DayColumn date={anchor} appts={dayAppts} isToday={isToday} onSelect={handleSelect} onCellClick={handleCellClick} />
               </div>
             </div>
           </div>
@@ -244,8 +422,7 @@ export default function AgendaPage() {
                   <div key={i} className="py-3 px-2 text-center border-l border-line">
                     <div className="text-[11px] text-ink-3 uppercase tracking-wider">{DAY_NAMES[d.getDay()]}</div>
                     <div
-                      className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white" : "text-ink"}`}
-                      style={isToday ? { background: "var(--color-accent)" } : undefined}
+                      className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white bg-accent" : "text-ink"}`}
                     >
                       {d.getDate()}
                     </div>
@@ -260,7 +437,7 @@ export default function AgendaPage() {
                   const ymd      = toYMD(d);
                   const isToday  = ymd === TODAY;
                   const dayAppts = weekAppts.filter((a) => a.date === ymd);
-                  return <DayColumn key={di} date={d} appts={dayAppts} isToday={isToday} />;
+                  return <DayColumn key={di} date={d} appts={dayAppts} isToday={isToday} onSelect={handleSelect} onCellClick={handleCellClick} />;
                 })}
               </div>
             </div>
@@ -270,14 +447,13 @@ export default function AgendaPage() {
 
       {/* ── Vista Mes ── */}
       {view === "mes" && (() => {
-        const cells       = getMonthGrid(anchor);
-        const monthStart  = toYMD(new Date(anchor.getFullYear(), anchor.getMonth(), 1));
-        const monthEnd    = toYMD(new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0));
-        const monthAppts  = allAppts.filter((a) => a.date >= monthStart && a.date <= monthEnd);
+        const cells      = getMonthGrid(anchor);
+        const monthStart = toYMD(new Date(anchor.getFullYear(), anchor.getMonth(), 1));
+        const monthEnd   = toYMD(new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0));
+        const monthAppts = allAppts.filter((a) => a.date >= monthStart && a.date <= monthEnd);
 
         return (
           <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden">
-            {/* Week day headers */}
             <div className="grid grid-cols-7 border-b border-line bg-bg">
               {["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"].map((d) => (
                 <div key={d} className="py-2 text-center text-[11px] font-semibold text-ink-3 uppercase tracking-wider border-r border-line last:border-r-0">
@@ -285,7 +461,6 @@ export default function AgendaPage() {
                 </div>
               ))}
             </div>
-            {/* Day cells */}
             <div className="grid grid-cols-7">
               {cells.map((cell, i) => {
                 if (!cell) {
@@ -305,8 +480,7 @@ export default function AgendaPage() {
                     className={`border-r border-b border-line last:border-r-0 min-h-[100px] p-2 cursor-pointer hover:bg-bg transition-colors ${isOtherM ? "opacity-40" : ""}`}
                   >
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-semibold mb-1 ${isToday ? "text-white" : "text-ink"}`}
-                      style={isToday ? { background: "var(--color-accent)" } : undefined}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-semibold mb-1 ${isToday ? "text-white bg-accent" : "text-ink"}`}
                     >
                       {cell.getDate()}
                     </div>
@@ -314,11 +488,11 @@ export default function AgendaPage() {
                       {dayAppts.slice(0, MAX_SHOW).map((appt) => (
                         <div
                           key={appt.id}
-                          className="text-[10.5px] font-medium px-1.5 py-0.5 rounded truncate"
+                          onClick={(e) => { e.stopPropagation(); handleSelect(appt); }}
+                          className="text-[10.5px] font-medium px-1.5 py-0.5 rounded truncate cursor-pointer hover:brightness-95 transition-all text-ink"
                           style={{
-                            background:  statusBg[appt.status],
-                            borderLeft:  `2px solid ${statusBorder[appt.status] ?? "var(--color-line)"}`,
-                            color:       "var(--color-ink)",
+                            background: statusBg[appt.status],
+                            borderLeft: `2px solid ${statusBorder[appt.status] ?? "var(--color-line)"}`,
                           }}
                         >
                           {appt.time} {appt.clientName ?? appt.serviceName}
@@ -336,7 +510,30 @@ export default function AgendaPage() {
         );
       })()}
 
-      <NuevoTurnoModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      {/* Detail panel */}
+      {selectedAppt && (
+        <ApptDetailPanel
+          appt={selectedAppt}
+          onClose={() => setSelectedApptId(null)}
+          onStatusChange={handleStatusChange}
+          onEdit={handleEdit}
+          isPending={updateAppt.isPending}
+        />
+      )}
+
+      <NuevoTurnoModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        initialDate={preset?.date}
+        initialTime={preset?.time}
+      />
+      {editAppt && (
+        <EditTurnoModal
+          open={!!editAppt}
+          onClose={() => setEditApptId(null)}
+          appointment={editAppt}
+        />
+      )}
     </AppShell>
   );
 }

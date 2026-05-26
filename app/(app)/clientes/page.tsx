@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppShell from "@/components/AppShell";
+import Pagination from "@/components/Pagination";
+import EmptyState, { ClientEmptyIcon, SearchEmptyIcon } from "@/components/EmptyState";
+import { SkeletonList } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
 import NuevoClienteModal from "@/components/NuevoClienteModal";
 import EditClienteModal from "@/components/EditClienteModal";
 import { useGetClients, useGetClient } from "@/hooks/useClients";
 import { useGetAppointments } from "@/hooks/useAppointments";
+
+const PAGE_LIMIT = 20;
 
 function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
@@ -17,20 +22,28 @@ function initials(name: string) {
 }
 
 export default function ClientesPage() {
-  const [search,     setSearch]     = useState("");
-  const [activeId,   setActiveId]   = useState<string>("");
-  const [modalOpen,  setModalOpen]  = useState(false);
-  const [editOpen,   setEditOpen]   = useState(false);
+  const [searchInput,  setSearchInput]  = useState("");
+  const [search,       setSearch]       = useState("");
+  const [page,         setPage]         = useState(1);
+  const [activeId,     setActiveId]     = useState<string>("");
+  const [modalOpen,    setModalOpen]    = useState(false);
+  const [editOpen,     setEditOpen]     = useState(false);
 
-  const { data: clientData, isLoading } = useGetClients({ limit: 100 });
+  // Debounce search — resetea página al buscar
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const { data: clientData, isLoading } = useGetClients({ page, limit: PAGE_LIMIT, search: search || undefined });
   const allClients = clientData?.clients ?? [];
+  const total      = clientData?.total;
 
-  const filtered = allClients.filter(
-    (c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search)
-  );
-
-  const grouped: Record<string, typeof filtered> = {};
-  for (const c of filtered) {
+  const grouped: Record<string, typeof allClients> = {};
+  for (const c of allClients) {
     const l = c.name[0].toUpperCase();
     if (!grouped[l]) grouped[l] = [];
     grouped[l].push(c);
@@ -39,17 +52,17 @@ export default function ClientesPage() {
 
   const resolvedActiveId = activeId || allClients[0]?.id || "";
 
-  const { data: active }      = useGetClient(resolvedActiveId);
-  const { data: apptData }    = useGetAppointments({ clientId: resolvedActiveId, limit: 100 });
-  const clientAppts           = apptData?.appointments ?? [];
+  const { data: active }   = useGetClient(resolvedActiveId);
+  const { data: apptData } = useGetAppointments({ clientId: resolvedActiveId, limit: 100 });
+  const clientAppts        = apptData?.appointments ?? [];
 
   return (
     <AppShell
       active="clientes"
       title="Clientes"
-      subtitle={`${allClients.length} clientes`}
+      subtitle={total !== undefined ? `${total} cliente${total !== 1 ? "s" : ""}` : undefined}
       actions={
-        <button className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" style={{ background: "var(--color-ink)" }} onClick={() => setModalOpen(true)}>
+        <button className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm" onClick={() => setModalOpen(true)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           Nueva cliente
         </button>
@@ -59,11 +72,22 @@ export default function ClientesPage() {
         {/* List */}
         <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col">
           <div className="p-3 border-b border-line">
-            <input className="input" placeholder="Buscar cliente…" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input
+              className="input"
+              placeholder="Buscar cliente…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
           </div>
           <div className="overflow-y-auto flex-1">
             {isLoading ? (
-              <div className="p-6 text-center text-[13px] text-ink-3">Cargando clientes…</div>
+              <div className="p-3"><SkeletonList rows={15} /></div>
+            ) : allClients.length === 0 ? (
+              <EmptyState
+                icon={search ? <SearchEmptyIcon /> : <ClientEmptyIcon />}
+                title={search ? "Sin resultados" : "Sin clientes registrados"}
+                description={search ? `No encontramos clientes para "${search}".` : "Agregá tu primera clienta usando el botón de arriba."}
+              />
             ) : letters.map((letter) => (
               <div key={letter}>
                 <div className="px-4 py-1.5 text-[10.5px] font-semibold text-ink-3 uppercase tracking-widest bg-bg border-b border-line">
@@ -75,10 +99,9 @@ export default function ClientesPage() {
                     <div
                       key={c.id}
                       onClick={() => setActiveId(c.id)}
-                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors ${isActive ? "border-l-[3px]" : "border-l-[3px] border-l-transparent hover:bg-bg"}`}
-                      style={isActive ? { background: "var(--color-accent-pale)", borderLeftColor: "var(--color-accent)" } : undefined}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "bg-accent-pale border-l-accent" : "border-l-transparent hover:bg-bg"}`}
                     >
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 bg-accent-pale text-accent-ink">
                         {initials(c.name)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -92,6 +115,9 @@ export default function ClientesPage() {
               </div>
             ))}
           </div>
+          <div className="px-3 border-t border-line">
+            <Pagination page={page} total={total} limit={PAGE_LIMIT} count={allClients.length} onChange={setPage} />
+          </div>
         </div>
 
         {/* Profile */}
@@ -99,7 +125,7 @@ export default function ClientesPage() {
           <div className="flex flex-col gap-4 overflow-y-auto">
             <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
               <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold shrink-0 bg-accent-pale text-accent-ink">
                   {initials(active.name)}
                 </div>
                 <div className="flex-1">
@@ -117,23 +143,28 @@ export default function ClientesPage() {
                 </button>
               </div>
               <div className="grid grid-cols-4 gap-3 mt-5 pt-5 border-t border-line">
-                {[
-                  { label: "Visitas",       val: active.visits },
-                  { label: "Total gastado", val: "$" + active.totalSpent.toLocaleString("es-AR") },
-                  { label: "Última visita", val: active.lastVisitAt ? formatDate(active.lastVisitAt) : "—" },
-                  { label: "Promedio",      val: active.visits > 0 ? "$" + Math.round(active.totalSpent / active.visits).toLocaleString("es-AR") : "—" },
-                ].map((s) => (
-                  <div key={s.label} className="text-center">
-                    <div className="text-base font-semibold text-ink">{s.val}</div>
-                    <div className="text-[11px] text-ink-3 mt-0.5">{s.label}</div>
-                  </div>
-                ))}
+                <div className="text-center">
+                  <div className="text-base font-semibold text-ink">{active.visits}</div>
+                  <div className="text-[11px] text-ink-3 mt-0.5">Visitas</div>
+                </div>
+                <div className="text-center bg-ink rounded-lg py-3">
+                  <div className="text-base font-semibold text-white">${active.totalSpent.toLocaleString("es-AR")}</div>
+                  <div className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>Total gastado</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-base font-semibold text-ink">{active.lastVisitAt ? formatDate(active.lastVisitAt) : "—"}</div>
+                  <div className="text-[11px] text-ink-3 mt-0.5">Última visita</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-base font-semibold text-ink">{active.visits > 0 ? "$" + Math.round(active.totalSpent / active.visits).toLocaleString("es-AR") : "—"}</div>
+                  <div className="text-[11px] text-ink-3 mt-0.5">Promedio</div>
+                </div>
               </div>
             </div>
 
             {active.notes && (
-              <div className="rounded-lg p-5 border" style={{ background: "var(--color-accent-pale)", borderColor: "var(--color-accent-soft)" }}>
-                <div className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--color-accent-ink)" }}>Notas privadas</div>
+              <div className="rounded-lg p-5 border bg-accent-pale border-accent-soft">
+                <div className="text-[11px] font-semibold uppercase tracking-wider mb-2 text-accent-ink">Notas privadas</div>
                 <p className="m-0 text-[13px] text-ink-2 leading-relaxed">{active.notes}</p>
               </div>
             )}

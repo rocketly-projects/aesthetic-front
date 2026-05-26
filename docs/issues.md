@@ -57,7 +57,7 @@ Implementadas las tres vistas. Estado `view: "dia" | "semana" | "mes"` controla 
 
 ---
 
-### [F-05] "Olvidé mi contraseña" no tiene flujo
+### ✅ [F-05] "Olvidé mi contraseña" no tiene flujo
 **Archivo:** `app/(auth)/login/page.tsx:88`
 
 El link apunta a `href="#"`. No hay página ni endpoint de recuperación de contraseña.
@@ -66,7 +66,7 @@ El link apunta a `href="#"`. No hay página ni endpoint de recuperación de cont
 
 ---
 
-### [F-06] ~~Login con Google no implementado~~ ✅ (frontend listo — requiere backend)
+### ✅ [F-06] ~~Login con Google no implementado~~ (frontend listo — backend implementado)
 **Archivos:** `types/google.d.ts`, `lib/api/auth.ts`, `hooks/useAuth.ts`, `components/CompleteGoogleRegisterModal.tsx`, `app/(auth)/layout.tsx`, `app/(auth)/login/page.tsx`, `app/(auth)/register/page.tsx`
 
 Frontend completo con Google Identity Services (sin dependencias extra). Flujo:
@@ -132,7 +132,7 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ---
 
-### [D-05] Badge de WhatsApp hardcodeado en sidebar
+### ✅ [D-05] Badge de WhatsApp hardcodeado en sidebar
 **Archivo:** `components/Sidebar.tsx:74`
 
 `badge: 3` es un número fijo. No refleja los mensajes no leídos reales.
@@ -143,7 +143,7 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ## UX / EXPERIENCIA
 
-### [U-01] Estado "no_show" falta en filtros de turnos
+### ✅ [U-01] Estado "no_show" falta en filtros de turnos
 **Archivo:** `app/(app)/turnos/page.tsx:12-18`
 
 `AppointmentStatus` incluye `"no_show"` pero el array `FILTERS` no lo contempla. Los turnos con ese estado quedan atrapados en "Todos" sin filtro propio.
@@ -152,53 +152,43 @@ El JWT no incluye `name`, por lo que se persiste `{ name, email, role, businessN
 
 ---
 
-### [U-02] Paginación ausente en todas las listas
-**Archivos:** `app/(app)/turnos/page.tsx:28`, `app/(app)/clientes/page.tsx:23`, `app/(app)/whatsapp/page.tsx:32`
+### [U-02] ~~Paginación ausente en todas las listas~~ ✅
+**Archivos:** `app/(app)/turnos/page.tsx`, `app/(app)/clientes/page.tsx`, `app/(app)/whatsapp/page.tsx`
 
-Todos los listados usan `limit: 100` sin paginación ni scroll infinito. Con bases de datos reales esto devuelve solo los primeros 100 registros sin aviso al usuario.
-
-**Solución:** Implementar paginación por cursor o página. El response ya incluye `page` y `limit` pero falta `total` para mostrar "X de Y". Agregar `total` al response del backend y controles de paginación en el frontend.
+Backend: agregado `total` al response de `GET /appointments`, `GET /clients` y `GET /whatsapp/chats` (este último también recibió soporte de `page`/`limit`). Frontend: componente `Pagination` reutilizable, paginación server-side en las tres páginas (20/página en turnos y clientes, 30/página en chats). Búsqueda de clientes movida al servidor con debounce de 300ms (resuelve también U-03). Empty states contextuales agregados.
 
 ---
 
-### [U-03] Búsqueda de clientes no usa la API
-**Archivo:** `app/(app)/clientes/page.tsx:26-28`
+### [U-03] ~~Búsqueda de clientes no usa la API~~ ✅
+**Archivo:** `app/(app)/clientes/page.tsx`
 
-El `search` filtra client-side sobre los 100 clientes ya cargados. El endpoint `getClients` acepta `params.search` pero no se usa.
-
-**Solución:** Hacer debounce del input y pasar `search` como parámetro a `useGetClients({ search, limit: 100 })` para que filtre en el servidor.
+Resuelto como parte de U-02. Búsqueda movida al servidor con debounce de 300ms y reset de página al buscar.
 
 ---
 
-### [U-04] Clicks en turnos de la agenda no abren detalle
-**Archivo:** `app/(app)/agenda/page.tsx:116-127`
+### [U-04] ~~Clicks en turnos de la agenda no abren detalle~~ ✅
+**Archivo:** `app/(app)/agenda/page.tsx`
 
-Los bloques de turno en la vista de calendario tienen `cursor-pointer` pero no tienen `onClick`. No es posible ver detalles ni cambiar estado desde la agenda.
-
-**Solución:** Al hacer click, abrir un popover/modal con los datos del turno y acciones rápidas (Confirmar, Cancelar, etc.) usando `useUpdateAppointment`.
+Panel lateral fijo (`ApptDetailPanel`) que muestra cliente, servicio, fecha/hora, duración, precio, estado y acciones rápidas de cambio de estado. `selectedApptId` derivado del cache de React Query — el panel refleja cambios de status sin sync manual. En vista mes, `e.stopPropagation()` separa click en turno (panel) de click en celda (navegar al día). "Editar turno" abre `EditTurnoModal`.
 
 ---
 
-### [U-05] Click en celda vacía de la agenda no pre-llena el modal
-**Archivo:** `app/(app)/agenda/page.tsx:115`
+### [U-05] ~~Click en celda vacía de la agenda no pre-llena el modal~~ ✅
+**Archivos:** `app/(app)/agenda/page.tsx`, `components/NuevoTurnoModal.tsx`
 
-El `div` de cada día no tiene `onClick` para capturar el horario y pre-llenarlo en `NuevoTurnoModal`.
-
-**Solución:** Detectar el click en la columna del día, calcular la hora según posición Y y abrir el modal con `date` y `time` pre-seteados.
+`DayColumn` detecta click en espacio vacío (`onClick` en el contenedor, `stopPropagation` en bloques de turno). Tiempo calculado con `yToTime(e.clientY - rect.top)` snapeado a 15 min. `AgendaPage` guarda `preset: { date, time }` y lo pasa a `NuevoTurnoModal` via `initialDate`/`initialTime`. El modal sincroniza los valores con `useEffect` al abrirse.
 
 ---
 
-### [U-06] No hay estados vacíos explícitos en listas filtradas
-**Archivo:** `app/(app)/turnos/page.tsx`
+### [U-06] ~~Estados vacíos son solo textos cortos~~ ✅
+**Archivos:** `components/EmptyState.tsx`, `turnos`, `clientes`, `whatsapp`, `servicios`
 
-Si se filtra por un estado y no hay resultados, la tabla queda vacía sin mensaje. El usuario no sabe si es un error o si realmente no hay datos.
-
-**Solución:** Mostrar un empty state con mensaje contextual cuando `visible.length === 0`.
+Componente `EmptyState` reutilizable con SVG contextual, título y descripción. Iconos específicos: `CalendarEmptyIcon` (turnos), `ClientEmptyIcon` (clientes), `ChatEmptyIcon` (whatsapp), `ScissorsEmptyIcon` (servicios), `SearchEmptyIcon` (búsquedas sin resultado). Servicios incluye CTA de acción.
 
 ---
 
-### [U-07] Sin feedback de éxito en modales
-**Archivos:** `NuevoTurnoModal.tsx`, `NuevoClienteModal.tsx`, `NuevoServicioModal.tsx`
+### ✅ [U-07] Sin feedback de éxito en modales
+**Archivos:** `NuevoTurnoModal.tsx`, `NuevoClienteModal.tsx`, `NuevoServicioModal.tsx`. Buscar otros archivos que necesiten esto.
 
 Los modales se cierran al crear exitosamente pero no hay ningún toast/snackbar de confirmación. El usuario no recibe feedback visual de que la acción se completó.
 
@@ -206,7 +196,7 @@ Los modales se cierran al crear exitosamente pero no hay ningún toast/snackbar 
 
 ---
 
-### [U-08] Mapa en negocio es un placeholder
+### ✅ [U-08] Mapa en negocio es un placeholder
 **Archivo:** `app/(app)/negocio/page.tsx:178-181`
 
 El "mapa" es un `div` con un emoji. No es un mapa real.
@@ -217,7 +207,7 @@ El "mapa" es un `div` con un emoji. No es un mapa real.
 
 ## TECNICO / DEUDA
 
-### [T-01] `remember` en login no se usa
+### ✅ [T-01] `remember` en login no se usa
 **Archivo:** `app/(auth)/login/page.tsx:11,17`
 
 El estado `remember` se trackea y muestra en el checkbox "Mantener sesión", pero no se pasa al `login()` call ni afecta la duración del token/cookie.
@@ -226,7 +216,7 @@ El estado `remember` se trackea y muestra en el checkbox "Mantener sesión", per
 
 ---
 
-### [T-02] `useGetAgenda` existe pero no se usa
+### ✅ [T-02] `useGetAgenda` existe pero no se usa
 **Archivo:** `hooks/useAppointments.ts:75-81`
 
 El hook `useGetAgenda(date)` —que llama a `/appointments/agenda/:date` y devuelve `availableSlots`— está implementado pero ninguna página lo consume. La agenda fetcha todos los appointments y filtra client-side.
@@ -235,21 +225,21 @@ El hook `useGetAgenda(date)` —que llama a `/appointments/agenda/:date` y devue
 
 ---
 
-### [T-03] Layouts de grupos de rutas son pass-through vacíos
+### ✅ [T-03] Layouts de grupos de rutas son pass-through vacíos
 **Archivos:** `app/(app)/layout.tsx`, `app/(auth)/layout.tsx`
 
 Ambos layouts solo hacen `return <>{children}</>`. El de `(app)` debería ser donde viva el auth guard (ver C-01). El de `(auth)` podría verificar que el usuario NO esté autenticado y redirigir al dashboard.
 
 ---
 
-### [T-04] Dependencia circular implícita entre hooks
+### ✅ [T-04] Dependencia circular implícita entre hooks
 **Archivos:** `hooks/useAppointments.ts:13`, `hooks/useClients.ts`
 
 `useAppointments.ts` importa `clientKeys` de `useClients.ts`. Si `useClients.ts` alguna vez importara algo de `useAppointments.ts`, se crearía una dependencia circular. Considerar mover las query keys a un archivo separado `lib/queryKeys.ts`.
 
 ---
 
-### [T-05] `var(--color-*)` usado directamente en algunos style inline
+### ✅ [T-05] `var(--color-*)` usado directamente en algunos style inline
 **Archivos:** múltiples componentes
 
 En varios lugares se usa `style={{ background: "var(--color-ok)" }}` en lugar de la clase Tailwind `bg-ok`. Inconsistente con la convención definida en el proyecto (usar clases Tailwind, no variables CSS directamente).

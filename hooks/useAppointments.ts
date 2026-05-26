@@ -7,16 +7,15 @@ import {
   createAppointment,
   updateAppointment,
   deleteAppointment,
-  getAgenda,
 } from "@/lib/api/appointments";
 import type { GetAppointmentsParams, CreateAppointmentParams, UpdateAppointmentParams } from "@/lib/api/appointments";
 import { clientKeys } from "./useClients";
+import { toast } from "@/components/Toaster";
 
 export const appointmentKeys = {
   all:    ["appointments"] as const,
   list:   (params: GetAppointmentsParams) => ["appointments", "list", params] as const,
   detail: (id: string) => ["appointments", "detail", id] as const,
-  agenda: (date: string) => ["appointments", "agenda", date] as const,
 };
 
 export function useGetAppointments(params: GetAppointmentsParams = {}) {
@@ -40,6 +39,7 @@ export function useCreateAppointment() {
     mutationFn: (params: CreateAppointmentParams) => createAppointment(params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
+      toast.success("Turno creado");
     },
   });
 }
@@ -52,11 +52,12 @@ export function useUpdateAppointment() {
     onSuccess: (data, { id }) => {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
       qc.invalidateQueries({ queryKey: appointmentKeys.detail(id) });
-      qc.invalidateQueries({ queryKey: appointmentKeys.agenda(data.date) });
+      qc.invalidateQueries({ queryKey: appointmentKeys.all });
       if (data.status === "completed" && data.clientId) {
         qc.invalidateQueries({ queryKey: clientKeys.detail(data.clientId) });
         qc.invalidateQueries({ queryKey: clientKeys.all });
       }
+      toast.success("Turno actualizado");
     },
   });
 }
@@ -67,14 +68,8 @@ export function useDeleteAppointment() {
     mutationFn: (id: string) => deleteAppointment(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: appointmentKeys.all });
+      toast.success("Turno cancelado");
     },
   });
 }
 
-export function useGetAgenda(date: string) {
-  return useQuery({
-    queryKey: appointmentKeys.agenda(date),
-    queryFn:  () => getAgenda(date),
-    enabled:  !!date,
-  });
-}

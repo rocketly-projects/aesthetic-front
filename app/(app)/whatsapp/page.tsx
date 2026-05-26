@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import Pagination from "@/components/Pagination";
+import EmptyState, { ChatEmptyIcon } from "@/components/EmptyState";
+import { SkeletonList } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
 import { useGetChats, useGetMessages, useSendMessage, usePatchChat } from "@/hooks/useWhatsapp";
 import { useGetClient } from "@/hooks/useClients";
@@ -9,6 +12,8 @@ import { useGetAppointments } from "@/hooks/useAppointments";
 import type { MessageSender } from "@/lib/api/whatsapp";
 
 type TabFilter = "todos" | "bot" | "yo";
+
+const CHATS_LIMIT = 30;
 
 function formatDate(d: string) {
   return new Date(d + "T12:00:00").toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
@@ -20,16 +25,19 @@ function initials(name: string) {
 
 function bubbleStyle(sender: MessageSender) {
   if (sender === "owner")  return { background: "var(--color-ink)",    color: "#fff",                   borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end"   };
-  if (sender === "bot")    return { background: "var(--color-accent)",  color: "#fff",                   borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end"   };
+  if (sender === "bot")    return { background: "var(--color-accent-pale)", color: "var(--color-accent-ink)", border: "1px solid var(--color-accent-soft)", borderRadius: "14px 14px 4px 14px", alignSelf: "flex-end" };
   return                          { background: "var(--color-surface)", color: "var(--color-ink)", border: "1px solid var(--color-line-2)", borderRadius: "14px 14px 14px 4px", alignSelf: "flex-start" };
 }
 
 export default function WhatsAppPage() {
   const [activeTab,    setActiveTab]    = useState<TabFilter>("todos");
   const [activeChatId, setActiveChatId] = useState<string>("");
+  const [chatsPage,    setChatsPage]    = useState(1);
   const [input,        setInput]        = useState("");
 
-  const { data: chats = [] }    = useGetChats();
+  const { data: chatsData, isLoading: chatsLoading } = useGetChats({ page: chatsPage, limit: CHATS_LIMIT });
+  const chats                  = chatsData?.chats ?? [];
+  const chatsTotal             = chatsData?.total;
   const patchChat               = usePatchChat();
   const sendMessage             = useSendMessage();
 
@@ -78,14 +86,22 @@ export default function WhatsAppPage() {
             </div>
           </div>
           <div className="overflow-y-auto flex-1">
-            {visibleChats.map((c) => {
+            {chatsLoading ? (
+              <div className="p-3"><SkeletonList rows={10} /></div>
+            ) : visibleChats.length === 0 ? (
+              <EmptyState
+                icon={<ChatEmptyIcon />}
+                title={activeTab === "bot" ? "Sin chats del bot" : activeTab === "yo" ? "Sin chats propios" : "Sin conversaciones"}
+                description={activeTab === "todos" ? "Los chats de tus clientes aparecerán acá." : "No hay chats en esta categoría."}
+              />
+            ) : visibleChats.map((c) => {
               const isActive = c.id === resolvedChatId;
               const name     = c.clientName ?? c.clientPhone;
               return (
-                <div key={c.id} onClick={() => handleSelectChat(c.id)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "" : "border-l-transparent hover:bg-bg"}`} style={isActive ? { background: "var(--color-accent-pale)", borderLeftColor: "var(--color-accent)" } : undefined}>
-                  <div className="relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                <div key={c.id} onClick={() => handleSelectChat(c.id)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "bg-accent-pale border-l-accent" : "border-l-transparent hover:bg-bg"}`}>
+                  <div className="relative w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 bg-accent-pale text-accent-ink">
                     {initials(name)}
-                    {c.isBot && <span className="absolute -bottom-0.5 -right-0.5 text-white text-[8px] font-bold rounded-sm px-0.5" style={{ background: "var(--color-accent)" }}>BOT</span>}
+                    {c.isBot && <span className="absolute -bottom-0.5 -right-0.5 bg-accent text-white text-[8px] font-bold rounded-sm px-0.5">BOT</span>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
@@ -94,10 +110,13 @@ export default function WhatsAppPage() {
                     </div>
                     <div className="text-xs text-ink-3 truncate mt-0.5">{c.lastMessage}</div>
                   </div>
-                  {c.unread > 0 && <span className="text-white rounded-full text-[10px] font-semibold px-1.5 leading-relaxed shrink-0" style={{ background: "var(--color-accent)" }}>{c.unread}</span>}
+                  {c.unread > 0 && <span className="bg-accent text-white rounded-full text-[10px] font-semibold px-1.5 leading-relaxed shrink-0">{c.unread}</span>}
                 </div>
               );
             })}
+          </div>
+          <div className="px-3 border-t border-line shrink-0">
+            <Pagination page={chatsPage} total={chatsTotal} limit={CHATS_LIMIT} count={chats.length} onChange={setChatsPage} />
           </div>
         </div>
 
@@ -106,7 +125,7 @@ export default function WhatsAppPage() {
           {activeChat ? (
             <>
               <div className="flex items-center gap-3 px-5 py-3.5 border-b border-line">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 bg-accent-pale text-accent-ink">
                   {initials(activeChat.clientName ?? activeChat.clientPhone)}
                 </div>
                 <div className="flex-1">
@@ -138,7 +157,7 @@ export default function WhatsAppPage() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 />
-                <button onClick={handleSend} disabled={sendMessage.isPending} className="shrink-0 text-white rounded-lg px-4 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-60" style={{ background: "var(--color-accent)" }}>
+                <button onClick={handleSend} disabled={sendMessage.isPending} className="shrink-0 bg-accent text-white rounded-lg px-4 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-60">
                   Enviar
                 </button>
               </div>
@@ -154,7 +173,7 @@ export default function WhatsAppPage() {
             <>
               <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
                 <div className="text-center mb-4">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-semibold mx-auto mb-3" style={{ background: "var(--color-accent-pale)", color: "var(--color-accent-ink)" }}>
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-semibold mx-auto mb-3 bg-accent-pale text-accent-ink">
                     {initials(activeChat.clientName ?? activeChat.clientPhone)}
                   </div>
                   <div className="text-[15px] font-semibold text-ink">{activeChat.clientName ?? activeChat.clientPhone}</div>

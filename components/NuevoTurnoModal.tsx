@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import Modal from "./Modal";
+import { useState, useEffect } from "react";
+import Drawer from "./Drawer";
 import { useGetClients } from "@/hooks/useClients";
 import { useGetServices } from "@/hooks/useServices";
 import { useCreateAppointment } from "@/hooks/useAppointments";
@@ -9,12 +9,20 @@ import { useCreateAppointment } from "@/hooks/useAppointments";
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialDate?: string;
+  initialTime?: string;
 }
 
 const EMPTY = { clientId: "", serviceId: "", date: "", time: "", notes: "" };
 
-export default function NuevoTurnoModal({ open, onClose }: Props) {
-  const [form, setForm] = useState(EMPTY);
+export default function NuevoTurnoModal({ open, onClose, initialDate, initialTime }: Props) {
+  const [form, setForm] = useState({ ...EMPTY, date: initialDate ?? "", time: initialTime ?? "" });
+
+  // Sync initial values each time the modal opens
+  useEffect(() => {
+    if (open) setForm({ ...EMPTY, date: initialDate ?? "", time: initialTime ?? "" });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const { data: clientData } = useGetClients({ limit: 100 });
   const { data: services = [] } = useGetServices();
@@ -43,7 +51,7 @@ export default function NuevoTurnoModal({ open, onClose }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Nuevo turno">
+    <Drawer open={open} onClose={handleClose} title="Nuevo turno">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Cliente</label>
@@ -74,15 +82,15 @@ export default function NuevoTurnoModal({ open, onClose }: Props) {
           <textarea className="input resize-y" rows={3} placeholder="Notas internas…" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
         </div>
         {createAppt.error && (
-          <p className="text-[12px] m-0" style={{ color: "var(--color-err)" }}>{(createAppt.error as Error).message}</p>
+          <p className="text-[12px] m-0 text-err">{(createAppt.error as Error).message}</p>
         )}
         <div className="flex gap-3 justify-end mt-1">
           <button type="button" onClick={handleClose} className="border border-line bg-transparent text-ink rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer hover:bg-bg transition-colors">Cancelar</button>
-          <button type="submit" disabled={createAppt.isPending} className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60" style={{ background: "var(--color-accent)" }}>
+          <button type="submit" disabled={createAppt.isPending} className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60">
             {createAppt.isPending ? "Creando…" : "Crear turno"}
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

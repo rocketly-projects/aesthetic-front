@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import { useUpdateClient } from "@/hooks/useClients";
 import type { Client } from "@/lib/api/clients";
 
@@ -52,7 +52,7 @@ export default function EditClienteModal({ open, onClose, client }: Props) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Editar cliente">
+    <Drawer open={open} onClose={handleClose} title="Editar cliente">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Nombre</label>
@@ -109,13 +109,12 @@ export default function EditClienteModal({ open, onClose, client }: Props) {
           <button
             type="submit"
             disabled={updateClient.isPending}
-            className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-            style={{ background: "var(--color-accent)" }}
+            className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
           >
             {updateClient.isPending ? "Guardando…" : "Guardar cambios"}
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

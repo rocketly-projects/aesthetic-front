@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans, Geist_Mono } from "next/font/google";
+import { Inter, DM_Sans, Space_Grotesk } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import "./globals.css";
 
@@ -15,9 +15,10 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${dmSans.variable} ${geistMono.variable}`}
+      className={`${inter.variable} ${dmSans.variable} ${spaceGrotesk.variable}`}
       style={{ height: "100%" }}
     >
       <body style={{ height: "100%", margin: 0 }}>

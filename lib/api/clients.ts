@@ -26,6 +26,7 @@ export interface GetClientsResponse {
   clients: Client[];
   page: number;
   limit: number;
+  total: number;
 }
 
 export interface CreateClientParams {

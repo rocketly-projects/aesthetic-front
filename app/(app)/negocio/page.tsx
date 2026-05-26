@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import AppShell from "@/components/AppShell";
+import Skeleton from "@/components/Skeleton";
 import { useSearchParams } from "next/navigation";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect } from "@/hooks/useBusiness";
 
@@ -29,8 +30,8 @@ const defaultSchedule: Record<string, DaySchedule> = {
 
 function NegocioPageInner() {
   const searchParams    = useSearchParams();
-  const { data: business }  = useGetBusiness();
-  const { data: hoursData } = useGetHours();
+  const { data: business, isLoading: bizLoading }    = useGetBusiness();
+  const { data: hoursData, isLoading: hoursLoading } = useGetHours();
   const updateBusiness  = useUpdateBusiness();
   const updateHours     = useUpdateHours();
   const mpConnect       = useMpConnect();
@@ -155,13 +156,33 @@ function NegocioPageInner() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-1.5 text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-          style={{ background: "var(--color-ink)" }}
+          className="flex items-center gap-1.5 bg-ink text-white text-[13.5px] font-medium rounded-lg px-4 py-2 border-none cursor-pointer hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
         >
           {isSaving ? "Guardando…" : "Guardar cambios"}
         </button>
       }
     >
+      {(bizLoading || hoursLoading) ? (
+        <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+          <div className="flex flex-col gap-5">
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-4">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-24 rounded-lg" />
+              {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-9" />)}
+            </div>
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-3">
+              <Skeleton className="h-5 w-32" />
+              {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-9" />)}
+            </div>
+          </div>
+          <div className="flex flex-col gap-5">
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-3">
+              <Skeleton className="h-5 w-36" />
+              {Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
+            </div>
+          </div>
+        </div>
+      ) : (
       <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
         <div className="flex flex-col gap-5">
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
@@ -300,18 +321,13 @@ function NegocioPageInner() {
 
             {/* MercadoPago connection */}
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-line">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style={{ background: "#009EE3" }}>
-                  <svg width="18" height="12" viewBox="0 0 36 24" fill="white"><path d="M18 0C8.06 0 0 5.37 0 12s8.06 12 18 12 18-5.37 18-12S27.94 0 18 0zm0 20c-7.18 0-13-3.58-13-8s5.82-8 13-8 13 3.58 13 8-5.82 8-13 8z"/></svg>
-                </div>
-                <div>
-                  <div className="text-[13px] font-medium text-ink">MercadoPago</div>
-                  {business?.mpUserId ? (
-                    <div className="text-xs text-ok mt-0.5">● Conectado (ID: {business.mpUserId})</div>
-                  ) : (
-                    <div className="text-xs text-ink-3 mt-0.5">No conectado — necesario para cobrar señas</div>
-                  )}
-                </div>
+              <div className="flex items-start gap-3 flex-col">
+                <img src="/mpLogo.png" alt="MercadoPago" style={{ height: 34, width: "auto", objectFit: "contain" }} />
+                {business?.mpUserId ? (
+                  <div className="text-xs text-ok">● Conectado (ID: {business.mpUserId})</div>
+                ) : (
+                  <div className="text-xs text-ink-3">No conectado — necesario para cobrar señas</div>
+                )}
               </div>
               {business?.mpUserId ? (
                 <button
@@ -335,12 +351,12 @@ function NegocioPageInner() {
 
             {/* Aviso del callback OAuth */}
             {mpNotice === "connected" && (
-              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-ok" style={{ background: "var(--color-ok-pale, #f0fdf4)", border: "1px solid var(--color-ok)" }}>
+              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-ok bg-[#f0fdf4] border border-ok">
                 ✓ MercadoPago conectado correctamente.
               </div>
             )}
             {mpNotice === "error" && (
-              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-err" style={{ background: "var(--color-err-pale, #fef2f2)", border: "1px solid var(--color-err)" }}>
+              <div className="mb-4 px-3 py-2 rounded-md text-[12.5px] text-err bg-[#fef2f2] border border-err">
                 ✗ No se pudo conectar MercadoPago. Intentá de nuevo.
               </div>
             )}
@@ -373,8 +389,7 @@ function NegocioPageInner() {
                     type="range" min={5} max={100} step={5}
                     value={depositPercent}
                     onChange={(e) => setDepositPercent(Number(e.target.value))}
-                    className="flex-1"
-                    style={{ accentColor: "var(--color-accent)" }}
+                    className="flex-1 accent-accent"
                   />
                   <span className="text-sm font-semibold text-ink w-10 text-right">{depositPercent}%</span>
                 </div>
@@ -395,7 +410,7 @@ function NegocioPageInner() {
             <div className="font-semibold text-sm text-ink mb-4">Vista previa del bot</div>
             <div className="bg-bg rounded-md p-4 border border-line">
               <div className="flex items-center gap-2 pb-3 mb-3 border-b border-line">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shrink-0" style={{ background: "var(--color-accent)" }}>a</div>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shrink-0 bg-accent">a</div>
                 <div>
                   <div className="text-xs font-semibold text-ink">aesthetic. bot</div>
                   <div className="text-[10px] text-ok">En línea</div>
@@ -405,12 +420,6 @@ function NegocioPageInner() {
             </div>
           </div>
 
-          <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
-            <div className="font-semibold text-sm text-ink mb-4">Ubicación</div>
-            <div className="h-44 rounded-md border border-line flex items-center justify-center text-[13px] text-ink-3" style={{ background: "linear-gradient(135deg, var(--color-bg-2) 0%, var(--color-line) 100%)" }}>
-              🗺 Mapa — {form.address || "Ingresá tu dirección"}
-            </div>
-          </div>
 
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-3">Links rápidos</div>
@@ -419,13 +428,14 @@ function NegocioPageInner() {
                 <span className="text-lg">{l.icon}</span>
                 <div>
                   <div className="text-[11px] text-ink-3">{l.label}</div>
-                  <div className="text-[13px] font-medium" style={{ color: "var(--color-accent)" }}>{l.val || "—"}</div>
+                  <div className="text-[13px] font-medium text-accent">{l.val || "—"}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+      )}
     </AppShell>
   );
 }

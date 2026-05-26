@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import { useGoogleAuth } from "@/hooks/useAuth";
 import { ApiError } from "@/lib/api/client";
 
@@ -26,7 +26,7 @@ export default function CompleteGoogleRegisterModal({ credential, onClose }: Pro
   }
 
   return (
-    <Modal open onClose={onClose} title="Un último paso">
+    <Drawer open onClose={onClose} title="Un último paso">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <p className="text-[13px] text-ink-2 m-0 leading-relaxed">
           ¡Bienvenida! Tu cuenta de Google fue verificada. Solo necesitamos el nombre de tu negocio para terminar de configurar tu cuenta.
@@ -58,13 +58,12 @@ export default function CompleteGoogleRegisterModal({ credential, onClose }: Pro
           <button
             type="submit"
             disabled={googleAuth.isPending}
-            className="text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
-            style={{ background: "var(--color-accent)" }}
+            className="bg-accent text-white rounded-lg px-5 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
           >
             {googleAuth.isPending ? "Creando cuenta…" : "Crear cuenta"}
           </button>
         </div>
       </form>
-    </Modal>
+    </Drawer>
   );
 }

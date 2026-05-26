@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "@/components/Toaster";
 import {
   getClients,
   getClient,
@@ -37,6 +38,7 @@ export function useCreateClient() {
     mutationFn: (params: CreateClientParams) => createClient(params),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: clientKeys.all });
+      toast.success("Cliente creada");
     },
   });
 }
@@ -49,6 +51,7 @@ export function useUpdateClient() {
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: clientKeys.all });
       qc.invalidateQueries({ queryKey: clientKeys.detail(id) });
+      toast.success("Cliente actualizada");
     },
   });
 }
@@ -59,6 +62,7 @@ export function useDeleteClient() {
     mutationFn: (id: string) => deleteClient(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: clientKeys.all });
+      toast.success("Cliente eliminada");
     },
   });
 }
