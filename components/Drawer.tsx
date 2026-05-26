@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface DrawerProps {
   open: boolean;
@@ -39,7 +40,7 @@ export default function Drawer({ open, onClose, title, children, width = 520 }: 
 
   if (!mounted) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex justify-end"
       style={{
@@ -77,6 +78,7 @@ export default function Drawer({ open, onClose, title, children, width = 520 }: 
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
