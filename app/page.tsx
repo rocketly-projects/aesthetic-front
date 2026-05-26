@@ -401,7 +401,7 @@ export default function LandingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section
         id="top"
-        className="relative pt-20 pb-20 px-6 overflow-hidden"
+        className="relative pt-12 pb-14 px-5 md:pt-20 md:pb-20 md:px-6 overflow-hidden"
         onMouseMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           setSpot({ x: e.clientX - r.left, y: e.clientY - r.top });
@@ -436,7 +436,7 @@ export default function LandingPage() {
 
             {/* 3 — h1 word highlight */}
             <h1
-              className="text-[50px] font-semibold leading-[1.1] tracking-tight text-ink mb-5"
+              className="text-[38px] sm:text-[44px] lg:text-[50px] font-semibold leading-[1.1] tracking-tight text-ink mb-5"
               style={{ fontFamily: "var(--font-display)" }}
             >
               Una agenda{" "}
@@ -594,7 +594,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Features 01 ──────────────────────────────────────────────── */}
-      <section id="features" className="py-24 px-6">
+      <section id="features" className="py-14 md:py-24 px-5 md:px-6">
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-4">
@@ -602,7 +602,7 @@ export default function LandingPage() {
             </span>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-14">
               <h2
-                className="text-[38px] font-semibold leading-tight tracking-tight text-ink m-0"
+                className="text-[28px] md:text-[38px] font-semibold leading-tight tracking-tight text-ink m-0"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 Todo en un solo lugar.
@@ -638,8 +638,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Bot 02 ───────────────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-bg-2">
-        <Reveal className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+      <section className="py-14 md:py-24 px-5 md:px-6 bg-bg-2">
+        <Reveal className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div>
             <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-4">
               Producto · 02
@@ -719,7 +719,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Plans 04 ─────────────────────────────────────────────────── */}
-      <section id="planes" className="py-24 px-6">
+      <section id="planes" className="py-14 md:py-24 px-5 md:px-6">
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <div className="text-center mb-16">
@@ -840,7 +840,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials 05 ──────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-bg-2">
+      <section className="py-14 md:py-24 px-5 md:px-6 bg-bg-2">
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-3">
@@ -881,7 +881,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ 06 ───────────────────────────────────────────────────── */}
-      <section id="faq" className="py-24 px-6">
+      <section id="faq" className="py-14 md:py-24 px-5 md:px-6">
         <div className="max-w-3xl mx-auto">
           <Reveal>
             <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-3">
@@ -906,10 +906,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── Final CTA ────────────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-ink">
+      <section className="py-14 md:py-24 px-5 md:px-6 bg-ink">
         <Reveal className="max-w-2xl mx-auto text-center">
           <h2
-            className="text-[40px] font-semibold leading-tight tracking-tight text-white mb-4"
+            className="text-[28px] md:text-[40px] font-semibold leading-tight tracking-tight text-white mb-4"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Probá aesthetic por 14 días, gratis.
@@ -938,7 +938,7 @@ export default function LandingPage() {
 
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer
-        className="bg-ink px-6 pb-10 pt-12"
+        className="bg-ink px-5 pb-8 pt-10 md:px-6 md:pb-10 md:pt-12"
         style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
         <div className="max-w-6xl mx-auto">

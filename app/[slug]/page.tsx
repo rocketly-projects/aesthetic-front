@@ -438,7 +438,7 @@ export default function PublicBookingPage() {
         </div>
 
         {/* Content */}
-        <div style={{ maxWidth: 500, margin: "0 auto", padding: "36px 24px 100px" }}>
+        <div style={{ maxWidth: 500, margin: "0 auto", padding: "24px 16px 100px" }}>
 
           {/* ── PASO 0: Servicios ── */}
           {step === 0 && (

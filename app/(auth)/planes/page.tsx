@@ -18,7 +18,7 @@ export default function PlanesPage() {
   return (
     <div className="min-h-screen bg-bg flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-10 py-8">
+      <div className="flex items-center gap-3 px-6 py-6 md:px-10 md:py-8">
         <span className="grid place-items-center w-8 h-8 rounded-full bg-ink text-bg font-semibold text-[15px] shrink-0 font-display">
           a
         </span>
@@ -30,7 +30,7 @@ export default function PlanesPage() {
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-16">
         <div className="text-center mb-10 max-w-lg">
-          <h1 className="font-display text-[40px] leading-[1.05] tracking-[-0.03em] font-normal text-ink mb-3">
+          <h1 className="font-display text-[32px] md:text-[40px] leading-[1.05] tracking-[-0.03em] font-normal text-ink mb-3">
             Elegí tu <em className="italic text-accent font-normal">plan</em>
           </h1>
           <p className="text-[15px] text-ink-3">
@@ -39,9 +39,9 @@ export default function PlanesPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex gap-5">
+          <div className="flex gap-5 flex-wrap justify-center w-full">
             {[0, 1].map((i) => (
-              <div key={i} className="w-[300px] h-[380px] rounded-xl bg-bg-2 animate-pulse" />
+              <div key={i} className="w-full max-w-[300px] h-[380px] rounded-xl bg-bg-2 animate-pulse" />
             ))}
           </div>
         ) : (
@@ -54,7 +54,7 @@ export default function PlanesPage() {
                 <div
                   key={plan.id}
                   className={`
-                    relative w-[300px] rounded-xl border p-7 flex flex-col transition-shadow
+                    relative w-full max-w-[300px] rounded-xl border p-7 flex flex-col transition-shadow
                     ${isPro
                       ? "bg-ink text-bg border-ink shadow-xl"
                       : "bg-surface text-ink border-line shadow-md"

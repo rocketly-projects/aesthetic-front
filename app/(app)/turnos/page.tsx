@@ -90,8 +90,8 @@ export default function TurnosPage() {
         </button>
       }
     >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="seg">
+      <div className="flex items-center gap-3 mb-4 overflow-x-auto pb-1">
+        <div className="seg shrink-0">
           {FILTERS.map((f) => (
             <button key={f.key} className={`seg-item${filter === f.key ? " active" : ""}`} onClick={() => handleFilter(f.key)}>
               {f.label}
@@ -102,7 +102,20 @@ export default function TurnosPage() {
 
       <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden">
         {isLoading ? (
-          <table className="tbl"><tbody><SkeletonTableRows cols={8} rows={10} /></tbody></table>
+          <>
+            <table className="tbl hidden md:table"><tbody><SkeletonTableRows cols={8} rows={10} /></tbody></table>
+            <div className="md:hidden flex flex-col divide-y divide-line">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="p-4 flex gap-3 animate-pulse">
+                  <div className="w-10 h-10 rounded-lg bg-bg-2 shrink-0" />
+                  <div className="flex-1 flex flex-col gap-2">
+                    <div className="h-3.5 bg-bg-2 rounded w-2/3" />
+                    <div className="h-3 bg-bg-2 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : appts.length === 0 ? (
           <EmptyState
             icon={filter === "todos" ? <CalendarEmptyIcon /> : <SearchEmptyIcon />}
@@ -110,62 +123,121 @@ export default function TurnosPage() {
             description={filter === "todos" ? "Creá tu primer turno usando el botón de arriba." : "No hay turnos con este estado en la página actual."}
           />
         ) : (
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Duración</th><th>Precio</th><th>Estado</th><th className="w-[60px]" />
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Desktop: tabla */}
+            <table className="tbl hidden md:table">
+              <thead>
+                <tr>
+                  <th>Fecha</th><th>Hora</th><th>Cliente</th><th>Servicio</th><th>Duración</th><th>Precio</th><th>Estado</th><th className="w-[60px]" />
+                </tr>
+              </thead>
+              <tbody>
+                {appts.map((appt, index) => (
+                  <tr
+                    key={appt.id}
+                    className="cursor-pointer"
+                    style={{
+                      animation: "fade-in-up var(--dur-base) var(--ease-out) both",
+                      animationDelay: `${index * 25}ms`,
+                    }}
+                  >
+                    <td style={{ borderLeft: `3px solid ${statusColor(appt.status)}` }}><span className="font-mono text-[12px] text-ink-2">{formatDate(appt.date)}</span></td>
+                    <td><span className="font-mono text-[12px] font-semibold">{appt.time}</span></td>
+                    <td className="text-ink font-medium">{appt.clientName ?? <span className="text-ink-3">—</span>}</td>
+                    <td className="text-ink-2">{appt.serviceName}</td>
+                    <td><span className="font-mono text-[12px] text-ink-2">{appt.duration} min</span></td>
+                    <td><span className="font-mono text-[12px] font-semibold">${appt.price.toLocaleString("es-AR")}</span></td>
+                    <td>{statusChip(appt.status)}</td>
+                    <td>
+                      <div className="flex gap-1 relative">
+                        <button
+                          onClick={() => setEditAppt(appt)}
+                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          onClick={() => setMenuId(menuId === appt.id ? null : appt.id)}
+                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                        >
+                          ⋯
+                        </button>
+                        {menuId === appt.id && (
+                          <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-line rounded-lg shadow-lg overflow-hidden min-w-[130px]">
+                            {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
+                              <button
+                                key={q.status}
+                                onClick={() => handleQuickStatus(appt, q.status)}
+                                className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border-none bg-transparent cursor-pointer transition-colors"
+                              >
+                                {q.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Mobile: cards */}
+            <div className="md:hidden flex flex-col divide-y divide-line">
               {appts.map((appt, index) => (
-                <tr
+                <div
                   key={appt.id}
-                  className="cursor-pointer"
+                  className="p-4"
                   style={{
                     animation: "fade-in-up var(--dur-base) var(--ease-out) both",
                     animationDelay: `${index * 25}ms`,
+                    borderLeft: `3px solid ${statusColor(appt.status)}`,
                   }}
                 >
-                  <td style={{ borderLeft: `3px solid ${statusColor(appt.status)}` }}><span className="font-mono text-[12px] text-ink-2">{formatDate(appt.date)}</span></td>
-                  <td><span className="font-mono text-[12px] font-semibold">{appt.time}</span></td>
-                  <td className="text-ink font-medium">{appt.clientName ?? <span className="text-ink-3">—</span>}</td>
-                  <td className="text-ink-2">{appt.serviceName}</td>
-                  <td><span className="font-mono text-[12px] text-ink-2">{appt.duration} min</span></td>
-                  <td><span className="font-mono text-[12px] font-semibold">${appt.price.toLocaleString("es-AR")}</span></td>
-                  <td>{statusChip(appt.status)}</td>
-                  <td>
-                    <div className="flex gap-1 relative">
-                      <button
-                        onClick={() => setEditAppt(appt)}
-                        className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        onClick={() => setMenuId(menuId === appt.id ? null : appt.id)}
-                        className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
-                      >
-                        ⋯
-                      </button>
-                      {menuId === appt.id && (
-                        <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-line rounded-lg shadow-lg overflow-hidden min-w-[130px]">
-                          {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
-                            <button
-                              key={q.status}
-                              onClick={() => handleQuickStatus(appt, q.status)}
-                              className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border-none bg-transparent cursor-pointer transition-colors"
-                            >
-                              {q.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-[13px] font-semibold text-ink">{appt.time}</span>
+                        <span className="font-mono text-[11px] text-ink-3">{formatDate(appt.date)}</span>
+                      </div>
+                      <div className="text-[14px] font-medium text-ink truncate">{appt.clientName ?? <span className="text-ink-3">Sin cliente</span>}</div>
+                      <div className="text-[12px] text-ink-3 mt-0.5">{appt.serviceName} · {appt.duration} min · <span className="font-mono">${appt.price.toLocaleString("es-AR")}</span></div>
                     </div>
-                  </td>
-                </tr>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      {statusChip(appt.status)}
+                      <div className="flex gap-1 relative">
+                        <button
+                          onClick={() => setEditAppt(appt)}
+                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          onClick={() => setMenuId(menuId === appt.id ? null : appt.id)}
+                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                        >
+                          ⋯
+                        </button>
+                        {menuId === appt.id && (
+                          <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-line rounded-lg shadow-lg overflow-hidden min-w-[130px]">
+                            {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
+                              <button
+                                key={q.status}
+                                onClick={() => handleQuickStatus(appt, q.status)}
+                                className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border-none bg-transparent cursor-pointer transition-colors"
+                              >
+                                {q.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </>
         )}
       </div>
 

@@ -163,7 +163,7 @@ function NegocioPageInner() {
       }
     >
       {(bizLoading || hoursLoading) ? (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+        <div className="grid gap-5 grid-cols-1 lg:grid-cols-[1.2fr_1fr]">
           <div className="flex flex-col gap-5">
             <div className="bg-surface border border-line rounded-lg shadow-sm p-5 space-y-4">
               <Skeleton className="h-5 w-40" />

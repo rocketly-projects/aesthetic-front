@@ -39,10 +39,10 @@ export default function RegisterPage() {
 
   return (
     <>
-    <div className="grid grid-cols-[1fr_1.1fr] h-screen font-sans">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] h-screen font-sans">
 
       {/* Left panel */}
-      <div className="flex flex-col bg-bg px-14 py-10">
+      <div className="flex flex-col bg-bg px-6 py-8 lg:px-14 lg:py-10 overflow-y-auto">
 
         {/* Brand */}
         <div className="flex items-center gap-3">
@@ -171,7 +171,7 @@ export default function RegisterPage() {
 
       {/* Right panel */}
       <div
-        className="relative overflow-hidden flex flex-col justify-center p-10"
+        className="hidden lg:flex relative overflow-hidden flex-col justify-center p-10"
         style={{
           background: `
             radial-gradient(at 20% 20%, var(--color-accent-pale) 0%, transparent 50%),

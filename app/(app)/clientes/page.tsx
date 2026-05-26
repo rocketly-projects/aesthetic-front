@@ -22,12 +22,13 @@ function initials(name: string) {
 }
 
 export default function ClientesPage() {
-  const [searchInput,  setSearchInput]  = useState("");
-  const [search,       setSearch]       = useState("");
-  const [page,         setPage]         = useState(1);
-  const [activeId,     setActiveId]     = useState<string>("");
-  const [modalOpen,    setModalOpen]    = useState(false);
-  const [editOpen,     setEditOpen]     = useState(false);
+  const [searchInput,      setSearchInput]      = useState("");
+  const [search,           setSearch]           = useState("");
+  const [page,             setPage]             = useState(1);
+  const [activeId,         setActiveId]         = useState<string>("");
+  const [mobileDetail,     setMobileDetail]     = useState(false);
+  const [modalOpen,        setModalOpen]        = useState(false);
+  const [editOpen,         setEditOpen]         = useState(false);
 
   // Debounce search — resetea página al buscar
   useEffect(() => {
@@ -68,7 +69,7 @@ export default function ClientesPage() {
         </button>
       }
     >
-      <div className="grid gap-5 h-full" style={{ gridTemplateColumns: "360px 1fr" }}>
+      <div className="grid gap-5 h-full grid-cols-1 lg:grid-cols-[360px_1fr]">
         {/* List */}
         <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col">
           <div className="p-3 border-b border-line">
@@ -98,7 +99,7 @@ export default function ClientesPage() {
                   return (
                     <div
                       key={c.id}
-                      onClick={() => setActiveId(c.id)}
+                      onClick={() => { setActiveId(c.id); setMobileDetail(true); }}
                       className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-line transition-colors border-l-[3px] ${isActive ? "bg-accent-pale border-l-accent" : "border-l-transparent hover:bg-bg"}`}
                     >
                       <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 bg-accent-pale text-accent-ink">
@@ -120,9 +121,24 @@ export default function ClientesPage() {
           </div>
         </div>
 
-        {/* Profile */}
+        {/* Profile — desktop: columna derecha; mobile: overlay al seleccionar */}
         {active ? (
-          <div className="flex flex-col gap-4 overflow-y-auto">
+          <div className={`flex flex-col gap-4 overflow-y-auto
+            ${mobileDetail
+              ? "fixed inset-0 z-40 bg-bg p-4 lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:p-0"
+              : "hidden lg:flex"
+            }`}
+          >
+            {/* Back button — mobile only */}
+            <button
+              className="lg:hidden flex items-center gap-2 text-[13px] text-ink-2 hover:text-ink mb-1 bg-transparent border-none cursor-pointer p-0"
+              onClick={() => setMobileDetail(false)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+              Volver a clientes
+            </button>
             <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold shrink-0 bg-accent-pale text-accent-ink">
@@ -142,7 +158,7 @@ export default function ClientesPage() {
                   Editar
                 </button>
               </div>
-              <div className="grid grid-cols-4 gap-3 mt-5 pt-5 border-t border-line">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-5 border-t border-line">
                 <div className="text-center">
                   <div className="text-base font-semibold text-ink">{active.visits}</div>
                   <div className="text-[11px] text-ink-3 mt-0.5">Visitas</div>

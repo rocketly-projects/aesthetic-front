@@ -12,7 +12,9 @@
       "Bash(node -e \"\nconst fs = require\\('fs'\\);\nconst zlib = require\\('zlib'\\);\nconst path = require\\('path'\\);\n\nconst src = 'C:/Users/USER/.claude/projects/C--workspacePersonal-aesthetic-front/deba0c20-0748-42db-9395-79a9e64a9c82/tool-results/webfetch-1778002712556-31pk69.bin';\nconst data = fs.readFileSync\\(src\\);\nconst decompressed = zlib.gunzipSync\\(data\\);\nfs.writeFileSync\\('/tmp/design_decompressed.tar', decompressed\\);\nconsole.log\\('Decompressed size:', decompressed.length\\);\n\")",
       "Read(//c/tmp/**)",
       "Bash(node -e \":*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(findstr /n \"gridTemplateColumns grid-cols\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\turnos\\\\page.tsx\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\servicios\\\\page.tsx\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\negocio\\\\page.tsx\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\config\\\\page.tsx\")",
+      "Bash(npm run *)"
     ]
   }
 }

@@ -109,9 +109,11 @@ interface SidebarProps {
   active: string;
   collapsed: boolean;
   onToggle: () => void;
+  mobile?: boolean;
+  onNavigate?: () => void;
 }
 
-export default function Sidebar({ active, collapsed, onToggle }: SidebarProps) {
+export default function Sidebar({ active, collapsed, onToggle, mobile = false, onNavigate }: SidebarProps) {
   const logout  = useLogout();
   const current = useCurrentUser();
   const roleLabel = current?.role === "owner" ? "Propietario" : current?.role === "staff" ? "Colaborador" : "";
@@ -123,12 +125,13 @@ export default function Sidebar({ active, collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className="flex flex-col overflow-y-auto overflow-x-hidden border-r border-line bg-bg"
+      className="flex flex-col h-full overflow-y-auto overflow-x-hidden border-r border-line bg-bg"
       style={{ transition: `width var(--dur-base) var(--ease-out)` }}
     >
       {/* Brand */}
       <Link
         href="/dashboard"
+        onClick={onNavigate}
         className="flex items-center gap-2.5 border-b border-line"
         style={{
           padding: collapsed ? "16px 0" : "16px",
@@ -162,6 +165,7 @@ export default function Sidebar({ active, collapsed, onToggle }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={navItemClass(item.id)}
               title={collapsed ? item.label : undefined}
             >
@@ -192,6 +196,7 @@ export default function Sidebar({ active, collapsed, onToggle }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={navItemClass(item.id)}
               title={collapsed ? item.label : undefined}
             >
@@ -203,14 +208,16 @@ export default function Sidebar({ active, collapsed, onToggle }: SidebarProps) {
 
         <div className="flex-1" />
 
-        {/* Toggle button */}
-        <button
-          onClick={onToggle}
-          className={`nav-item w-full border-none bg-transparent cursor-pointer text-ink-3 hover:text-ink${collapsed ? " justify-center" : ""}`}
-          title={collapsed ? "Expandir sidebar" : "Colapsar sidebar"}
-        >
-          {collapsed ? <IconChevronRight /> : <><IconChevronLeft /><span className="flex-1 text-left">Colapsar</span></>}
-        </button>
+        {/* Toggle button — sólo en desktop */}
+        {!mobile && (
+          <button
+            onClick={onToggle}
+            className={`nav-item w-full border-none bg-transparent cursor-pointer text-ink-3 hover:text-ink${collapsed ? " justify-center" : ""}`}
+            title={collapsed ? "Expandir sidebar" : "Colapsar sidebar"}
+          >
+            {collapsed ? <IconChevronRight /> : <><IconChevronLeft /><span className="flex-1 text-left">Colapsar</span></>}
+          </button>
+        )}
 
         <button
           onClick={logout}
