@@ -30,10 +30,11 @@ function bubbleStyle(sender: MessageSender) {
 }
 
 export default function WhatsAppPage() {
-  const [activeTab,    setActiveTab]    = useState<TabFilter>("todos");
-  const [activeChatId, setActiveChatId] = useState<string>("");
-  const [chatsPage,    setChatsPage]    = useState(1);
-  const [input,        setInput]        = useState("");
+  const [activeTab,         setActiveTab]         = useState<TabFilter>("todos");
+  const [activeChatId,      setActiveChatId]      = useState<string>("");
+  const [mobileConversation, setMobileConversation] = useState(false);
+  const [chatsPage,         setChatsPage]         = useState(1);
+  const [input,             setInput]             = useState("");
 
   const { data: chatsData, isLoading: chatsLoading } = useGetChats({ page: chatsPage, limit: CHATS_LIMIT });
   const chats                  = chatsData?.chats ?? [];
@@ -57,6 +58,7 @@ export default function WhatsAppPage() {
 
   function handleSelectChat(id: string) {
     setActiveChatId(id);
+    setMobileConversation(true);
     // Marcar como leído al abrir
     const chat = chats.find((c) => c.id === id);
     if (chat && chat.unread > 0) {
@@ -73,9 +75,9 @@ export default function WhatsAppPage() {
 
   return (
     <AppShell active="whatsapp" title="WhatsApp" subtitle="Mensajes con clientes">
-      <div className="grid gap-4" style={{ gridTemplateColumns: "340px 1fr 320px", height: "calc(100vh - 128px)" }}>
-        {/* Chat list */}
-        <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col">
+      <div className="grid gap-4 h-full grid-cols-1 lg:grid-cols-[340px_1fr] xl:grid-cols-[340px_1fr_320px] lg:h-[calc(100vh-var(--topbar-h)-3rem)]">
+        {/* Chat list — ocultamos en mobile cuando hay conversación abierta */}
+        <div className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex-col ${mobileConversation ? "hidden lg:flex" : "flex"}`}>
           <div className="p-3 border-b border-line">
             <div className="seg w-full">
               {(["todos", "bot", "yo"] as TabFilter[]).map((t) => (
@@ -120,11 +122,22 @@ export default function WhatsAppPage() {
           </div>
         </div>
 
-        {/* Conversation */}
-        <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col">
+        {/* Conversation — desktop: columna central; mobile: overlay */}
+        <div className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex-col
+          ${mobileConversation ? "flex fixed inset-0 z-40 lg:static lg:inset-auto lg:z-auto" : "hidden lg:flex"}`}>
           {activeChat ? (
             <>
               <div className="flex items-center gap-3 px-5 py-3.5 border-b border-line">
+                {/* Back button mobile */}
+                <button
+                  className="lg:hidden -ml-1 mr-1 tb-icon-btn shrink-0"
+                  onClick={() => setMobileConversation(false)}
+                  aria-label="Volver"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                  </svg>
+                </button>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 bg-accent-pale text-accent-ink">
                   {initials(activeChat.clientName ?? activeChat.clientPhone)}
                 </div>
@@ -167,8 +180,8 @@ export default function WhatsAppPage() {
           )}
         </div>
 
-        {/* Right panel */}
-        <div className="flex flex-col gap-4 overflow-y-auto">
+        {/* Right panel — sólo xl+ */}
+        <div className="hidden xl:flex flex-col gap-4 overflow-y-auto">
           {activeChat && (
             <>
               <div className="bg-surface border border-line rounded-lg shadow-sm p-5">

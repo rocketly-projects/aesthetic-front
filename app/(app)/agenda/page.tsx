@@ -108,7 +108,7 @@ function ApptDetailPanel({
       <div className="fixed inset-0 z-40" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed right-6 top-24 w-72 bg-surface border border-line rounded-xl shadow-xl z-50 flex flex-col overflow-hidden">
+      <div className="fixed inset-x-3 bottom-4 md:inset-auto md:right-6 md:top-24 md:w-72 bg-surface border border-line rounded-xl shadow-xl z-50 flex flex-col overflow-hidden max-h-[80vh] md:max-h-none overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-line">
           <div className="font-semibold text-[13.5px] text-ink truncate">
@@ -347,7 +347,7 @@ export default function AgendaPage() {
       }
     >
       {/* Controls */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
         <button
           className="border border-line bg-surface rounded-md px-2.5 py-1.5 cursor-pointer hover:bg-bg text-ink transition-colors text-sm"
           onClick={() => navigate(-1)}
@@ -414,31 +414,33 @@ export default function AgendaPage() {
         const weekAppts = allAppts.filter((a) => a.date >= weekStart && a.date <= weekEnd);
         return (
           <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col">
-            <div className="grid border-b border-line bg-bg" style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}>
-              <div />
-              {weekDates.map((d, i) => {
-                const isToday = toYMD(d) === TODAY;
-                return (
-                  <div key={i} className="py-3 px-2 text-center border-l border-line">
-                    <div className="text-[11px] text-ink-3 uppercase tracking-wider">{DAY_NAMES[d.getDay()]}</div>
-                    <div
-                      className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white bg-accent" : "text-ink"}`}
-                    >
-                      {d.getDate()}
+            <div className="overflow-x-auto">
+              <div className="grid border-b border-line bg-bg" style={{ gridTemplateColumns: "60px repeat(7, minmax(100px, 1fr))", minWidth: 760 }}>
+                <div />
+                {weekDates.map((d, i) => {
+                  const isToday = toYMD(d) === TODAY;
+                  return (
+                    <div key={i} className="py-3 px-2 text-center border-l border-line">
+                      <div className="text-[11px] text-ink-3 uppercase tracking-wider">{DAY_NAMES[d.getDay()]}</div>
+                      <div
+                        className={`text-lg font-semibold w-8 h-8 rounded-full inline-flex items-center justify-center mt-0.5 ${isToday ? "text-white bg-accent" : "text-ink"}`}
+                      >
+                        {d.getDate()}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
-              <div className="grid" style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}>
-                <HourGrid />
-                {weekDates.map((d, di) => {
-                  const ymd      = toYMD(d);
-                  const isToday  = ymd === TODAY;
-                  const dayAppts = weekAppts.filter((a) => a.date === ymd);
-                  return <DayColumn key={di} date={d} appts={dayAppts} isToday={isToday} onSelect={handleSelect} onCellClick={handleCellClick} />;
+                  );
                 })}
+              </div>
+              <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+                <div className="grid" style={{ gridTemplateColumns: "60px repeat(7, minmax(100px, 1fr))", minWidth: 760 }}>
+                  <HourGrid />
+                  {weekDates.map((d, di) => {
+                    const ymd      = toYMD(d);
+                    const isToday  = ymd === TODAY;
+                    const dayAppts = weekAppts.filter((a) => a.date === ymd);
+                    return <DayColumn key={di} date={d} appts={dayAppts} isToday={isToday} onSelect={handleSelect} onCellClick={handleCellClick} />;
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -477,7 +479,7 @@ export default function AgendaPage() {
                   <div
                     key={i}
                     onClick={() => { setAnchor(cell); setView("dia"); }}
-                    className={`border-r border-b border-line last:border-r-0 min-h-[100px] p-2 cursor-pointer hover:bg-bg transition-colors ${isOtherM ? "opacity-40" : ""}`}
+                    className={`border-r border-b border-line last:border-r-0 min-h-[72px] md:min-h-[100px] p-1 md:p-2 cursor-pointer hover:bg-bg transition-colors ${isOtherM ? "opacity-40" : ""}`}
                   >
                     <div
                       className={`w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-semibold mb-1 ${isToday ? "text-white bg-accent" : "text-ink"}`}

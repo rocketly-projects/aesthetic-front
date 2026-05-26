@@ -137,7 +137,7 @@ export default function DashboardPage() {
       {/* ── Greeting ── */}
       <div className="mb-6">
         <p className="text-[11.5px] font-mono text-ink-3 uppercase tracking-widest mb-1.5">{todayFormatted}</p>
-        <h2 className="font-display text-[34px] font-normal text-ink leading-none tracking-[-0.03em] m-0">
+        <h2 className="font-display text-[26px] md:text-[34px] font-normal text-ink leading-none tracking-[-0.03em] m-0">
           Buen día, <em className="not-italic text-accent">{firstName ?? "…"}</em>.
         </h2>
         <p className="text-sm text-ink-3 mt-2 mb-0">
@@ -151,12 +151,12 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Bento grid ── */}
-      <div className="grid gap-4" style={{ gridTemplateColumns: "1.55fr 1fr", gridTemplateRows: "auto 1fr auto" }}>
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-[1.55fr_1fr] lg:[grid-template-rows:auto_1fr_auto]">
 
         {/* HERO — Agenda de hoy */}
         <div
-          className="bg-surface border border-line rounded-2xl shadow-sm p-5 flex flex-col"
-          style={{ gridRow: "1 / 4", animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "0ms" }}
+          className="bg-surface border border-line rounded-2xl shadow-sm p-5 flex flex-col lg:row-span-3"
+          style={{ animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "0ms" }}
         >
           <div className="flex items-center justify-between mb-4">
             <div>

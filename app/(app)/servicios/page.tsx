@@ -32,7 +32,7 @@ export default function ServiciosPage() {
         </button>
       }
     >
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <KPI lbl="Total servicios"   val={services.length}                          variant="accent" />
         <KPI lbl="Activos"           val={visible.length}  delta={`${services.length - visible.length} ocultos`} variant="accent" />
         <KPI lbl="Precio promedio"   val={"$" + avgPrice.toLocaleString("es-AR")}   variant="dark"   />
@@ -40,7 +40,7 @@ export default function ServiciosPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="bg-surface border border-line rounded-xl p-5 space-y-3">
               <div className="flex items-center gap-3">
@@ -69,7 +69,7 @@ export default function ServiciosPage() {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((s, index) => (
             <div
               key={s.id}
