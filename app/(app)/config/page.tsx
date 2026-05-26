@@ -18,25 +18,9 @@ function ToggleRow({ label, description, checked, onChange }: { label: string; d
   );
 }
 
-const PALETTE_OPTIONS = [
-  { key: "sage",  label: "Salvia",  color: "#7a8b6e" },
-  { key: "rose",  label: "Rosa",    color: "#9b7e7e" },
-  { key: "slate", label: "Pizarra", color: "#7e869b" },
-  { key: "sand",  label: "Arena",   color: "#9b8e7e" },
-];
-
-const TYPOGRAPHY_OPTIONS = [
-  { key: "inter",  label: "Inter + DM Sans (predeterminada)" },
-  { key: "geist",  label: "Geist" },
-  { key: "dmsans", label: "DM Sans" },
-];
-
 export default function ConfigPage() {
   const { prefs, setPrefs, save, saved } = usePreferences();
 
-  const setPalette = (palette: string) => setPrefs((p) => ({ ...p, palette }));
-  const setTypography = (typography: string) => setPrefs((p) => ({ ...p, typography }));
-  const setDensity = (density: "comfortable" | "compact") => setPrefs((p) => ({ ...p, density }));
   const setNotif = (key: keyof typeof prefs.notifications, value: boolean) =>
     setPrefs((p) => ({ ...p, notifications: { ...p.notifications, [key]: value } }));
 
@@ -55,36 +39,6 @@ export default function ConfigPage() {
       }
     >
       <div className="flex flex-col gap-5 max-w-[720px]">
-        <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
-          <div className="font-semibold text-sm text-ink mb-5">Apariencia</div>
-          <div className="mb-5">
-            <label className="block text-[11px] font-semibold text-ink-2 mb-2 uppercase tracking-wider">Paleta de color</label>
-            <div className="flex gap-3">
-              {PALETTE_OPTIONS.map((p) => (
-                <button key={p.key} onClick={() => setPalette(p.key)} className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all ${prefs.palette === p.key ? "bg-surface shadow-sm" : "bg-bg hover:bg-surface"}`} style={{ border: `2px solid ${prefs.palette === p.key ? p.color : "var(--color-line)"}` }}>
-                  <span className="w-4 h-4 rounded-full shrink-0" style={{ background: p.color }} />
-                  <span className="text-xs font-medium text-ink">{p.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="mb-5">
-            <label className="block text-[11px] font-semibold text-ink-2 mb-2 uppercase tracking-wider">Tipografía</label>
-            <select className="input" value={prefs.typography} onChange={(e) => setTypography(e.target.value)}>
-              {TYPOGRAPHY_OPTIONS.map((t) => (
-                <option key={t.key} value={t.key}>{t.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-[11px] font-semibold text-ink-2 mb-2 uppercase tracking-wider">Densidad</label>
-            <div className="seg">
-              <button className={`seg-item${prefs.density === "comfortable" ? " active" : ""}`} onClick={() => setDensity("comfortable")}>Cómoda</button>
-              <button className={`seg-item${prefs.density === "compact" ? " active" : ""}`} onClick={() => setDensity("compact")}>Compacta</button>
-            </div>
-          </div>
-        </div>
-
         <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
           <div className="font-semibold text-sm text-ink mb-2">Notificaciones</div>
           <ToggleRow label="Nuevos turnos"          description="Notificación al recibir un turno nuevo"        checked={prefs.notifications.turnos}        onChange={(v) => setNotif("turnos", v)}        />

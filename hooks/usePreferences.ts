@@ -3,9 +3,6 @@
 import { useState, useCallback } from "react";
 
 export type Preferences = {
-  palette: string;
-  typography: string;
-  density: "comfortable" | "compact";
   notifications: {
     turnos: boolean;
     recordatorios: boolean;
@@ -16,9 +13,6 @@ export type Preferences = {
 };
 
 const DEFAULTS: Preferences = {
-  palette: "sage",
-  typography: "inter",
-  density: "comfortable",
   notifications: { turnos: true, recordatorios: true, pagos: false, resumen: true, marketing: false },
 };
 
