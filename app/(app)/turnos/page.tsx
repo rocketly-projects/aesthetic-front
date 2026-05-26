@@ -8,7 +8,7 @@ import { SkeletonTableRows } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
 import EditTurnoModal from "@/components/EditTurnoModal";
-import { useGetAppointments, useUpdateAppointment } from "@/hooks/useAppointments";
+import { useGetAppointments } from "@/hooks/useAppointments";
 import type { Appointment, AppointmentStatus } from "@/lib/api/appointments";
 
 type Filter = "todos" | AppointmentStatus;
@@ -41,19 +41,11 @@ function statusColor(s: AppointmentStatus): string {
   }
 }
 
-const QUICK_STATUSES: { status: AppointmentStatus; label: string }[] = [
-  { status: "confirmed", label: "Confirmar"   },
-  { status: "completed", label: "Completar"   },
-  { status: "cancelled", label: "Cancelar"    },
-  { status: "no_show",   label: "No asistió"  },
-];
-
 export default function TurnosPage() {
   const [filter, setFilter]       = useState<Filter>("todos");
   const [page,   setPage]         = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [editAppt,  setEditAppt]  = useState<Appointment | null>(null);
-  const [menuId,    setMenuId]    = useState<string | null>(null);
 
   function handleFilter(f: Filter) {
     setFilter(f);
@@ -67,13 +59,6 @@ export default function TurnosPage() {
   });
   const appts = apptData?.appointments ?? [];
   const total = apptData?.total;
-
-  const updateAppt = useUpdateAppointment();
-
-  function handleQuickStatus(appt: Appointment, status: AppointmentStatus) {
-    setMenuId(null);
-    updateAppt.mutate({ id: appt.id, status });
-  }
 
   return (
     <AppShell
@@ -149,33 +134,12 @@ export default function TurnosPage() {
                     <td><span className="font-mono text-[12px] font-semibold">${appt.price.toLocaleString("es-AR")}</span></td>
                     <td>{statusChip(appt.status)}</td>
                     <td>
-                      <div className="flex gap-1 relative">
-                        <button
-                          onClick={() => setEditAppt(appt)}
-                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
-                        >
-                          ✎
-                        </button>
-                        <button
-                          onClick={() => setMenuId(menuId === appt.id ? null : appt.id)}
-                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
-                        >
-                          ⋯
-                        </button>
-                        {menuId === appt.id && (
-                          <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-line rounded-lg shadow-lg overflow-hidden min-w-[130px]">
-                            {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
-                              <button
-                                key={q.status}
-                                onClick={() => handleQuickStatus(appt, q.status)}
-                                className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border-none bg-transparent cursor-pointer transition-colors"
-                              >
-                                {q.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => setEditAppt(appt)}
+                        className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                      >
+                        ✎
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -205,33 +169,12 @@ export default function TurnosPage() {
                     </div>
                     <div className="flex flex-col items-end gap-2 shrink-0">
                       {statusChip(appt.status)}
-                      <div className="flex gap-1 relative">
-                        <button
-                          onClick={() => setEditAppt(appt)}
-                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
-                        >
-                          ✎
-                        </button>
-                        <button
-                          onClick={() => setMenuId(menuId === appt.id ? null : appt.id)}
-                          className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
-                        >
-                          ⋯
-                        </button>
-                        {menuId === appt.id && (
-                          <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-line rounded-lg shadow-lg overflow-hidden min-w-[130px]">
-                            {QUICK_STATUSES.filter((q) => q.status !== appt.status).map((q) => (
-                              <button
-                                key={q.status}
-                                onClick={() => handleQuickStatus(appt, q.status)}
-                                className="w-full text-left px-3 py-2 text-[12.5px] text-ink-2 hover:bg-bg hover:text-ink border-none bg-transparent cursor-pointer transition-colors"
-                              >
-                                {q.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => setEditAppt(appt)}
+                        className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded px-2 py-1 text-sm transition-colors"
+                      >
+                        ✎
+                      </button>
                     </div>
                   </div>
                 </div>
