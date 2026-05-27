@@ -1,3 +1,5 @@
+import NotificationBell from "./NotificationBell";
+
 interface TopbarProps {
   title: string;
   subtitle?: string;
@@ -30,13 +32,7 @@ export default function Topbar({ title, subtitle, actions, onOpenMobileNav }: To
       </div>
 
       {/* Notifications */}
-      <button className="tb-icon-btn" aria-label="Notificaciones">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M6 8a6 6 0 1 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9z"/>
-          <path d="M10 21a2 2 0 0 0 4 0"/>
-        </svg>
-        <span className="dot" />
-      </button>
+      <NotificationBell />
 
       {/* Divider + actions */}
       {actions && (

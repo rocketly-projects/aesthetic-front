@@ -41,11 +41,9 @@ export default function ConfigPage() {
       <div className="flex flex-col gap-5 max-w-[720px]">
         <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
           <div className="font-semibold text-sm text-ink mb-2">Notificaciones</div>
-          <ToggleRow label="Nuevos turnos"          description="Notificación al recibir un turno nuevo"        checked={prefs.notifications.turnos}        onChange={(v) => setNotif("turnos", v)}        />
-          <ToggleRow label="Recordatorios enviados" description="Confirmación cuando se envía un recordatorio"  checked={prefs.notifications.recordatorios} onChange={(v) => setNotif("recordatorios", v)} />
-          <ToggleRow label="Pagos recibidos"        description="Alerta al registrar un pago"                   checked={prefs.notifications.pagos}         onChange={(v) => setNotif("pagos", v)}         />
-          <ToggleRow label="Resumen diario"         description="Reporte de cierre de jornada por email"        checked={prefs.notifications.resumen}       onChange={(v) => setNotif("resumen", v)}       />
-          <ToggleRow label="Emails de marketing"    description="Novedades y actualizaciones del producto"      checked={prefs.notifications.marketing}     onChange={(v) => setNotif("marketing", v)}     />
+          <ToggleRow label="Nuevos turnos"          description="Toast al recibir un turno desde la web"       checked={prefs.notifications.turnos}        onChange={(v) => setNotif("turnos", v)}        />
+          <ToggleRow label="Recordatorios enviados" description="Toast cuando el bot envía un recordatorio"    checked={prefs.notifications.recordatorios} onChange={(v) => setNotif("recordatorios", v)} />
+          <ToggleRow label="Pagos recibidos"        description="Toast al confirmar una seña"                  checked={prefs.notifications.pagos}         onChange={(v) => setNotif("pagos", v)}         />
         </div>
 
         <div className="rounded-lg p-5" style={{ background: "linear-gradient(135deg, #272a25 0%, #3a4535 100%)" }}>

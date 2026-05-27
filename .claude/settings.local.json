@@ -14,7 +14,8 @@
       "Bash(node -e \":*)",
       "Bash(git add:*)",
       "Bash(findstr /n \"gridTemplateColumns grid-cols\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\turnos\\\\page.tsx\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\servicios\\\\page.tsx\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\negocio\\\\page.tsx\" \"C:\\\\workspacePersonal\\\\aesthetic-front\\\\.claude\\\\worktrees\\\\gifted-khayyam-603adf\\\\app\\\\\\(app\\)\\\\config\\\\page.tsx\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git -C C:/workspacePersonal/aesthetic-front log --oneline -5)"
     ]
   }
 }

@@ -7,13 +7,11 @@ export type Preferences = {
     turnos: boolean;
     recordatorios: boolean;
     pagos: boolean;
-    resumen: boolean;
-    marketing: boolean;
   };
 };
 
 const DEFAULTS: Preferences = {
-  notifications: { turnos: true, recordatorios: true, pagos: false, resumen: true, marketing: false },
+  notifications: { turnos: true, recordatorios: true, pagos: true },
 };
 
 const STORAGE_KEY = "aesthetic_prefs";
