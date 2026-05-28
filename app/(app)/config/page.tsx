@@ -42,7 +42,16 @@ export default function ConfigPage() {
         <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
           <div className="font-semibold text-sm text-ink mb-2">Notificaciones</div>
           <ToggleRow label="Nuevos turnos"          description="Toast al recibir un turno desde la web"       checked={prefs.notifications.turnos}        onChange={(v) => setNotif("turnos", v)}        />
-          <ToggleRow label="Recordatorios enviados" description="Toast cuando el bot envía un recordatorio"    checked={prefs.notifications.recordatorios} onChange={(v) => setNotif("recordatorios", v)} />
+          <div className="flex items-center gap-4 py-4 border-b border-line opacity-50">
+            <div className="flex-1">
+              <div className="text-[13px] font-medium text-ink">Recordatorios enviados</div>
+              <div className="text-xs text-ink-3 mt-0.5">Aún sin desarrollar</div>
+            </div>
+            <label className="toggle">
+              <input type="checkbox" disabled checked={false} onChange={() => {}} />
+              <span className="toggle-track" /><span className="toggle-thumb" />
+            </label>
+          </div>
           <ToggleRow label="Pagos recibidos"        description="Toast al confirmar una seña"                  checked={prefs.notifications.pagos}         onChange={(v) => setNotif("pagos", v)}         />
         </div>
 
