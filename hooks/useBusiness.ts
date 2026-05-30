@@ -9,8 +9,9 @@ import {
   connectMp,
   disconnectMp,
   submitWhatsappRequest,
+  submitWhatsappDeactivationRequest,
 } from "@/lib/api/business";
-import type { UpdateBusinessParams, UpdateHoursParam, WhatsappRequestParams } from "@/lib/api/business";
+import type { UpdateBusinessParams, UpdateHoursParam, WhatsappRequestParams, WhatsappDeactivationParams } from "@/lib/api/business";
 
 export const businessKeys = {
   all:   ["business"] as const,
@@ -58,6 +59,12 @@ export function useSubmitWhatsappRequest() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: businessKeys.all });
     },
+  });
+}
+
+export function useSubmitWhatsappDeactivationRequest() {
+  return useMutation({
+    mutationFn: (params: WhatsappDeactivationParams) => submitWhatsappDeactivationRequest(params),
   });
 }
 

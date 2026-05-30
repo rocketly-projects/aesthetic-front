@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useSubmitWhatsappRequest } from "@/hooks/useBusiness";
 
 interface Props {
@@ -66,12 +67,15 @@ export default function WhatsAppSetupModal({ open, onClose }: Props) {
     }
   }
 
-  if (!open) return null;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
-  return (
+  if (!open || !mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,.45)", backdropFilter: "blur(4px)" }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,.5)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) resetAndClose(); }}
     >
       <div className="bg-surface border border-line rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
@@ -113,8 +117,9 @@ export default function WhatsAppSetupModal({ open, onClose }: Props) {
                   title: "Número nuevo",
                   desc:  "No tenés un número dedicado. Te conseguimos uno para el bot.",
                   icon:  (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 5v14M5 12h14"/>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      <path d="M19 3v4M17 5h4"/>
                     </svg>
                   ),
                 },
@@ -123,8 +128,9 @@ export default function WhatsAppSetupModal({ open, onClose }: Props) {
                   title: "Número existente",
                   desc:  "Ya tenés un número de WhatsApp y querés conectarlo al bot.",
                   icon:  (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                      <path d="M15 3l4 4-4 4M19 7H9"/>
                     </svg>
                   ),
                 },
@@ -132,13 +138,15 @@ export default function WhatsAppSetupModal({ open, onClose }: Props) {
                 <button
                   key={opt.id}
                   onClick={() => setRequestType(opt.id)}
-                  className={`flex items-start gap-4 p-4 rounded-xl border-2 text-left transition-all cursor-pointer bg-transparent w-full ${
+                  className={`flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all cursor-pointer bg-transparent w-full ${
                     requestType === opt.id
                       ? "border-accent bg-accent-pale"
                       : "border-line hover:border-ink-3"
                   }`}
                 >
-                  <div className={`shrink-0 mt-0.5 ${requestType === opt.id ? "text-accent" : "text-ink-3"}`}>
+                  <div className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
+                    requestType === opt.id ? "bg-accent text-white" : "bg-bg-2 text-ink-3"
+                  }`}>
                     {opt.icon}
                   </div>
                   <div>
@@ -281,6 +289,7 @@ export default function WhatsAppSetupModal({ open, onClose }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

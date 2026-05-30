@@ -23,6 +23,7 @@ export interface Business {
   planStatus: 'active' | 'inactive' | 'cancelled' | 'past_due';
   // WhatsApp setup
   whatsappRequestedAt: string | null;
+  whatsappBotActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,6 +31,12 @@ export interface Business {
 export interface WhatsappRequestParams {
   type:         'new' | 'existing';
   phone?:       string;
+  contactName:  string;
+  contactPhone: string;
+  notes?:       string;
+}
+
+export interface WhatsappDeactivationParams {
   contactName:  string;
   contactPhone: string;
   notes?:       string;
@@ -94,6 +101,13 @@ export async function updateHours(hours: UpdateHoursParam[]): Promise<BusinessHo
 
 export async function submitWhatsappRequest(params: WhatsappRequestParams): Promise<void> {
   await apiFetch("/businesses/me/whatsapp-request", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function submitWhatsappDeactivationRequest(params: WhatsappDeactivationParams): Promise<void> {
+  await apiFetch("/businesses/me/whatsapp-deactivation-request", {
     method: "POST",
     body: JSON.stringify(params),
   });
