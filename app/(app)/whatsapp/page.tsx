@@ -9,6 +9,7 @@ import { statusChip } from "@/components/Chip";
 import { useGetChats, useGetMessages, useSendMessage, usePatchChat } from "@/hooks/useWhatsapp";
 import { useGetClient } from "@/hooks/useClients";
 import { useGetAppointments } from "@/hooks/useAppointments";
+import { useGetBusiness } from "@/hooks/useBusiness";
 import type { MessageSender } from "@/lib/api/whatsapp";
 
 type TabFilter = "todos" | "bot" | "yo";
@@ -29,7 +30,41 @@ function bubbleStyle(sender: MessageSender) {
   return                          { background: "var(--color-surface)", color: "var(--color-ink)", border: "1px solid var(--color-line-2)", borderRadius: "14px 14px 14px 4px", alignSelf: "flex-start" };
 }
 
+function ProGate() {
+  return (
+    <AppShell active="whatsapp" title="WhatsApp" subtitle="Mensajes con clientes">
+      <div className="flex flex-col items-center justify-center py-20 gap-6 text-center">
+        <div className="w-20 h-20 rounded-full bg-accent-pale flex items-center justify-center">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+            <path d="M21 11.5a8.4 8.4 0 0 1-1.2 4.4L21 21l-5.2-1.2a8.4 8.4 0 1 1 5.4-8.3z"/>
+            <path d="M8 9a1 1 0 0 1 1-1h.5l1 2.5-1 1a6 6 0 0 0 3 3l1-1L16 14.5V15a1 1 0 0 1-1 1c-3.9 0-7-3.1-7-7z"/>
+          </svg>
+        </div>
+        <div>
+          <span className="inline-flex items-center bg-accent text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider mb-3">
+            Plan Pro
+          </span>
+          <h2 className="text-[17px] font-semibold text-ink mt-3 mb-2">WhatsApp disponible en el plan Pro</h2>
+          <p className="text-[13px] text-ink-3 max-w-sm">
+            Respondé mensajes, gestioná turnos automáticamente y dejá que el bot atienda a tus clientes las 24 hs.
+          </p>
+        </div>
+        <a
+          href="/config"
+          className="inline-flex items-center gap-2 bg-ink text-white text-[13.5px] font-medium rounded-lg px-5 py-2.5 hover:opacity-90 transition-opacity"
+          style={{ textDecoration: "none" }}
+        >
+          Ver planes
+        </a>
+      </div>
+    </AppShell>
+  );
+}
+
 export default function WhatsAppPage() {
+  const { data: business, isLoading: bizLoading } = useGetBusiness();
+  const isPro = business?.planId === 'pro' && business?.planStatus === 'active';
+
   const [activeTab,         setActiveTab]         = useState<TabFilter>("todos");
   const [activeChatId,      setActiveChatId]      = useState<string>("");
   const [mobileConversation, setMobileConversation] = useState(false);
@@ -55,6 +90,8 @@ export default function WhatsAppPage() {
   const { data: clientProfile } = useGetClient(activeChat?.clientId ?? "");
   const { data: apptData }      = useGetAppointments({ clientId: activeChat?.clientId ?? "", limit: 20 });
   const clientAppts             = apptData?.appointments ?? [];
+
+  if (!bizLoading && !isPro) return <ProGate />;
 
   function handleSelectChat(id: string) {
     setActiveChatId(id);

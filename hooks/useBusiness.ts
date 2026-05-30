@@ -8,8 +8,9 @@ import {
   updateHours,
   connectMp,
   disconnectMp,
+  submitWhatsappRequest,
 } from "@/lib/api/business";
-import type { UpdateBusinessParams, UpdateHoursParam } from "@/lib/api/business";
+import type { UpdateBusinessParams, UpdateHoursParam, WhatsappRequestParams } from "@/lib/api/business";
 
 export const businessKeys = {
   all:   ["business"] as const,
@@ -46,6 +47,16 @@ export function useUpdateHours() {
     mutationFn: (hours: UpdateHoursParam[]) => updateHours(hours),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: businessKeys.hours });
+    },
+  });
+}
+
+export function useSubmitWhatsappRequest() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (params: WhatsappRequestParams) => submitWhatsappRequest(params),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: businessKeys.all });
     },
   });
 }

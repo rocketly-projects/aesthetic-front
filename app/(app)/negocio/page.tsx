@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import AppShell from "@/components/AppShell";
 import Skeleton from "@/components/Skeleton";
+import WhatsAppSetupModal from "@/components/WhatsAppSetupModal";
 import { useSearchParams } from "next/navigation";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect } from "@/hooks/useBusiness";
 
@@ -45,7 +46,8 @@ function NegocioPageInner() {
   const [webDepositRequired, setWebDepositRequired] = useState(false);
   const [botDepositRequired, setBotDepositRequired] = useState(false);
   const [depositPercent, setDepositPercent]         = useState(30);
-  const [urlCopied, setUrlCopied]   = useState(false);
+  const [urlCopied, setUrlCopied]         = useState(false);
+  const [waModalOpen, setWaModalOpen]     = useState(false);
   const [logoFile, setLogoFile]     = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoError, setLogoError]   = useState("");
@@ -145,7 +147,7 @@ function NegocioPageInner() {
 
   const isSaving = updateBusiness.isPending || updateHours.isPending;
 
-  const botSample = `Hola! Soy el asistente de ${form.name || "tu estudio"} 🌿\nPara reservar escribí TURNO, o indicame:\n• Tu nombre\n• El servicio que buscás\n• Día y horario preferido\n\nHorario: Lun–Vie 9–18 · Sáb 9–14`;
+  const isPro = business?.planId === 'pro' && business?.planStatus === 'active';
 
   return (
     <AppShell
@@ -363,21 +365,28 @@ function NegocioPageInner() {
 
             {/* Toggles de seña */}
             <div className="flex flex-col gap-3">
-              {[
-                { label: "Seña en reservas web", desc: "El cliente paga al reservar desde tu link público", val: webDepositRequired, set: setWebDepositRequired },
-                { label: "Seña en reservas por bot", desc: "El chatbot solicita el pago antes de confirmar", val: botDepositRequired, set: setBotDepositRequired },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-[13px] font-medium text-ink">Seña en reservas web</div>
+                  <div className="text-xs text-ink-3 mt-0.5">El cliente paga al reservar desde tu link público</div>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" checked={webDepositRequired} onChange={(e) => setWebDepositRequired(e.target.checked)} disabled={!business?.mpUserId} />
+                  <span className="toggle-track" /><span className="toggle-thumb" />
+                </label>
+              </div>
+              {isPro && (
+                <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-[13px] font-medium text-ink">{item.label}</div>
-                    <div className="text-xs text-ink-3 mt-0.5">{item.desc}</div>
+                    <div className="text-[13px] font-medium text-ink">Seña en reservas por bot</div>
+                    <div className="text-xs text-ink-3 mt-0.5">El chatbot solicita el pago antes de confirmar</div>
                   </div>
                   <label className="toggle">
-                    <input type="checkbox" checked={item.val} onChange={(e) => item.set(e.target.checked)} disabled={!business?.mpUserId} />
+                    <input type="checkbox" checked={botDepositRequired} onChange={(e) => setBotDepositRequired(e.target.checked)} disabled={!business?.mpUserId} />
                     <span className="toggle-track" /><span className="toggle-thumb" />
                   </label>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Porcentaje de seña */}
@@ -406,20 +415,32 @@ function NegocioPageInner() {
             )}
           </div>
 
-          <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
-            <div className="font-semibold text-sm text-ink mb-4">Vista previa del bot</div>
-            <div className="bg-bg rounded-md p-4 border border-line">
-              <div className="flex items-center gap-2 pb-3 mb-3 border-b border-line">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-semibold shrink-0 bg-accent">a</div>
-                <div>
-                  <div className="text-xs font-semibold text-ink">aesthetic. bot</div>
-                  <div className="text-[10px] text-ok">En línea</div>
-                </div>
+          {isPro && (
+            <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
+              <div className="font-semibold text-sm text-ink mb-1.5">Bot de WhatsApp</div>
+              <div className="text-[12.5px] text-ink-3 mb-4">
+                Conectá un número de WhatsApp para que el bot gestione turnos automáticamente con tus clientes.
               </div>
-              <div className="bg-surface rounded-md p-3 border border-line-2 text-xs text-ink-2 leading-relaxed whitespace-pre-line">{botSample}</div>
+              {business?.whatsappRequestedAt ? (
+                <div className="flex items-center gap-2 justify-center py-2.5 rounded-lg bg-[#f0fdf4] border border-ok text-ok text-[13px] font-medium">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6L9 17l-5-5"/>
+                  </svg>
+                  Solicitud enviada — te contactamos pronto
+                </div>
+              ) : (
+                <button
+                  onClick={() => setWaModalOpen(true)}
+                  className="w-full flex items-center justify-center gap-2 text-[13px] font-medium rounded-lg px-4 py-2.5 border border-line text-ink hover:border-accent hover:text-accent transition-colors bg-transparent cursor-pointer"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.4 8.4 0 0 1-1.2 4.4L21 21l-5.2-1.2a8.4 8.4 0 1 1 5.4-8.3zM8 9a1 1 0 0 1 1-1h.5l1 2.5-1 1a6 6 0 0 0 3 3l1-1L16 14.5V15a1 1 0 0 1-1 1c-3.9 0-7-3.1-7-7z"/>
+                  </svg>
+                  Habilitar número de WhatsApp
+                </button>
+              )}
             </div>
-          </div>
-
+          )}
 
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-3">Links rápidos</div>
@@ -436,6 +457,7 @@ function NegocioPageInner() {
         </div>
       </div>
       )}
+      <WhatsAppSetupModal open={waModalOpen} onClose={() => setWaModalOpen(false)} />
     </AppShell>
   );
 }

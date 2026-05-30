@@ -2,6 +2,24 @@
 
 import AppShell from "@/components/AppShell";
 import { usePreferences } from "@/hooks/usePreferences";
+import { useGetBusiness } from "@/hooks/useBusiness";
+
+const PLAN_CONFIG = {
+  basic: {
+    label:    "Plan Básico activo",
+    subtitle: "Turnos, clientes y servicios en un solo lugar.",
+    features: ["Gestión de turnos", "Agenda", "Clientes", "Servicios", "Perfil público"],
+    price:    "$30.000",
+    gradient: "linear-gradient(135deg, #1e2535 0%, #2c3a4a 100%)",
+  },
+  pro: {
+    label:    "Plan Pro activo",
+    subtitle: "Clientes ilimitadas · Bot de WhatsApp · Reportes avanzados",
+    features: ["Turnos ilimitados", "WhatsApp bot", "Estadísticas", "Soporte prioritario"],
+    price:    "$40.000",
+    gradient: "linear-gradient(135deg, #272a25 0%, #3a4535 100%)",
+  },
+} as const;
 
 function ToggleRow({ label, description, checked, onChange }: { label: string; description?: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -20,9 +38,15 @@ function ToggleRow({ label, description, checked, onChange }: { label: string; d
 
 export default function ConfigPage() {
   const { prefs, setPrefs, save, saved } = usePreferences();
+  const { data: business } = useGetBusiness();
 
   const setNotif = (key: keyof typeof prefs.notifications, value: boolean) =>
     setPrefs((p) => ({ ...p, notifications: { ...p.notifications, [key]: value } }));
+
+  const planKey = business?.planStatus === 'active' && business?.planId
+    ? (business.planId as keyof typeof PLAN_CONFIG)
+    : null;
+  const plan = planKey && planKey in PLAN_CONFIG ? PLAN_CONFIG[planKey] : null;
 
   return (
     <AppShell
@@ -55,24 +79,32 @@ export default function ConfigPage() {
           <ToggleRow label="Pagos recibidos"        description="Toast al confirmar una seña"                  checked={prefs.notifications.pagos}         onChange={(v) => setNotif("pagos", v)}         />
         </div>
 
-        <div className="rounded-lg p-5" style={{ background: "linear-gradient(135deg, #272a25 0%, #3a4535 100%)" }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-semibold text-base text-white mb-2">Plan Pro activo</div>
-              <div className="text-[13px] mb-4" style={{ color: "rgba(255,255,255,.7)" }}>Clientes ilimitadas · Bot de WhatsApp · Reportes avanzados</div>
-              <div className="flex flex-wrap gap-2">
-                {["Turnos ilimitados", "WhatsApp bot", "Estadísticas", "Soporte prioritario"].map((f) => (
-                  <span key={f} className="rounded-full px-2.5 py-1 text-[11px] font-medium text-white" style={{ background: "rgba(255,255,255,.15)" }}>{f}</span>
-                ))}
+        {plan ? (
+          <div className="rounded-lg p-5" style={{ background: plan.gradient }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-base text-white mb-2">{plan.label}</div>
+                <div className="text-[13px] mb-4" style={{ color: "rgba(255,255,255,.7)" }}>{plan.subtitle}</div>
+                <div className="flex flex-wrap gap-2">
+                  {plan.features.map((f) => (
+                    <span key={f} className="rounded-full px-2.5 py-1 text-[11px] font-medium text-white" style={{ background: "rgba(255,255,255,.15)" }}>{f}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="text-right shrink-0 pl-6">
+                <div className="text-[28px] font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>{plan.price}</div>
+                <div className="text-xs" style={{ color: "rgba(255,255,255,.6)" }}>por mes</div>
               </div>
             </div>
-            <div className="text-right shrink-0 pl-6">
-              <div className="text-[28px] font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>$4.900</div>
-              <div className="text-xs" style={{ color: "rgba(255,255,255,.6)" }}>por mes</div>
-              <button className="mt-3 rounded-lg px-4 py-1.5 text-xs cursor-pointer hover:bg-white/25 transition-colors text-white border" style={{ background: "rgba(255,255,255,.15)", borderColor: "rgba(255,255,255,.3)" }}>Gestionar plan</button>
-            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-surface border border-line rounded-lg p-5">
+            <div className="font-semibold text-sm text-ink mb-1">Sin plan activo</div>
+            <p className="text-[12.5px] text-ink-3 mt-0.5">
+              Activá un plan para acceder a todas las funciones de aesthetic.
+            </p>
+          </div>
+        )}
       </div>
     </AppShell>
   );

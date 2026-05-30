@@ -18,8 +18,21 @@ export interface Business {
   depositPercent: number;
   // MercadoPago OAuth (null = no conectado)
   mpUserId: string | null;
+  // Plan de suscripción
+  planId: string | null;                                              // 'basic' | 'pro' | null
+  planStatus: 'active' | 'inactive' | 'cancelled' | 'past_due';
+  // WhatsApp setup
+  whatsappRequestedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface WhatsappRequestParams {
+  type:         'new' | 'existing';
+  phone?:       string;
+  contactName:  string;
+  contactPhone: string;
+  notes?:       string;
 }
 
 export interface BusinessHours {
@@ -77,6 +90,13 @@ export async function updateHours(hours: UpdateHoursParam[]): Promise<BusinessHo
     body: JSON.stringify(hours),
   });
   return data.hours;
+}
+
+export async function submitWhatsappRequest(params: WhatsappRequestParams): Promise<void> {
+  await apiFetch("/businesses/me/whatsapp-request", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
 }
 
 export async function connectMp(): Promise<void> {

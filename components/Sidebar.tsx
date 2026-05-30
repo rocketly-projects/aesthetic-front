@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLogout, useCurrentUser } from "@/hooks/useAuth";
 import { useGetChats } from "@/hooks/useWhatsapp";
+import { useGetBusiness } from "@/hooks/useBusiness";
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -119,6 +120,8 @@ export default function Sidebar({ active, collapsed, onToggle, mobile = false, o
   const roleLabel = current?.role === "owner" ? "Propietario" : current?.role === "staff" ? "Colaborador" : "";
   const { data: chatsData } = useGetChats();
   const unreadCount = chatsData?.chats.reduce((sum, c) => sum + (c.unread ?? 0), 0) ?? 0;
+  const { data: business } = useGetBusiness();
+  const isPro = business?.planId === 'pro' && business?.planStatus === 'active';
 
   const navItemClass = (id: string) =>
     `nav-item${active === id ? " active" : ""}${collapsed ? " justify-center" : ""}`;
@@ -171,12 +174,25 @@ export default function Sidebar({ active, collapsed, onToggle, mobile = false, o
             >
               {IconComp && <IconComp />}
               {!collapsed && <span className="flex-1">{item.label}</span>}
-              {!collapsed && item.id === "whatsapp" && unreadCount > 0 && (
-                <span className="bg-accent text-white text-[10px] font-semibold leading-none px-1.5 py-0.5 rounded-full">
-                  {unreadCount}
+              {!collapsed && item.id === "whatsapp" && (
+                isPro
+                  ? unreadCount > 0 && (
+                      <span className="bg-accent text-white text-[10px] font-semibold leading-none px-1.5 py-0.5 rounded-full">
+                        {unreadCount}
+                      </span>
+                    )
+                  : (
+                      <span className="bg-accent text-white text-[9px] font-bold leading-none px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                        Pro
+                      </span>
+                    )
+              )}
+              {collapsed && item.id === "whatsapp" && !isPro && (
+                <span className="absolute top-0.5 right-0.5 bg-accent text-white text-[7px] font-bold leading-none px-1 py-px rounded-full uppercase">
+                  Pro
                 </span>
               )}
-              {collapsed && item.id === "whatsapp" && unreadCount > 0 && (
+              {collapsed && item.id === "whatsapp" && isPro && unreadCount > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
               )}
             </Link>

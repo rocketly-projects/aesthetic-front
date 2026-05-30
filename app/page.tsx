@@ -31,21 +31,17 @@ const botFeatures = [
 ];
 
 const basicPlan = [
-  "Agenda con vista semanal",
-  "Hasta 50 clientes",
-  "Hasta 100 turnos por mes",
-  "Catálogo de servicios",
-  "Recordatorios manuales",
+  "Gestión de turnos",
+  "Agenda",
+  "Clientes",
+  "Servicios",
+  "Perfil público",
 ];
 
 const proPlan = [
-  "Todo lo del plan Básico, sin límites",
-  "Asistente WhatsApp con IA",
-  "Recordatorios automáticos 24h antes",
-  "Link público para reservas",
-  "Aparición en el buscador público",
-  "Estadísticas e ingresos por servicio",
-  "Soporte prioritario por WhatsApp",
+  "Todo el Plan Básico",
+  "Bot de WhatsApp",
+  "Respuestas automáticas 24/7",
 ];
 
 const testimonials = [
@@ -90,7 +86,7 @@ const faqs = [
   },
   {
     q: "¿Qué pasa si cancelo el plan Pro?",
-    a: "Volvés automáticamente al plan Básico — gratis, para siempre. Tus datos quedan intactos, solo se desactivan las funciones premium (bot de IA, link público, estadísticas). Podés reactivar el Pro cuando quieras.",
+    a: "Tus datos quedan intactos. Podés reactivar el Pro cuando quieras desde la configuración de tu cuenta.",
   },
   {
     q: "¿Sirve para peluquerías con más de una persona?",
@@ -109,17 +105,6 @@ const agendaMock = [
   { time: "14:00", name: "Valentina L.", svc: "Mechas", status: "ok" as const },
 ];
 
-const proofItems = [
-  "+200 peluquerías en aesthetic",
-  "Estudio Marina",
-  "Casa Mía",
-  "La Trenza",
-  "Atelier Carmen",
-  "Salón Beatriz",
-  "Studio Celine",
-  "Peluquería Mía",
-  "Cortes & Arte",
-];
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
 
@@ -401,7 +386,7 @@ export default function LandingPage() {
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section
         id="top"
-        className="relative pt-12 pb-14 px-5 md:pt-20 md:pb-20 md:px-6 overflow-hidden"
+        className="relative min-h-[100dvh] flex items-center px-5 md:px-6 overflow-hidden py-20"
         onMouseMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           setSpot({ x: e.clientX - r.left, y: e.clientY - r.top });
@@ -426,7 +411,7 @@ export default function LandingPage() {
           }}
         />
 
-        <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Copy */}
           <div>
             <div className="inline-flex items-center gap-2 bg-accent-pale text-accent-ink text-[12px] font-medium rounded-full px-3 py-1 mb-6">
@@ -577,21 +562,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* ── Proof bar — marquee ──────────────────────────────────────── */}
-      <div className="border-y border-line bg-bg-2 py-4 overflow-hidden">
-        <div
-          className="flex items-center gap-10 w-max"
-          style={{ animation: "marquee 28s linear infinite" }}
-        >
-          {[...proofItems, ...proofItems].map((item, i) => (
-            <span key={i} className="text-[13px] text-ink-3 whitespace-nowrap flex items-center gap-10">
-              {item}
-              <span className="text-line-2 text-[10px]">·</span>
-            </span>
-          ))}
-        </div>
-      </div>
 
       {/* ── Features 01 ──────────────────────────────────────────────── */}
       <section id="features" className="py-14 md:py-24 px-5 md:px-6">
@@ -748,16 +718,17 @@ export default function LandingPage() {
                 >
                   Básico
                 </h3>
-                <p className="text-[13px] text-ink-3 mb-5">Para empezar a ordenar tu agenda.</p>
+                <p className="text-[13px] text-ink-3 mb-5">Turnos, clientes y servicios en un solo lugar.</p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span
                     className="text-[36px] font-semibold text-ink"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
-                    Gratis
+                    $30.000
                   </span>
+                  <span className="text-[14px] text-ink-3">/ mes</span>
                 </div>
-                <p className="text-[12px] text-ink-3 mb-7">Para siempre · sin tarjeta</p>
+                <p className="text-[12px] text-ink-3 mb-7">ARS · 14 días gratis · cancelás cuando quieras</p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {basicPlan.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-[13.5px] text-ink-2">
@@ -797,14 +768,14 @@ export default function LandingPage() {
                     className="text-[36px] font-semibold text-white"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
-                    $15.900
+                    $40.000
                   </span>
                   <span className="text-[14px]" style={{ color: "rgba(255,255,255,0.5)" }}>
                     / mes
                   </span>
                 </div>
                 <p className="text-[12px] mb-7" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  14 días gratis · cancelás cuando quieras
+                  ARS · 14 días gratis · cancelás cuando quieras
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {proPlan.map((f) => (

@@ -151,7 +151,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Bento grid ── */}
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-[1.55fr_1fr] lg:[grid-template-rows:auto_1fr_auto]">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-[1.55fr_1fr] lg:[grid-template-rows:auto_auto_1fr]">
 
         {/* HERO — Agenda de hoy */}
         <div
