@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { searchBusinesses, type BusinessSearchResult } from "@/lib/api/public";
 
 // ─── Static data ───────────────────────────────────────────────────────────────
 
@@ -266,9 +267,10 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
         <nav className="flex flex-col gap-1 p-4 flex-1">
           {(
             [
-              ["#features", "Producto"],
-              ["#planes", "Planes"],
-              ["#faq", "Preguntas frecuentes"],
+              ["#features",  "Producto"],
+              ["#negocios",  "Negocios"],
+              ["#planes",    "Planes"],
+              ["#faq",       "Preguntas frecuentes"],
             ] as [string, string][]
           ).map(([href, label]) => (
             <a
@@ -300,6 +302,140 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
           </Link>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── BusinessSearch ───────────────────────────────────────────────────────────
+
+function BusinessSearch() {
+  const [query,   setQuery]   = useState("");
+  const [results, setResults] = useState<BusinessSearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const runSearch = useCallback(async (q: string) => {
+    if (q.trim().length < 2) {
+      setResults([]);
+      setSearched(false);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await searchBusinesses(q);
+      setResults(res);
+      setSearched(true);
+    } catch {
+      setResults([]);
+      setSearched(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setQuery(v);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (v.trim().length < 2) {
+      setResults([]);
+      setSearched(false);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    timerRef.current = setTimeout(() => runSearch(v), 300);
+  }
+
+  return (
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Input */}
+      <div className="relative">
+        <svg
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none"
+          width="17" height="17" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          value={query}
+          onChange={handleChange}
+          placeholder="Buscá por nombre del negocio…"
+          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-line bg-surface text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent transition-colors shadow-sm"
+        />
+        {loading && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-accent inline-block"
+                style={{ animation: `bounce 0.9s ${i * 0.15}s ease-in-out infinite` }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Results */}
+      {query.trim().length >= 2 && !loading && (
+        <div className="mt-4">
+          {searched && results.length === 0 ? (
+            <div className="text-center py-10 text-ink-3 text-[14px]">
+              No encontramos negocios para{" "}
+              <span className="font-medium text-ink">«{query.trim()}»</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {results.map((biz) => (
+                <Link
+                  key={biz.slug}
+                  href={`/${biz.slug}`}
+                  className="flex items-center gap-3 p-4 bg-surface border border-line rounded-xl hover:border-accent hover:shadow-md transition-all no-underline group"
+                >
+                  {/* Logo / initials */}
+                  <div className="w-11 h-11 rounded-xl shrink-0 overflow-hidden flex items-center justify-center bg-accent-pale">
+                    {biz.logoUrl ? (
+                      <img src={biz.logoUrl} alt={biz.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-accent-ink font-semibold text-[16px]">
+                        {biz.name[0].toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[14px] font-semibold text-ink truncate">{biz.name}</div>
+                    {biz.address ? (
+                      <div className="text-[12px] text-ink-3 truncate mt-0.5">{biz.address}</div>
+                    ) : (
+                      <div className="text-[12px] text-ink-3 mt-0.5">Reservas online</div>
+                    )}
+                  </div>
+                  {/* Arrow */}
+                  <svg
+                    className="text-ink-3 group-hover:text-accent transition-colors shrink-0"
+                    width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Hint when idle */}
+      {query.trim().length === 0 && (
+        <p className="text-center text-[13px] text-ink-3 mt-4">
+          Escribí al menos 2 caracteres para buscar
+        </p>
+      )}
     </div>
   );
 }
@@ -339,9 +475,10 @@ export default function LandingPage() {
           <div className="hidden lg:flex items-center gap-6">
             {(
               [
-                ["#features", "Producto"],
-                ["#planes", "Planes"],
-                ["#faq", "Preguntas"],
+                ["#features",  "Producto"],
+                ["#negocios",  "Negocios"],
+                ["#planes",    "Planes"],
+                ["#faq",       "Preguntas"],
               ] as [string, string][]
             ).map(([href, label]) => (
               <a
@@ -686,6 +823,31 @@ export default function LandingPage() {
             </div>
           </div>
         </Reveal>
+      </section>
+
+      {/* ── Search 03 ────────────────────────────────────────────────── */}
+      <section id="negocios" className="py-14 md:py-24 px-5 md:px-6">
+        <div className="max-w-6xl mx-auto">
+          <Reveal>
+            <div className="text-center mb-10">
+              <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-3">
+                Negocios · 03
+              </span>
+              <h2
+                className="text-[28px] md:text-[38px] font-semibold leading-tight tracking-tight text-ink mb-3"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                Encontrá tu peluquería.
+              </h2>
+              <p className="text-[15px] text-ink-2 max-w-md mx-auto">
+                Buscá por nombre y reservá tu turno directamente, sin llamadas ni mensajes.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={80}>
+            <BusinessSearch />
+          </Reveal>
+        </div>
       </section>
 
       {/* ── Plans 04 ─────────────────────────────────────────────────── */}

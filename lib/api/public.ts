@@ -104,6 +104,21 @@ export async function getPublicAvailability(
   return data.slots;
 }
 
+export interface BusinessSearchResult {
+  name:    string;
+  slug:    string;
+  address: string | null;
+  logoUrl: string | null;
+}
+
+export async function searchBusinesses(q: string): Promise<BusinessSearchResult[]> {
+  if (q.trim().length < 2) return [];
+  const data = await publicFetch<{ businesses: BusinessSearchResult[] }>(
+    `/public/businesses/search?q=${encodeURIComponent(q.trim())}`
+  );
+  return data.businesses;
+}
+
 export async function createPublicAppointment(
   slug: string,
   params: BookingParams
