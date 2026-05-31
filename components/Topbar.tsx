@@ -12,15 +12,17 @@ export default function Topbar({ title, subtitle, actions, onOpenMobileNav }: To
     <div className="h-[var(--topbar-h)] min-h-[var(--topbar-h)] flex items-center px-3 md:px-6 gap-3 md:gap-4">
       {/* Hamburger — mobile only */}
       {onOpenMobileNav && (
+        <div className="lg:hidden">
         <button
           onClick={onOpenMobileNav}
           aria-label="Abrir menú"
-          className="lg:hidden tb-icon-btn"
+          className="tb-icon-btn"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
+        </div>
       )}
 
       {/* Title */}
