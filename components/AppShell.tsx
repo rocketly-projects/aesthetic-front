@@ -83,7 +83,7 @@ export default function AppShell({ active, title, subtitle, actions, children }:
           />
           <div
             key={pathname}
-            className="flex-1 overflow-y-auto p-4 md:p-6"
+            className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6"
             style={{ animation: "page-in var(--dur-slow) var(--ease-out) both" }}
           >
             {children}
