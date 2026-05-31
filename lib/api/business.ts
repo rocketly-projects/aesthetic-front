@@ -24,6 +24,7 @@ export interface Business {
   // WhatsApp setup
   whatsappRequestedAt: string | null;
   whatsappBotActive: boolean;
+  whatsappDeactivationRequestedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -49,7 +49,6 @@ function NegocioPageInner() {
   const [urlCopied, setUrlCopied]         = useState(false);
   const [waModalOpen, setWaModalOpen]     = useState(false);
   const [deactOpen,   setDeactOpen]       = useState(false);
-  const [deactSent,   setDeactSent]       = useState(false);
   const [deactName,   setDeactName]       = useState("");
   const [deactPhone,  setDeactPhone]      = useState("");
   const [deactNotes,  setDeactNotes]      = useState("");
@@ -427,12 +426,12 @@ function NegocioPageInner() {
 
               {/* ── State 3: bot activo ── */}
               {business?.whatsappBotActive ? (
-                deactSent ? (
-                  <div className="flex items-center gap-2 justify-center py-2.5 rounded-lg bg-[#f0fdf4] border border-ok text-ok text-[13px] font-medium">
+                business?.whatsappDeactivationRequestedAt ? (
+                  <div className="flex items-center gap-2 justify-center py-2.5 rounded-lg bg-[#fff8ed] border border-[#f5a623] text-[#7a4f00] text-[13px] font-medium">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 6L9 17l-5-5"/>
                     </svg>
-                    Solicitud de baja enviada — te contactamos pronto
+                    Baja solicitada — te contactamos pronto
                   </div>
                 ) : deactOpen ? (
                   <div className="flex flex-col gap-3">
@@ -471,7 +470,7 @@ function NegocioPageInner() {
                           if (!deactName.trim() || !deactPhone.trim()) return;
                           deactivate.mutate(
                             { contactName: deactName.trim(), contactPhone: deactPhone.trim(), notes: deactNotes.trim() || undefined },
-                            { onSuccess: () => { setDeactOpen(false); setDeactSent(true); } }
+                            { onSuccess: () => setDeactOpen(false) }
                           );
                         }}
                         disabled={!deactName.trim() || !deactPhone.trim() || deactivate.isPending}

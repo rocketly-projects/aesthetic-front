@@ -63,8 +63,12 @@ export function useSubmitWhatsappRequest() {
 }
 
 export function useSubmitWhatsappDeactivationRequest() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (params: WhatsappDeactivationParams) => submitWhatsappDeactivationRequest(params),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: businessKeys.all });
+    },
   });
 }
 
