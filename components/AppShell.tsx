@@ -73,7 +73,7 @@ export default function AppShell({ active, title, subtitle, actions, children }:
         {/* Panel flotante */}
         <div
           className="flex-1 min-h-0 flex flex-col overflow-hidden bg-bg lg:rounded-2xl"
-          style={{ boxShadow: "0 0 0 1px var(--color-line), 0 2px 6px rgba(39,42,37,.04), 0 8px 24px rgba(39,42,37,.06), 0 24px 64px rgba(39,42,37,.05)" }}
+          style={{ boxShadow: "0 0 0 1px var(--color-line), 0 4px 20px rgba(39,42,37,.04)" }}
         >
           <Topbar
             title={title}
