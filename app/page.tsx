@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { searchBusinesses, type BusinessSearchResult } from "@/lib/api/public";
+import { getFeaturedBusinesses, searchBusinesses, type BusinessSearchResult } from "@/lib/api/public";
 
 // ─── Static data ───────────────────────────────────────────────────────────────
 
@@ -306,53 +306,146 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
+// ─── BizCard ──────────────────────────────────────────────────────────────────
+
+function BizCard({ biz }: { biz: BusinessSearchResult }) {
+  return (
+    <Link href={`/${biz.slug}`} className="group block no-underline h-full">
+      <div className="h-full bg-surface border border-line rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 group-hover:border-accent/50">
+
+        {/* Gradient header */}
+        <div
+          className="h-[4.5rem] flex items-end px-5"
+          style={{ background: "linear-gradient(135deg, var(--color-accent-pale) 0%, var(--color-bg-2) 100%)" }}
+        >
+          {/* Avatar — overlaps into body via translate-y-1/2 */}
+          <div className="w-14 h-14 rounded-2xl border-[3px] border-surface shadow-md overflow-hidden flex items-center justify-center translate-y-1/2 bg-surface shrink-0">
+            {biz.logoUrl ? (
+              <img src={biz.logoUrl} alt={biz.name} className="w-full h-full object-cover" />
+            ) : (
+              <span
+                className="text-[22px] font-bold text-accent"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {biz.name[0].toUpperCase()}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-5 pt-9 pb-5 flex flex-col">
+          <p
+            className="m-0 text-[15px] font-semibold text-ink leading-snug"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            {biz.name}
+          </p>
+
+          <div className="h-5 flex items-center mt-1 min-w-0">
+            {biz.address && (
+              <div className="flex items-center gap-1.5 text-[11.5px] text-ink-3 min-w-0">
+                <svg className="shrink-0" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span className="truncate">{biz.address}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-line">
+            <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-ok">
+              <span className="w-1.5 h-1.5 rounded-full bg-ok inline-block" />
+              Online
+            </div>
+            <span className="flex items-center gap-1 text-[12.5px] font-semibold text-accent transition-all duration-200 group-hover:gap-2">
+              Reservar
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </Link>
+  );
+}
+
+// ─── BizCardSkeleton ──────────────────────────────────────────────────────────
+
+function BizCardSkeleton() {
+  return (
+    <div className="bg-surface border border-line rounded-2xl overflow-hidden">
+      <div className="h-[4.5rem] bg-bg-2 animate-pulse" />
+      <div className="px-5 pt-9 pb-5 flex flex-col gap-3">
+        <div className="h-4 w-3/4 rounded-lg bg-bg-2 animate-pulse" />
+        <div className="h-3 w-1/2 rounded-lg bg-bg-2 animate-pulse" />
+        <div className="h-px bg-line mt-1" />
+        <div className="flex justify-between">
+          <div className="h-3 w-12 rounded-lg bg-bg-2 animate-pulse" />
+          <div className="h-3 w-16 rounded-lg bg-bg-2 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── BusinessSearch ───────────────────────────────────────────────────────────
 
 function BusinessSearch() {
-  const [query,   setQuery]   = useState("");
-  const [results, setResults] = useState<BusinessSearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  const [query,         setQuery]         = useState("");
+  const [featured,      setFeatured]      = useState<BusinessSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<BusinessSearchResult[]>([]);
+  const [featLoading,   setFeatLoading]   = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [hasSearched,   setHasSearched]   = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const runSearch = useCallback(async (q: string) => {
-    if (q.trim().length < 2) {
-      setResults([]);
-      setSearched(false);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await searchBusinesses(q);
-      setResults(res);
-      setSearched(true);
-    } catch {
-      setResults([]);
-      setSearched(true);
-    } finally {
-      setLoading(false);
-    }
+  // Cargar featured al montar
+  useEffect(() => {
+    getFeaturedBusinesses()
+      .then(setFeatured)
+      .catch(() => {})
+      .finally(() => setFeatLoading(false));
   }, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value;
     setQuery(v);
     if (timerRef.current) clearTimeout(timerRef.current);
+
     if (v.trim().length < 2) {
-      setResults([]);
-      setSearched(false);
-      setLoading(false);
+      setSearchResults([]);
+      setHasSearched(false);
+      setSearchLoading(false);
       return;
     }
-    setLoading(true);
-    timerRef.current = setTimeout(() => runSearch(v), 300);
+
+    setSearchLoading(true);
+    timerRef.current = setTimeout(async () => {
+      try {
+        const res = await searchBusinesses(v);
+        setSearchResults(res);
+        setHasSearched(true);
+      } catch {
+        setSearchResults([]);
+        setHasSearched(true);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
   }
 
+  const isSearching = query.trim().length >= 2;
+  const items       = isSearching ? searchResults : featured;
+  const isLoading   = isSearching ? searchLoading : featLoading;
+
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      {/* Input */}
-      <div className="relative">
+    <div className="w-full">
+      {/* ── Search input ── */}
+      <div className="relative max-w-xl mx-auto mb-10">
         <svg
           className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none"
           width="17" height="17" viewBox="0 0 24 24" fill="none"
@@ -365,9 +458,9 @@ function BusinessSearch() {
           value={query}
           onChange={handleChange}
           placeholder="Buscá por nombre del negocio…"
-          className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-line bg-surface text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent transition-colors shadow-sm"
+          className="w-full pl-11 pr-12 py-4 rounded-2xl border border-line bg-surface text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent transition-colors shadow-sm"
         />
-        {loading && (
+        {searchLoading && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-1">
             {[0, 1, 2].map((i) => (
               <span
@@ -380,62 +473,44 @@ function BusinessSearch() {
         )}
       </div>
 
-      {/* Results */}
-      {query.trim().length >= 2 && !loading && (
-        <div className="mt-4">
-          {searched && results.length === 0 ? (
-            <div className="text-center py-10 text-ink-3 text-[14px]">
-              No encontramos negocios para{" "}
-              <span className="font-medium text-ink">«{query.trim()}»</span>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {results.map((biz) => (
-                <Link
-                  key={biz.slug}
-                  href={`/${biz.slug}`}
-                  className="flex items-center gap-3 p-4 bg-surface border border-line rounded-xl hover:border-accent hover:shadow-md transition-all no-underline group"
-                >
-                  {/* Logo / initials */}
-                  <div className="w-11 h-11 rounded-xl shrink-0 overflow-hidden flex items-center justify-center bg-accent-pale">
-                    {biz.logoUrl ? (
-                      <img src={biz.logoUrl} alt={biz.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-accent-ink font-semibold text-[16px]">
-                        {biz.name[0].toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[14px] font-semibold text-ink truncate">{biz.name}</div>
-                    {biz.address ? (
-                      <div className="text-[12px] text-ink-3 truncate mt-0.5">{biz.address}</div>
-                    ) : (
-                      <div className="text-[12px] text-ink-3 mt-0.5">Reservas online</div>
-                    )}
-                  </div>
-                  {/* Arrow */}
-                  <svg
-                    className="text-ink-3 group-hover:text-accent transition-colors shrink-0"
-                    width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                  >
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {/* ── Label de contexto ── */}
+      <div className="mb-5 min-h-[1.25rem]">
+        {!isLoading && (
+          isSearching ? (
+            hasSearched && (
+              <p className="text-[13px] text-ink-3 m-0">
+                {searchResults.length === 0
+                  ? <>Sin resultados para <strong className="text-ink">«{query.trim()}»</strong></>
+                  : <><strong className="text-ink">{searchResults.length}</strong> resultado{searchResults.length !== 1 ? "s" : ""} para <strong className="text-ink">«{query.trim()}»</strong></>
+                }
+              </p>
+            )
+          ) : featured.length > 0 ? (
+            <p className="text-[13px] text-ink-3 m-0">Negocios en aesthetic</p>
+          ) : null
+        )}
+      </div>
 
-      {/* Hint when idle */}
-      {query.trim().length === 0 && (
-        <p className="text-center text-[13px] text-ink-3 mt-4">
-          Escribí al menos 2 caracteres para buscar
-        </p>
-      )}
+      {/* ── Grid ── */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 5 }).map((_, i) => <BizCardSkeleton key={i} />)}
+        </div>
+      ) : items.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {items.map((biz) => <BizCard key={biz.slug} biz={biz} />)}
+        </div>
+      ) : isSearching && hasSearched ? (
+        <div className="text-center py-16">
+          <div className="w-14 h-14 rounded-2xl bg-bg-2 flex items-center justify-center mx-auto mb-4">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="text-ink-3">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </div>
+          <p className="text-[15px] font-medium text-ink mb-1 m-0">No encontramos «{query.trim()}»</p>
+          <p className="text-[13px] text-ink-3 m-0">Probá con otro nombre o verificá la escritura.</p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -826,8 +901,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Search 03 ────────────────────────────────────────────────── */}
-      <section id="negocios" className="py-14 md:py-24 px-5 md:px-6">
-        <div className="max-w-6xl mx-auto">
+      <section id="negocios" className="py-14 md:py-24 px-5 md:px-6 bg-bg-2">
+        <div className="max-w-5xl mx-auto">
           <Reveal>
             <div className="text-center mb-10">
               <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-3">

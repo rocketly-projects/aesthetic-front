@@ -111,6 +111,13 @@ export interface BusinessSearchResult {
   logoUrl: string | null;
 }
 
+export async function getFeaturedBusinesses(): Promise<BusinessSearchResult[]> {
+  const data = await publicFetch<{ businesses: BusinessSearchResult[] }>(
+    `/public/businesses/search`
+  );
+  return data.businesses;
+}
+
 export async function searchBusinesses(q: string): Promise<BusinessSearchResult[]> {
   if (q.trim().length < 2) return [];
   const data = await publicFetch<{ businesses: BusinessSearchResult[] }>(
