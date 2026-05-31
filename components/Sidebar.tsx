@@ -128,7 +128,7 @@ export default function Sidebar({ active, collapsed, onToggle, mobile = false, o
 
   return (
     <aside
-      className="flex flex-col h-full overflow-y-auto overflow-x-hidden border-r border-line bg-bg"
+      className="flex flex-col h-full overflow-y-auto overflow-x-hidden bg-bg-2"
       style={{ transition: `width var(--dur-base) var(--ease-out)` }}
     >
       {/* Brand */}
