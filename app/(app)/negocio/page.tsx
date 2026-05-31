@@ -190,7 +190,7 @@ function NegocioPageInner() {
           </div>
         </div>
       ) : (
-      <div className="grid gap-5" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+      <div className="grid gap-5 grid-cols-1 lg:grid-cols-[1.2fr_1fr]">
         <div className="flex flex-col gap-5">
           <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
             <div className="font-semibold text-sm text-ink mb-4">Datos del negocio</div>
@@ -275,16 +275,16 @@ function NegocioPageInner() {
                 const s = schedule[key];
                 return (
                   <div key={key} className="flex items-center gap-3">
-                    <div className={`w-24 text-[13px] ${s.open ? "text-ink font-medium" : "text-ink-3"}`}>{label}</div>
-                    <label className="toggle">
+                    <div className={`w-20 sm:w-24 shrink-0 text-[13px] ${s.open ? "text-ink font-medium" : "text-ink-3"}`}>{label}</div>
+                    <label className="toggle shrink-0">
                       <input type="checkbox" checked={s.open} onChange={() => toggleDay(key)} />
                       <span className="toggle-track" /><span className="toggle-thumb" />
                     </label>
                     {s.open ? (
-                      <div className="flex items-center gap-2 flex-1">
-                        <input className="input" type="time" value={s.from} style={{ width: "6.875rem" }} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], from: e.target.value } }))} />
-                        <span className="text-xs text-ink-3">a</span>
-                        <input className="input" type="time" value={s.to}   style={{ width: "6.875rem" }} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], to: e.target.value } }))} />
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        <input className="input flex-1 min-w-0" type="time" value={s.from} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], from: e.target.value } }))} />
+                        <span className="text-xs text-ink-3 shrink-0">a</span>
+                        <input className="input flex-1 min-w-0" type="time" value={s.to} onChange={(e) => setSchedule((p) => ({ ...p, [key]: { ...p[key], to: e.target.value } }))} />
                       </div>
                     ) : <span className="text-xs text-ink-3">Cerrado</span>}
                   </div>
