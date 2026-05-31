@@ -9,7 +9,7 @@ interface TopbarProps {
 
 export default function Topbar({ title, subtitle, actions, onOpenMobileNav }: TopbarProps) {
   return (
-    <div className="h-[var(--topbar-h)] min-h-[var(--topbar-h)] bg-surface border-b border-line flex items-center px-3 md:px-6 gap-3 md:gap-4">
+    <div className="h-[var(--topbar-h)] min-h-[var(--topbar-h)] flex items-center px-3 md:px-6 gap-3 md:gap-4">
       {/* Hamburger — mobile only */}
       {onOpenMobileNav && (
         <button

@@ -135,7 +135,7 @@ export default function Sidebar({ active, collapsed, onToggle, mobile = false, o
       <Link
         href="/dashboard"
         onClick={onNavigate}
-        className="flex items-center gap-2.5 border-b border-line"
+        className="flex items-center gap-2.5"
         style={{
           padding: collapsed ? "16px 0" : "16px",
           justifyContent: collapsed ? "center" : undefined,
@@ -247,7 +247,7 @@ export default function Sidebar({ active, collapsed, onToggle, mobile = false, o
 
       {/* User footer */}
       <div
-        className="flex items-center border-t border-line"
+        className="flex items-center"
         style={{
           padding: collapsed ? "12px 0" : "12px 16px",
           gap: collapsed ? 0 : 12,
