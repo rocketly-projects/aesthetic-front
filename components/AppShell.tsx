@@ -35,7 +35,7 @@ export default function AppShell({ active, title, subtitle, actions, children }:
 
   return (
     <div
-      className="h-screen overflow-hidden lg:grid lg:[grid-template-columns:var(--cols)]"
+      className="h-screen overflow-hidden bg-bg-2 lg:grid lg:[grid-template-columns:var(--cols)]"
       style={{
         ["--cols" as string]: `${sidebarW} 1fr`,
         transition: `grid-template-columns var(--dur-base) var(--ease-out)`,
@@ -68,19 +68,26 @@ export default function AppShell({ active, title, subtitle, actions, children }:
         </div>
       )}
 
-      <div className="flex flex-col overflow-hidden bg-bg h-full">
-        <Topbar
-          title={title}
-          subtitle={subtitle}
-          actions={actions}
-          onOpenMobileNav={() => setMobileOpen(true)}
-        />
+      {/* Right panel — wrapper que provee el inset gap en desktop */}
+      <div className="h-full flex flex-col lg:p-2">
+        {/* Panel flotante */}
         <div
-          key={pathname}
-          className="flex-1 overflow-y-auto p-4 md:p-6"
-          style={{ animation: "page-in var(--dur-slow) var(--ease-out) both" }}
+          className="flex-1 min-h-0 flex flex-col overflow-hidden bg-bg lg:rounded-2xl"
+          style={{ boxShadow: "0 0 0 1px var(--color-line)" }}
         >
-          {children}
+          <Topbar
+            title={title}
+            subtitle={subtitle}
+            actions={actions}
+            onOpenMobileNav={() => setMobileOpen(true)}
+          />
+          <div
+            key={pathname}
+            className="flex-1 overflow-y-auto p-4 md:p-6"
+            style={{ animation: "page-in var(--dur-slow) var(--ease-out) both" }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>
