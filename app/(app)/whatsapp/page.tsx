@@ -244,8 +244,9 @@ export default function WhatsAppPage() {
                 )}
               </div>
 
-              <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden">
-                <div className="px-4 py-3 border-b border-line font-semibold text-[13px] text-ink">Turnos</div>
+              <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col min-h-0">
+                <div className="px-4 py-3 border-b border-line font-semibold text-[13px] text-ink shrink-0">Turnos</div>
+                <div className="overflow-y-auto max-h-64">
                 {clientAppts.length === 0 ? (
                   <div className="p-4 text-xs text-ink-3 text-center">Sin turnos</div>
                 ) : clientAppts.map((a) => (
@@ -257,6 +258,7 @@ export default function WhatsAppPage() {
                     {statusChip(a.status)}
                   </div>
                 ))}
+                </div>
               </div>
             </>
           )}
