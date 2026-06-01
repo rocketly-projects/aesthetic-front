@@ -44,10 +44,8 @@ export default function LoginPage() {
 
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <span className="grid place-items-center w-8 h-8 rounded-full bg-ink text-bg font-semibold text-[15px] shrink-0 font-display">
-            a
-          </span>
-          <span className="text-[19px] font-medium tracking-[-0.02em] font-display text-ink">
+          <img src="/logoDark.svg" alt="aesthetic" className="w-9 h-9 rounded-full shrink-0" />
+          <span className="text-[21px] font-medium tracking-[-0.02em] font-display text-ink">
             aesthetic<em className="not-italic text-accent">.</em>
           </span>
         </div>

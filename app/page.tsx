@@ -240,16 +240,9 @@ function MobileNav({ open, onClose }: { open: boolean; onClose: () => void }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-16 border-b border-line shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-ink flex items-center justify-center">
-              <span
-                className="text-bg text-sm font-semibold italic"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                a
-              </span>
-            </div>
+            <img src="/logoDark.svg" alt="aesthetic" className="w-[44px] h-[44px] rounded-full shrink-0" />
             <span
-              className="text-[14px] font-semibold text-ink"
+              className="text-[20px] font-medium text-ink"
               style={{ fontFamily: "var(--font-display)" }}
             >
               aesthetic.
@@ -530,16 +523,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <a href="#top" className="flex items-center gap-2.5 no-underline">
-            <div className="w-8 h-8 rounded-full bg-ink flex items-center justify-center">
-              <span
-                className="text-bg text-base font-semibold italic"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                a
-              </span>
-            </div>
+            <img src="/logoDark.svg" alt="aesthetic" className="w-[44px] h-[44px] rounded-full shrink-0" />
             <span
-              className="text-[15px] font-semibold text-ink tracking-tight"
+              className="text-[20px] font-medium text-ink tracking-tight"
               style={{ fontFamily: "var(--font-display)" }}
             >
               aesthetic.
@@ -1153,22 +1139,9 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 mb-3">
-                <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center"
-                  style={{
-                    background: "rgba(255,255,255,0.1)",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                  }}
-                >
-                  <span
-                    className="text-bg text-sm font-semibold italic"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    a
-                  </span>
-                </div>
+                <img src="/logoLight.svg" alt="aesthetic" className="w-[44px] h-[44px] rounded-full shrink-0" />
                 <span
-                  className="text-[14px] font-semibold"
+                  className="text-[20px] font-medium"
                   style={{
                     color: "rgba(255,255,255,0.9)",
                     fontFamily: "var(--font-display)",

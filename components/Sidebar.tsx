@@ -144,11 +144,9 @@ export default function Sidebar({ active, collapsed, onToggle, mobile = false, o
         }}
         title={collapsed ? "aesthetic." : undefined}
       >
-        <span className="flex items-center justify-center text-white font-semibold text-sm shrink-0 w-7 h-7 rounded-full bg-accent font-display">
-          a
-        </span>
+        <img src="/logoDark.svg" alt="aesthetic" className="shrink-0 w-9 h-9 rounded-full" />
         {!collapsed && (
-          <span className="text-[15px] font-semibold text-ink" style={{ fontFamily: "var(--font-display)" }}>
+          <span className="text-[19px] font-medium text-ink" style={{ fontFamily: "var(--font-display)" }}>
             aesthetic<em className="not-italic text-accent">.</em>
           </span>
         )}
