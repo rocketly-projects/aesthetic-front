@@ -26,6 +26,27 @@ const FALLBACK_PLANS: Plan[] = [
   },
 ];
 
+function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
+  const daysLeft = Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const label = daysLeft <= 1 ? "Último día de prueba" : `${daysLeft} días de prueba restantes`;
+
+  return (
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-5 py-2.5 text-[12.5px]"
+      style={{ background: "var(--color-ink)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+    >
+      <span className="text-white/70">{label}</span>
+      <a
+        href="/planes"
+        className="shrink-0 bg-accent text-bg text-[12px] font-medium no-underline rounded-lg px-3 py-1.5 hover:opacity-90 transition-opacity"
+        style={{ fontFamily: "var(--font-display)" }}
+      >
+        Elegir plan
+      </a>
+    </div>
+  );
+}
+
 export default function PlanGate({ children }: { children: React.ReactNode }) {
   const { data: status, isLoading: statusLoading } = useBillingStatus();
   const { data: plansData, isLoading: plansLoading } = usePlans();
@@ -38,6 +59,17 @@ export default function PlanGate({ children }: { children: React.ReactNode }) {
   if (statusLoading) return <>{children}</>;
 
   if (status?.planStatus === "active") return <>{children}</>;
+
+  // Trial activo: trialEndsAt existe y no venció
+  const isInTrial = !!status?.trialEndsAt && new Date(status.trialEndsAt) > new Date();
+  if (isInTrial) {
+    return (
+      <>
+        <div style={{ paddingBottom: "44px" }}>{children}</div>
+        <TrialBanner trialEndsAt={status!.trialEndsAt!} />
+      </>
+    );
+  }
 
   const isCancelled = status?.planStatus === "cancelled";
   const isPastDue = status?.planStatus === "past_due";

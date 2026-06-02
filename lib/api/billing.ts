@@ -15,6 +15,7 @@ export interface BillingStatus {
   planStatus: "active" | "inactive" | "cancelled" | "past_due" | null;
   subscriptionId: string | null;
   subscriptionExpiresAt: string | null;
+  trialEndsAt: string | null;
 }
 
 export interface SubscribeResponse {
