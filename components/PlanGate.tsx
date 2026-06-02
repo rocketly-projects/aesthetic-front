@@ -32,8 +32,8 @@ function TrialBanner({ trialEndsAt }: { trialEndsAt: string }) {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-5 py-2.5 text-[12.5px]"
-      style={{ background: "var(--color-ink)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+      className="shrink-0 flex items-center justify-between gap-4 px-5 py-2.5 text-[12.5px]"
+      style={{ background: "var(--color-ink)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
       <span className="text-white/70">{label}</span>
       <a
@@ -65,8 +65,8 @@ export default function PlanGate({ children }: { children: React.ReactNode }) {
   if (isInTrial) {
     return (
       <>
-        <div style={{ paddingBottom: "44px" }}>{children}</div>
         <TrialBanner trialEndsAt={status!.trialEndsAt!} />
+        <div className="flex-1 min-h-0">{children}</div>
       </>
     );
   }

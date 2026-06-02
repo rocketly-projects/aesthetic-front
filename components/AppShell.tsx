@@ -35,7 +35,7 @@ export default function AppShell({ active, title, subtitle, actions, children }:
 
   return (
     <div
-      className="h-screen overflow-hidden bg-bg-2 lg:grid lg:[grid-template-columns:var(--cols)] lg:[grid-template-rows:100%]"
+      className="h-full overflow-hidden bg-bg-2 lg:grid lg:[grid-template-columns:var(--cols)] lg:[grid-template-rows:100%]"
       style={{
         ["--cols" as string]: `${sidebarW} 1fr`,
         transition: `grid-template-columns var(--dur-base) var(--ease-out)`,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, DM_Sans, Space_Grotesk } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
+import Toaster from "@/components/Toaster";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,7 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       style={{ height: "100%" }}
     >
       <body style={{ height: "100%", margin: 0 }}>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+            <Toaster />
+          </QueryProvider>
         </body>
     </html>
   );

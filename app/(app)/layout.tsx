@@ -3,9 +3,11 @@ import Toaster from "@/components/Toaster";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <PlanGate>
-      {children}
-      <Toaster />
-    </PlanGate>
+    <div className="h-screen flex flex-col overflow-hidden">
+      <PlanGate>
+        {children}
+        <Toaster />
+      </PlanGate>
+    </div>
   );
 }

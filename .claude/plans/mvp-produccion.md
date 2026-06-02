@@ -8,7 +8,7 @@ El core del producto está completo (turnos, clientes, servicios, agenda, reserv
 
 ## 🔴 Bloqueantes
 
-### 1. Verificar firma de webhooks de MercadoPago
+### 1. Verificar firma de webhooks de MercadoPago - OK
 **Archivos:** `aesthetic-back/src/routes/billing.ts`
 
 El env `MP_WEBHOOK_SECRET` está declarado en `Bindings` pero los handlers `/billing/webhook` y `/billing/deposit-webhook` no verifican la firma HMAC-SHA256 que MP envía en el header `x-signature`. Cualquiera puede falsificar un pago.
@@ -68,18 +68,18 @@ Agregar handler `scheduled()` en `src/index.ts` que ejecute la misma lógica de 
 
 ## 🟡 Importantes
 
-### 5. Trial de 14 días
+### 5. Trial de 14 días - OK
 **Archivos:** `aesthetic-back/src/routes/billing.ts`, `aesthetic-back/src/db/schema.ts`, `aesthetic-front/components/PlanGate.tsx`
 
 La landing promete "14 días gratis" pero un usuario nuevo tiene `planStatus: 'inactive'` y PlanGate muestra el paywall de inmediato.
 
-**Opción A (recomendada, sin cambios de DB):** Verificar que los `preapproval_plan` en el panel de MP tengan `free_trial` de 14 días configurado.
+**Implementado (Opción B — DB-based):** `trialEndsAt timestamp` en `businesses` (se setea en `createdAt + 14 días`). En `GET /billing/status` se incluye `trialEndsAt`. En `PlanGate`: si `planStatus !== 'active'` pero `trialEndsAt > now()`, se deja pasar con banner de días restantes.
 
-**Opción B (si MP no lo soporta):** Agregar `trialEndsAt timestamp` a `businesses` (se setea en `createdAt + 14 días`). En `GET /billing/status` incluir `trialEndsAt`. En `PlanGate`: si `planStatus !== 'active'` pero `trialEndsAt > now()`, dejar pasar.
+**Alcance del trial (Opción A):** Solo funcionalidades básicas. WhatsApp bot sigue bloqueado (requiere configuración manual de número por usuario).
 
 ---
 
-### 6. Páginas de error en Next.js
+### 6. Páginas de error en Next.js - OK
 **Archivos a crear:**
 - `aesthetic-front/app/error.tsx`
 - `aesthetic-front/app/not-found.tsx`

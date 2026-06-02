@@ -44,8 +44,11 @@ export async function apiFetch<T>(
     }
 
     if (res.status === 401) {
+      const hadToken = !!token;
       Cookies.remove("token");
-      if (typeof window !== "undefined") {
+      // Solo redirigir si había sesión activa (token expirado).
+      // Si no había token, el 401 viene del propio login → no redirigir.
+      if (typeof window !== "undefined" && hadToken) {
         window.location.href = "/login";
       }
     }
