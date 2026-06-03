@@ -16,9 +16,7 @@ export default function ServiciosPage() {
   const [editService, setEditService] = useState<Service | null>(null);
 
   const { data: services = [], isLoading } = useGetServices();
-  const visible    = services.filter((s) => s.visible);
-  const avgPrice   = services.length ? Math.round(services.reduce((a, s) => a + s.price, 0)    / services.length) : 0;
-  const avgDuration = services.length ? Math.round(services.reduce((a, s) => a + s.duration, 0) / services.length) : 0;
+  const visible = services.filter((s) => s.visible);
 
   return (
     <AppShell
@@ -32,11 +30,9 @@ export default function ServiciosPage() {
         </button>
       }
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <KPI lbl="Total servicios"   val={services.length}                          variant="accent" />
-        <KPI lbl="Activos"           val={visible.length}  delta={`${services.length - visible.length} ocultos`} variant="accent" />
-        <KPI lbl="Precio promedio"   val={"$" + avgPrice.toLocaleString("es-AR")}   variant="dark"   />
-        <KPI lbl="Duración promedio" val={`${avgDuration} min`}                     variant="dark"   />
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <KPI lbl="Total servicios" val={services.length}                          variant="accent" />
+        <KPI lbl="Activos"         val={visible.length}  delta={`${services.length - visible.length} ocultos`} variant="dark" />
       </div>
 
       {isLoading ? (

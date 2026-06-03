@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Drawer from "./Drawer";
-import { useGetClients } from "@/hooks/useClients";
+import ClientAutocomplete from "./ClientAutocomplete";
 import { useGetServices } from "@/hooks/useServices";
 import { useCreateAppointment } from "@/hooks/useAppointments";
 
@@ -24,11 +24,8 @@ export default function NuevoTurnoModal({ open, onClose, initialDate, initialTim
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const { data: clientData } = useGetClients({ limit: 100 });
   const { data: services = [] } = useGetServices();
   const createAppt = useCreateAppointment();
-
-  const clients = clientData?.clients ?? [];
 
   function handleClose() {
     setForm(EMPTY);
@@ -54,11 +51,13 @@ export default function NuevoTurnoModal({ open, onClose, initialDate, initialTim
     <Drawer open={open} onClose={handleClose} title="Nuevo turno">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Cliente</label>
-          <select className="input" value={form.clientId} onChange={(e) => setForm({ ...form, clientId: e.target.value })}>
-            <option value="">Sin cliente asignado</option>
-            {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">
+            Cliente <span className="normal-case font-normal text-ink-3 tracking-normal">(opcional, pero recomendado)</span>
+          </label>
+          <ClientAutocomplete
+            value={form.clientId}
+            onChange={(id) => setForm({ ...form, clientId: id })}
+          />
         </div>
         <div>
           <label className="block text-[11px] font-semibold text-ink-2 mb-1.5 uppercase tracking-wider">Servicio</label>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { getPlans, getBillingStatus, subscribe } from "@/lib/api/billing";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getPlans, getBillingStatus, subscribe, cancelSubscription } from "@/lib/api/billing";
 
 export function usePlans() {
   return useQuery({
@@ -24,6 +24,16 @@ export function useSubscribe() {
     onSuccess: (data) => {
       // Redirigir al checkout de MP
       window.location.href = data.checkoutUrl;
+    },
+  });
+}
+
+export function useCancelSubscription() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: cancelSubscription,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["billing", "status"] });
     },
   });
 }

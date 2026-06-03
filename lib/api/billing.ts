@@ -40,3 +40,7 @@ export async function subscribe(planId: "basic" | "pro"): Promise<SubscribeRespo
     body: JSON.stringify({ planId }),
   });
 }
+
+export async function cancelSubscription(): Promise<void> {
+  await apiFetch<{ ok: boolean }>("/billing/cancel", { method: "POST" });
+}
