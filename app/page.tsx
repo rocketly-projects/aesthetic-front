@@ -75,27 +75,27 @@ const testimonials = [
 const faqs = [
   {
     q: "¿Cómo funciona el asistente de WhatsApp?",
-    a: "Conectás tu número de WhatsApp Business y el asistente aprende tu agenda, tus servicios y tus horarios. Responde consultas simples (precios, horarios, disponibilidad) y agenda turnos automáticamente. Si en algún momento querés tomar la conversación, lo hacés manualmente y el bot se pausa solo en ese chat.",
+    a: "Conectás tu número de WhatsApp Business y el asistente aprende tu agenda, tus servicios y tus horarios. Responde consultas simples — precios, disponibilidad, confirmaciones — y agenda turnos automáticamente. Si en algún momento querés tomar la conversación vos, el bot se pausa solo en ese chat.",
   },
   {
     q: "¿Mis clientes tienen que instalar algo?",
-    a: "No, nada. Ellos te escriben a WhatsApp como siempre — la magia pasa de tu lado. Si querés podés también compartirles un link público de reservas donde eligen el horario directamente, pero no es obligatorio.",
+    a: "No, nada. Te escriben por WhatsApp como siempre. También podés compartirles tu link de reservas para que elijan el horario directamente desde el navegador, sin apps ni cuentas.",
   },
   {
-    q: "¿Puedo importar mis clientes desde mi cuaderno o planilla?",
-    a: "Sí. Aceptamos CSV de Excel o Google Sheets, y también podés ir cargándolos a medida que te llegan turnos. Si tu lista es grande, te ayudamos a importarla en el onboarding sin costo extra.",
+    q: "¿Puedo cobrar una seña al reservar?",
+    a: "Sí. Si conectás tu cuenta de MercadoPago, podés pedirle al cliente un adelanto al momento de confirmar el turno online. El monto lo configurás vos. Si el pago no llega en el tiempo definido, el turno se cancela automáticamente y el horario queda libre.",
   },
   {
-    q: "¿Qué pasa si cancelo el plan Pro?",
-    a: "Tus datos quedan intactos. Podés reactivar el Pro cuando quieras desde la configuración de tu cuenta.",
+    q: "¿Qué pasa si cancelo la suscripción?",
+    a: "Tus datos quedan intactos. Podés reactivar el plan desde la configuración de tu cuenta cuando quieras. Si cancelás antes de que termine el ciclo, seguís teniendo acceso hasta el último día del período pago.",
   },
   {
-    q: "¿Sirve para peluquerías con más de una persona?",
-    a: "Aesthetic está pensado y optimizado para peluquerías unipersonales. Si sos un equipo de 2-3 personas también lo usás bien, pero a partir de ahí te conviene una herramienta multi-agenda. En unos meses lanzamos un plan Equipo.",
+    q: "¿Sirve para negocios con más de un profesional?",
+    a: "Aesthetic está optimizado para negocios unipersonales. Si trabajás en pareja también funciona, aunque la agenda es compartida bajo un mismo perfil. Para equipos más grandes hay herramientas más adecuadas — y algo estamos cocinando para ese caso.",
   },
   {
-    q: "¿Puedo cobrar a través de aesthetic?",
-    a: "Aún no. Por ahora registramos los precios de cada servicio para que sepas cuánto facturás, pero el cobro lo hacés vos como siempre (efectivo, MercadoPago, transferencia). Estamos trabajando en la integración con Mercado Pago para este año.",
+    q: "¿Puedo usar aesthetic desde el celular?",
+    a: "Sí, funciona desde el navegador del celular sin instalación. La vista de escritorio es más cómoda para manejar la agenda del día, pero podés revisar y gestionar turnos desde donde estés.",
   },
 ];
 
@@ -179,17 +179,34 @@ function FAQItem({ q, a }: { q: string; a: string }) {
     <div className="border-b border-line last:border-0">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full text-left py-5 flex items-center justify-between gap-4 bg-transparent border-none cursor-pointer"
+        className="w-full text-left py-5 flex items-center justify-between gap-4 bg-transparent border-none cursor-pointer group"
       >
-        <span className="text-[15px] font-medium text-ink">{q}</span>
+        <span className="text-[15px] font-medium text-ink group-hover:text-accent-ink transition-colors duration-150">
+          {q}
+        </span>
         <span
-          className="text-ink-3 text-xl leading-none shrink-0 transition-transform duration-200"
-          style={{ transform: open ? "rotate(45deg)" : "none" }}
+          className="shrink-0 text-ink-3 group-hover:text-accent transition-colors duration-150"
+          style={{
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), color 0.15s",
+          }}
         >
-          +
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </span>
       </button>
-      {open && <p className="pb-5 text-[14px] text-ink-2 leading-relaxed m-0">{a}</p>}
+      <div
+        className="grid"
+        style={{
+          gridTemplateRows: open ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.3s cubic-bezier(0.16,1,0.3,1)",
+        }}
+      >
+        <div className="overflow-hidden">
+          <p className="pb-5 text-[14px] text-ink-2 leading-relaxed m-0">{a}</p>
+        </div>
+      </div>
     </div>
   );
 }

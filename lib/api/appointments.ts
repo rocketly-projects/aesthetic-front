@@ -26,6 +26,8 @@ export interface GetAppointmentsParams {
   limit?: number;
   status?: AppointmentStatus;
   date?: string;
+  dateFrom?: string;
+  dateTo?: string;
   clientId?: string;
 }
 
@@ -59,6 +61,8 @@ export async function getAppointments(params: GetAppointmentsParams = {}): Promi
   if (params.limit)    qs.set("limit",    String(params.limit));
   if (params.status)   qs.set("status",   params.status);
   if (params.date)     qs.set("date",     params.date);
+  if (params.dateFrom) qs.set("dateFrom", params.dateFrom);
+  if (params.dateTo)   qs.set("dateTo",   params.dateTo);
   if (params.clientId) qs.set("clientId", params.clientId);
   const query = qs.toString() ? `?${qs}` : "";
   return apiFetch<GetAppointmentsResponse>(`/appointments${query}`);

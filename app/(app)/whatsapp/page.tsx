@@ -112,7 +112,7 @@ export default function WhatsAppPage() {
 
   return (
     <AppShell active="whatsapp" title="WhatsApp" subtitle="Mensajes con clientes">
-      <div className="grid gap-4 h-full grid-cols-1 lg:grid-cols-[340px_1fr] xl:grid-cols-[340px_1fr_320px] lg:h-[calc(100vh-var(--topbar-h)-3rem)]">
+      <div className="grid gap-4 h-full grid-cols-1 lg:grid-cols-[340px_1fr] xl:grid-cols-[340px_1fr_320px] lg:h-[calc(100vh-var(--topbar-h)-4rem)]">
         {/* Chat list — ocultamos en mobile cuando hay conversación abierta */}
         <div className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex-col ${mobileConversation ? "hidden lg:flex" : "flex"}`}>
           <div className="p-3 border-b border-line">
@@ -246,7 +246,7 @@ export default function WhatsAppPage() {
 
               <div className="bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex flex-col min-h-0">
                 <div className="px-4 py-3 border-b border-line font-semibold text-[13px] text-ink shrink-0">Turnos</div>
-                <div className="overflow-y-auto max-h-64">
+                <div className="overflow-y-auto">
                 {clientAppts.length === 0 ? (
                   <div className="p-4 text-xs text-ink-3 text-center">Sin turnos</div>
                 ) : clientAppts.map((a) => (

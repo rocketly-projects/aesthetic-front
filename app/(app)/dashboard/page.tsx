@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AppShell from "@/components/AppShell";
 import Chip from "@/components/Chip";
 import NuevoTurnoModal from "@/components/NuevoTurnoModal";
@@ -11,43 +11,21 @@ import type { Appointment } from "@/lib/api/appointments";
 
 const TODAY = new Date().toISOString().slice(0, 10);
 
+// Lunes–Domingo de la semana actual
+const WEEK: string[] = (() => {
+  const dow = new Date().getDay();
+  const mon = new Date();
+  mon.setDate(mon.getDate() - (dow === 0 ? 6 : dow - 1));
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+})();
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function timeLabel(apptTime: string): string {
-  const [h, m] = apptTime.split(":").map(Number);
-  const now = new Date();
-  const apptMinutes = h * 60 + m;
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const diff = nowMinutes - apptMinutes;
-  if (diff < 0) return `a las ${apptTime}`;
-  if (diff < 60) return diff <= 1 ? "Hace 1 min" : `Hace ${diff} min`;
-  const hrs = Math.floor(diff / 60);
-  return hrs === 1 ? "Hace 1 hora" : `Hace ${hrs} horas`;
-}
 
-type ActivityItem = { color: string; text: React.ReactNode };
-
-function deriveActivity(appts: Appointment[]): ActivityItem[] {
-  if (!appts.length) return [];
-  const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const toMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
-  const past   = appts.filter((a) => toMinutes(a.time) <= nowMinutes).sort((a, b) => toMinutes(b.time) - toMinutes(a.time));
-  const future = appts.filter((a) => toMinutes(a.time) >  nowMinutes).sort((a, b) => toMinutes(a.time) - toMinutes(b.time));
-  return [...past, ...future].slice(0, 4).map((appt): ActivityItem => {
-    const name = appt.clientName ?? "Cliente";
-    const svc  = appt.serviceName;
-    const lbl  = timeLabel(appt.time);
-    switch (appt.status) {
-      case "confirmed":       return { color: "var(--color-ok)",   text: <><strong>{name}</strong> confirmó su turno de {svc}.<small>{lbl}</small></> };
-      case "pending":         return { color: "var(--color-warn)",  text: <><strong>{name}</strong> tiene turno pendiente · {svc} a las {appt.time}.<small>{lbl}</small></> };
-      case "completed":       return { color: "var(--color-info)",  text: <>Turno completado: <strong>{name}</strong> · {svc}.<small>{lbl}</small></> };
-      case "cancelled":       return { color: "var(--color-err)",   text: <><strong>{name}</strong> canceló su turno de {svc}.<small>{lbl}</small></> };
-      case "no_show":         return { color: "var(--color-warn)",  text: <><strong>{name}</strong> no se presentó a {svc}.<small>{lbl}</small></> };
-      case "awaiting_payment":return { color: "var(--color-warn)",  text: <><strong>{name}</strong> tiene un pago pendiente de seña para {svc}.<small>{lbl}</small></> };
-    }
-  });
-}
 
 function toMin(t: string): number { const [h, m] = t.split(":").map(Number); return h * 60 + m; }
 function fromMin(mins: number): string { return `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`; }
@@ -66,6 +44,139 @@ function calcFreeBlocks(appts: Appointment[], fromTime: string, toTime: string, 
   }
   if (closeMin - cursor >= minGap) blocks.push(`${fromMin(cursor)}–${fromMin(closeMin)}`);
   return blocks.slice(0, 3);
+}
+
+// ── Weekly occupancy grid ─────────────────────────────────────────────────────
+
+type BusinessHour = { dayOfWeek: number; open: boolean; fromTime: string; toTime: string };
+const DAY_LABELS = ["L", "Ma", "Mi", "J", "V", "S", "D"];
+
+function WeeklyOccupancy({
+  appts,
+  hoursData,
+  isLoading,
+}: {
+  appts: Appointment[];
+  hoursData: BusinessHour[] | undefined;
+  isLoading: boolean;
+}) {
+  const SLOT        = 60; // 1 cuadrado = 1 hora
+  const openHours   = hoursData?.filter((h) => h.open) ?? [];
+  const minOpen     = openHours.length ? Math.min(...openHours.map((h) => toMin(h.fromTime))) : toMin("09:00");
+  const maxClose    = openHours.length ? Math.max(...openHours.map((h) => toMin(h.toTime)))   : toMin("20:00");
+  const slotCount   = Math.ceil((maxClose - minOpen) / SLOT);
+  const dayHoursMap = new Map(hoursData?.map((h) => [h.dayOfWeek, h]) ?? []);
+
+  // Minutos ocupados por hora por día: clave "date:hourStartMin" → minutos (0-60)
+  const occupancyMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const a of appts) {
+      if (a.status === "cancelled" || a.status === "no_show") continue;
+      if (!WEEK.includes(a.date)) continue;
+      const start = toMin(a.time);
+      const end   = start + a.duration;
+      for (let h = Math.floor(start / SLOT) * SLOT; h < end; h += SLOT) {
+        const overlap = Math.min(end, h + SLOT) - Math.max(start, h);
+        const key = `${a.date}:${h}`;
+        map.set(key, (map.get(key) ?? 0) + overlap);
+      }
+    }
+    return map;
+  }, [appts]);
+
+  const weekTotal = appts.filter(
+    (a) => WEEK.includes(a.date) && a.status !== "cancelled" && a.status !== "no_show"
+  ).length;
+
+  return (
+    <div
+      className="bg-surface border border-line rounded-2xl shadow-sm p-5 card-lift"
+      style={{ animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "240ms" }}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-[11px] font-semibold text-ink-3 uppercase tracking-widest">Ocupación semanal</span>
+        {!isLoading && (
+          <span className="text-[11px] text-ink-3">{weekTotal} turno{weekTotal !== 1 ? "s" : ""} esta semana</span>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="flex gap-[5px] animate-pulse">
+          <div className="flex flex-col gap-[3px] w-[18px] shrink-0">
+            <div className="h-[9px] mb-[2px]" />
+            {Array.from({ length: 10 }).map((_, j) => (
+              <div key={j} className="h-[10px]" />
+            ))}
+          </div>
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="flex-1 flex flex-col gap-[3px]">
+              <div className="h-[9px] rounded-[2px] bg-bg-2 mb-[2px]" />
+              {Array.from({ length: 10 }).map((_, j) => (
+                <div key={j} className="h-[10px] rounded-[2px] bg-bg-2" />
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex gap-[5px]">
+          {/* Time axis — un label por cada slot (= cada hora) */}
+          <div className="flex flex-col gap-[3px] shrink-0 w-[18px]">
+            <span className="text-[10px] font-semibold mb-[2px] text-transparent select-none leading-none">L</span>
+            {Array.from({ length: slotCount }, (_, si) => {
+              const slotMin = minOpen + si * SLOT;
+              return (
+                <div key={si} className="h-[12px] flex items-start justify-end pr-[2px]">
+                  <span className="text-[9px] leading-none text-ink-3 whitespace-nowrap">
+                    {String(Math.floor(slotMin / 60))}h
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Columnas de días */}
+          {WEEK.map((day, di) => {
+            const dow     = di === 6 ? 0 : di + 1;
+            const dh      = dayHoursMap.get(dow);
+            const isOpen  = !!dh?.open;
+            const isToday = day === TODAY;
+
+            return (
+              <div key={day} className="flex-1 flex flex-col gap-[3px]">
+                <span className={`text-center text-[9px] font-semibold mb-[2px] leading-none ${isToday ? "text-accent" : "text-ink-3"}`}>
+                  {DAY_LABELS[di]}
+                </span>
+                {Array.from({ length: slotCount }, (_, si) => {
+                  const slotMin = minOpen + si * SLOT;
+                  const inHours = isOpen && !!dh &&
+                    slotMin >= toMin(dh.fromTime) && slotMin < toMin(dh.toTime);
+
+                  // Fuera de horario: invisible (sólo ocupa espacio para alineación)
+                  if (!inHours) {
+                    return <div key={si} className="w-full h-[10px]" />;
+                  }
+
+                  const occupied  = occupancyMap.get(`${day}:${slotMin}`) ?? 0;
+                  const pct       = Math.min(100, Math.round((occupied / SLOT) * 100));
+                  const occColor  = isToday ? "var(--color-accent)" : "var(--color-ok)";
+                  const freeColor = "var(--color-bg-2)";
+
+                  const bg =
+                    pct === 0   ? freeColor :
+                    pct === 100 ? occColor  :
+                    `linear-gradient(to right, ${occColor} ${pct}%, ${freeColor} ${pct}%)`;
+
+                  return (
+                    <div key={si} className="w-full h-[12px] rounded-[2px]" style={{ background: bg }} />
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ── Arc progress ───────────────────────────────────────────────────────────────
@@ -95,16 +206,16 @@ export default function DashboardPage() {
   const current  = useCurrentUser();
   const firstName = current ? current.name.trim().split(/\s+/)[0] : null;
 
-  const { data, isLoading }                        = useGetAppointments({ date: TODAY, limit: 100 });
+  const { data, isLoading }                        = useGetAppointments({ dateFrom: WEEK[0], limit: 100 });
   const { data: hoursData, isLoading: isLoadingHours } = useGetHours();
-  const appts = data?.appointments ?? [];
+  const allAppts = data?.appointments ?? [];
+  const appts    = allAppts.filter((a) => a.date === TODAY);
 
   const total     = appts.length;
   const confirmed = appts.filter((a) => a.status === "confirmed").length;
   const pending   = appts.filter((a) => a.status === "pending").length;
   const revenue   = appts.filter((a) => a.status !== "cancelled").reduce((s, a) => s + a.price, 0);
   const next      = appts.find((a) => a.status !== "cancelled");
-  const activity  = deriveActivity(appts);
 
   const todayDow   = new Date().getDay();
   const todayHours = hoursData?.find((h) => h.dayOfWeek === todayDow);
@@ -295,34 +406,12 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Actividad reciente */}
-        <div
-          className="bg-surface border border-line rounded-2xl shadow-sm p-5 card-lift"
-          style={{ animation: "fade-in-up var(--dur-base) var(--ease-out) both", animationDelay: "180ms" }}
-        >
-          <div className="flex items-baseline justify-between mb-3">
-            <span className="text-[11px] font-semibold text-ink-3 uppercase tracking-widest">Actividad reciente</span>
-            <span className="text-[11px] text-ink-3">Hoy</span>
-          </div>
-          <div className="activity">
-            {isLoading ? (
-              <div className="flex flex-col gap-2.5 animate-pulse">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-9 rounded-lg bg-bg-2" />
-                ))}
-              </div>
-            ) : activity.length === 0 ? (
-              <p className="text-[12.5px] text-ink-3">Sin actividad por hoy.</p>
-            ) : (
-              activity.map((item, i) => (
-                <div key={i} className="act">
-                  <span className="dot" style={{ background: item.color }} />
-                  <div className="text">{item.text}</div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        {/* Ocupación semanal */}
+        <WeeklyOccupancy
+          appts={allAppts}
+          hoursData={hoursData}
+          isLoading={isLoading || isLoadingHours}
+        />
 
       </div>
 
