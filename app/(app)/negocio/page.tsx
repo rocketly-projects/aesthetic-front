@@ -6,7 +6,6 @@ import Skeleton from "@/components/Skeleton";
 import WhatsAppSetupModal from "@/components/WhatsAppSetupModal";
 import { useSearchParams } from "next/navigation";
 import { useGetBusiness, useUpdateBusiness, useGetHours, useUpdateHours, useMpConnect, useMpDisconnect, useSubmitWhatsappDeactivationRequest } from "@/hooks/useBusiness";
-import { useBillingStatus, useCancelSubscription } from "@/hooks/useBilling";
 
 const DAYS = [
   { key: "lun", label: "Lunes",     dayOfWeek: 1 },
@@ -57,11 +56,8 @@ function NegocioPageInner() {
   const [logoFile, setLogoFile]     = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoError, setLogoError]   = useState("");
-  const [mpNotice, setMpNotice]       = useState<"connected" | "error" | null>(null);
-  const [cancelConfirm, setCancelConfirm] = useState(false);
+  const [mpNotice, setMpNotice] = useState<"connected" | "error" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { data: billing } = useBillingStatus();
-  const cancelPlan = useCancelSubscription();
 
   // Leer ?mp= param del callback OAuth
   useEffect(() => {
@@ -543,73 +539,6 @@ function NegocioPageInner() {
                     </svg>
                     Habilitar número de WhatsApp
                   </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Plan y suscripción */}
-          {billing && (
-            <div className="bg-surface border border-line rounded-lg shadow-sm p-5">
-              <div className="font-semibold text-sm text-ink mb-3">Plan y suscripción</div>
-
-              {billing.planStatus === "cancelled" ? (
-                <div className="flex items-center gap-2 py-2.5 px-3 rounded-lg bg-[#fef2f2] border border-err text-err text-[13px] font-medium">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>
-                  </svg>
-                  Plan cancelado
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-[14px] font-semibold text-ink">{billing.planName ?? "Plan activo"}</div>
-                      <div className="text-[12px] text-ok mt-0.5">● Activo</div>
-                    </div>
-                    {billing.subscriptionExpiresAt && (
-                      <div className="text-right">
-                        <div className="text-[11px] text-ink-3">Próximo cobro</div>
-                        <div className="text-[12.5px] font-medium text-ink">
-                          {new Date(billing.subscriptionExpiresAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {cancelConfirm ? (
-                    <div className="flex flex-col gap-3">
-                      <div className="px-3 py-2.5 rounded-lg bg-[#fef2f2] border border-err text-[12.5px] text-ink leading-snug">
-                        <span className="font-semibold text-err">¿Confirmás la baja?</span> Tu plan quedará cancelado de inmediato y perderás el acceso al finalizar el período actual.
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => { setCancelConfirm(false); cancelPlan.reset(); }}
-                          className="flex-1 text-[13px] text-ink-2 py-2 rounded-lg border border-line hover:border-ink-3 transition-colors bg-transparent cursor-pointer"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={() => cancelPlan.mutate(undefined, { onSuccess: () => setCancelConfirm(false) })}
-                          disabled={cancelPlan.isPending}
-                          className="flex-1 text-[13px] font-medium py-2 rounded-lg border-none text-white cursor-pointer transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                          style={{ background: "var(--color-err)" }}
-                        >
-                          {cancelPlan.isPending ? "Cancelando…" : "Confirmar baja"}
-                        </button>
-                      </div>
-                      {cancelPlan.error && (
-                        <p className="text-[12px] text-err m-0">{(cancelPlan.error as Error).message}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setCancelConfirm(true)}
-                      className="w-full text-[12.5px] font-medium py-2 rounded-lg border border-line hover:border-err hover:text-err transition-colors text-ink-3 bg-transparent cursor-pointer"
-                    >
-                      Dar de baja el plan
-                    </button>
-                  )}
                 </>
               )}
             </div>

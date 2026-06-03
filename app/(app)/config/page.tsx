@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import { usePreferences } from "@/hooks/usePreferences";
 import { useGetBusiness } from "@/hooks/useBusiness";
+import { useBillingStatus, useCancelSubscription } from "@/hooks/useBilling";
 
 const PLAN_CONFIG = {
   basic: {
@@ -39,6 +41,9 @@ function ToggleRow({ label, description, checked, onChange }: { label: string; d
 export default function ConfigPage() {
   const { prefs, setPrefs, save, saved } = usePreferences();
   const { data: business } = useGetBusiness();
+  const { data: billing }  = useBillingStatus();
+  const cancelPlan = useCancelSubscription();
+  const [cancelConfirm, setCancelConfirm] = useState(false);
 
   const setNotif = (key: keyof typeof prefs.notifications, value: boolean) =>
     setPrefs((p) => ({ ...p, notifications: { ...p.notifications, [key]: value } }));
@@ -79,23 +84,79 @@ export default function ConfigPage() {
           <ToggleRow label="Pagos recibidos"        description="Toast al confirmar una seña"                  checked={prefs.notifications.pagos}         onChange={(v) => setNotif("pagos", v)}         />
         </div>
 
-        {plan ? (
-          <div className="rounded-lg p-5" style={{ background: plan.gradient }}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-base text-white mb-2">{plan.label}</div>
-                <div className="text-[13px] mb-4" style={{ color: "rgba(255,255,255,.7)" }}>{plan.subtitle}</div>
-                <div className="flex flex-wrap gap-2">
-                  {plan.features.map((f) => (
-                    <span key={f} className="rounded-full px-2.5 py-1 text-[11px] font-medium text-white" style={{ background: "rgba(255,255,255,.15)" }}>{f}</span>
-                  ))}
+        {business?.planStatus === "cancelled" ? (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#fef2f2] border border-err text-err text-[13px] font-medium">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+            Plan cancelado — tu acceso se mantiene hasta el fin del período actual
+          </div>
+        ) : plan ? (
+          <div className="flex flex-col gap-3">
+            {/* Card oscura del plan */}
+            <div className="rounded-lg p-5" style={{ background: plan.gradient }}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-base text-white mb-1">{plan.label}</div>
+                  <div className="text-[13px] mb-4" style={{ color: "rgba(255,255,255,.7)" }}>{plan.subtitle}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {plan.features.map((f) => (
+                      <span key={f} className="rounded-full px-2.5 py-1 text-[11px] font-medium text-white" style={{ background: "rgba(255,255,255,.15)" }}>{f}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-right shrink-0 pl-2">
+                  <div className="text-[28px] font-semibold text-white leading-none" style={{ fontFamily: "var(--font-display)" }}>{plan.price}</div>
+                  <div className="text-xs mt-1" style={{ color: "rgba(255,255,255,.6)" }}>por mes</div>
+                  {billing?.subscriptionExpiresAt && (
+                    <div className="mt-3 text-right">
+                      <div className="text-[10px] uppercase tracking-wider" style={{ color: "rgba(255,255,255,.45)" }}>Próximo cobro</div>
+                      <div className="text-[12.5px] font-medium mt-0.5" style={{ color: "rgba(255,255,255,.8)" }}>
+                        {new Date(billing.subscriptionExpiresAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="text-right shrink-0 pl-6">
-                <div className="text-[28px] font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>{plan.price}</div>
-                <div className="text-xs" style={{ color: "rgba(255,255,255,.6)" }}>por mes</div>
-              </div>
             </div>
+
+            {/* Baja del plan */}
+            {cancelConfirm ? (
+              <div className="flex flex-col gap-3 p-4 rounded-lg bg-surface border border-err/30">
+                <p className="text-[12.5px] text-ink leading-snug m-0">
+                  <span className="font-semibold text-err">¿Confirmás la baja?</span> Tu suscripción se cancelará de inmediato en MercadoPago. Seguís teniendo acceso hasta el fin del período actual.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setCancelConfirm(false); cancelPlan.reset(); }}
+                    className="flex-1 text-[13px] text-ink-2 py-2 rounded-lg border border-line hover:border-ink-3 transition-colors bg-transparent cursor-pointer"
+                  >
+                    Mantener plan
+                  </button>
+                  <button
+                    onClick={() => cancelPlan.mutate(undefined, { onSuccess: () => setCancelConfirm(false) })}
+                    disabled={cancelPlan.isPending}
+                    className="flex-1 text-[13px] font-medium py-2 rounded-lg border-none text-white cursor-pointer transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{ background: "var(--color-err)" }}
+                  >
+                    {cancelPlan.isPending ? "Cancelando…" : "Confirmar baja"}
+                  </button>
+                </div>
+                {cancelPlan.error && (
+                  <p className="text-[12px] text-err m-0">{(cancelPlan.error as Error).message}</p>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setCancelConfirm(true)}
+                className="flex items-center gap-2 text-[12.5px] font-medium text-ink-3 hover:text-err border border-line hover:border-err/40 rounded-lg px-4 py-2.5 transition-colors bg-transparent cursor-pointer w-full justify-center"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                </svg>
+                Dar de baja el plan
+              </button>
+            )}
           </div>
         ) : (
           <div className="bg-surface border border-line rounded-lg p-5">
