@@ -104,6 +104,20 @@ export async function register(params: RegisterParams): Promise<AuthResponse> {
   return data;
 }
 
+export async function forgotPassword(email: string): Promise<void> {
+  await apiFetch<{ ok: boolean }>("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  await apiFetch<{ ok: boolean }>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
+}
+
 // Backend requerido: POST /auth/google
 // Verifica el Google ID token con Google, luego:
 //   - Usuario existente → devuelve AuthResponse (igual que /auth/login)

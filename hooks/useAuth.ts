@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { login, register, clearToken, googleAuth } from "@/lib/api/auth";
+import { login, register, clearToken, googleAuth, forgotPassword, resetPassword } from "@/lib/api/auth";
 import type { LoginParams, RegisterParams, GoogleAuthParams, StoredUser } from "@/lib/api/auth";
 import { toast } from "@/components/Toaster";
 import { ApiError } from "@/lib/api/client";
@@ -65,6 +65,24 @@ export function useCurrentUser(): StoredUser | null {
     }
   });
   return user;
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (email: string) => forgotPassword(email),
+  });
+}
+
+export function useResetPassword() {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: ({ token, password }: { token: string; password: string }) =>
+      resetPassword(token, password),
+    onSuccess: () => {
+      toast.success("Contraseña actualizada. Ya podés iniciar sesión.");
+      router.push("/login");
+    },
+  });
 }
 
 export function useLogout() {
