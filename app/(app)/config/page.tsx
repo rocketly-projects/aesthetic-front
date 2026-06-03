@@ -159,11 +159,19 @@ export default function ConfigPage() {
             )}
           </div>
         ) : (
-          <div className="bg-surface border border-line rounded-lg p-5">
-            <div className="font-semibold text-sm text-ink mb-1">Sin plan activo</div>
-            <p className="text-[12.5px] text-ink-3 mt-0.5">
-              Activá un plan para acceder a todas las funciones de aesthetic.
-            </p>
+          <div className="bg-surface border border-line rounded-lg p-5 flex items-center justify-between gap-4">
+            <div>
+              <div className="font-semibold text-sm text-ink mb-1">Sin plan activo</div>
+              <p className="text-[12.5px] text-ink-3 m-0">
+                Activá un plan para acceder a todas las funciones de aesthetic.
+              </p>
+            </div>
+            <a
+              href="/planes"
+              className="shrink-0 bg-accent text-bg text-[13px] font-medium no-underline rounded-lg px-4 py-2 hover:opacity-90 transition-opacity"
+            >
+              Elegir plan
+            </a>
           </div>
         )}
       </div>
