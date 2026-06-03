@@ -67,18 +67,24 @@ function WeeklyOccupancy({
   const slotCount   = Math.ceil((maxClose - minOpen) / SLOT);
   const dayHoursMap = new Map(hoursData?.map((h) => [h.dayOfWeek, h]) ?? []);
 
-  // Minutos ocupados por hora por día: clave "date:hourStartMin" → minutos (0-60)
+  // Segmento ocupado por slot: clave "date:hourStartMin" → { from, to } en minutos dentro del slot (0-60)
   const occupancyMap = useMemo(() => {
-    const map = new Map<string, number>();
+    const map = new Map<string, { from: number; to: number }>();
     for (const a of appts) {
       if (a.status === "cancelled" || a.status === "no_show") continue;
       if (!WEEK.includes(a.date)) continue;
       const start = toMin(a.time);
       const end   = start + a.duration;
       for (let h = Math.floor(start / SLOT) * SLOT; h < end; h += SLOT) {
-        const overlap = Math.min(end, h + SLOT) - Math.max(start, h);
+        const slotFrom = Math.max(start, h) - h;        // offset dentro del slot donde empieza
+        const slotTo   = Math.min(end, h + SLOT) - h;   // offset dentro del slot donde termina
         const key = `${a.date}:${h}`;
-        map.set(key, (map.get(key) ?? 0) + overlap);
+        const existing = map.get(key);
+        // Si hay varios turnos en el mismo slot, expandir el rango
+        map.set(key, existing
+          ? { from: Math.min(existing.from, slotFrom), to: Math.max(existing.to, slotTo) }
+          : { from: slotFrom, to: slotTo }
+        );
       }
     }
     return map;
@@ -156,15 +162,21 @@ function WeeklyOccupancy({
                     return <div key={si} className="w-full h-[10px]" />;
                   }
 
-                  const occupied  = occupancyMap.get(`${day}:${slotMin}`) ?? 0;
-                  const pct       = Math.min(100, Math.round((occupied / SLOT) * 100));
+                  const slot      = occupancyMap.get(`${day}:${slotMin}`);
                   const occColor  = isToday ? "var(--color-accent)" : "var(--color-ok)";
                   const freeColor = "var(--color-bg-2)";
+                  const fromPct   = slot ? Math.round((slot.from / SLOT) * 100) : 0;
+                  const toPct     = slot ? Math.round((slot.to   / SLOT) * 100) : 0;
 
-                  const bg =
-                    pct === 0   ? freeColor :
-                    pct === 100 ? occColor  :
-                    `linear-gradient(to right, ${occColor} ${pct}%, ${freeColor} ${pct}%)`;
+                  const bg = !slot
+                    ? freeColor
+                    : fromPct === 0 && toPct === 100
+                    ? occColor
+                    : fromPct === 0
+                    ? `linear-gradient(to right, ${occColor} ${toPct}%, ${freeColor} ${toPct}%)`
+                    : toPct === 100
+                    ? `linear-gradient(to right, ${freeColor} ${fromPct}%, ${occColor} ${fromPct}%)`
+                    : `linear-gradient(to right, ${freeColor} ${fromPct}%, ${occColor} ${fromPct}%, ${occColor} ${toPct}%, ${freeColor} ${toPct}%)`;
 
                   return (
                     <div key={si} className="w-full h-[12px] rounded-[2px]" style={{ background: bg }} />
