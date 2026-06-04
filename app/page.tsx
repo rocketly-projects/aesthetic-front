@@ -639,7 +639,7 @@ export default function LandingPage() {
               className="text-[38px] sm:text-[44px] lg:text-[50px] font-semibold leading-[1.1] tracking-tight text-ink mb-5"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Una agenda{" "}
+              La agenda{" "}
               <em
                 className="not-italic"
                 style={{
@@ -651,13 +651,13 @@ export default function LandingPage() {
                 tranquila
               </em>
               <br />
-              para tu peluquería.
+              para tu negocio de belleza.
             </h1>
 
             <p className="text-[17px] text-ink-2 leading-relaxed mb-8 max-w-md">
               aesthetic es un sistema simple para gestionar turnos, clientes y mensajes —
-              pensado para peluquerías unipersonales que quieren concentrarse en atender,
-              no en administrar.
+              pensado para peluquerías, estéticas y emprendedoras de belleza que quieren
+              concentrarse en atender, no en administrar.
             </p>
             <div className="flex items-center gap-3 flex-wrap">
               <Link
@@ -792,11 +792,11 @@ export default function LandingPage() {
               >
                 Todo en un solo lugar.
                 <br />
-                <span className="text-ink-3 font-normal">Lo justo, nada más.</span>
+                <span className="text-ink-3 font-normal">Cada función, bien construida.</span>
               </h2>
               <p className="text-[15px] text-ink-2 max-w-sm leading-relaxed m-0">
-                Tres funciones bien hechas — agenda, asistente de WhatsApp y ficha de clientes —
-                en vez de veinte a medias.
+                Agenda, asistente de WhatsApp y ficha de clientes — integrados y listos desde el primer día,
+                sin módulos de relleno que no usás.
               </p>
             </div>
           </Reveal>
@@ -835,7 +835,7 @@ export default function LandingPage() {
             >
               El bot que atiende
               <br />
-              mientras vos cortás.
+              mientras vos trabajás.
             </h2>
             <p className="text-[15px] text-ink-2 leading-relaxed mb-8">
               Conectás tu WhatsApp en 2 minutos. El asistente aprende tu agenda, tus servicios y
@@ -915,7 +915,7 @@ export default function LandingPage() {
                 className="text-[28px] md:text-[38px] font-semibold leading-tight tracking-tight text-ink mb-3"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Encontrá tu peluquería.
+                Encontrá tu negocio.
               </h2>
               <p className="text-[15px] text-ink-2 max-w-md mx-auto">
                 Buscá por nombre y reservá tu turno directamente, sin llamadas ni mensajes.
@@ -1051,7 +1051,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials 05 ──────────────────────────────────────────── */}
-      <section className="py-14 md:py-24 px-5 md:px-6 bg-bg-2">
+      <section className="hidden py-14 md:py-24 px-5 md:px-6 bg-bg-2">
         <div className="max-w-6xl mx-auto">
           <Reveal>
             <span className="text-[11px] font-semibold text-accent uppercase tracking-widest block mb-3">
@@ -1171,7 +1171,7 @@ export default function LandingPage() {
                 className="text-[13px] leading-relaxed m-0"
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
-                El sistema simple para peluquerías unipersonales. Hecho en Buenos Aires.
+                El sistema simple para profesionales de la belleza. Hecho en Buenos Aires.
               </p>
             </div>
 
@@ -1186,7 +1186,7 @@ export default function LandingPage() {
               },
               {
                 title: "Para clientes",
-                links: ["Buscar peluquería", "Cómo reservar", "Política de cancelación"],
+                links: ["Buscar negocio", "Cómo reservar", "Política de cancelación"],
               },
             ].map((col) => (
               <div key={col.title}>
