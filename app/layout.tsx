@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, DM_Sans, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import QueryProvider from "@/providers/QueryProvider";
 import Toaster from "@/components/Toaster";
 import "./globals.css";
@@ -39,6 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
             <Toaster />
           </QueryProvider>
+          <Analytics />
+          <SpeedInsights />
         </body>
     </html>
   );
