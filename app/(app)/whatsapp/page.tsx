@@ -12,7 +12,7 @@ import { useGetAppointments } from "@/hooks/useAppointments";
 import { useGetBusiness } from "@/hooks/useBusiness";
 import type { MessageSender } from "@/lib/api/whatsapp";
 
-type TabFilter = "todos" | "bot" | "yo";
+type TabFilter = "todos" | "bot";
 
 const CHATS_LIMIT = 30;
 
@@ -75,9 +75,7 @@ export default function WhatsAppPage() {
   const chatsTotal             = chatsData?.total;
   const patchChat               = usePatchChat();
 
-  const visibleChats = activeTab === "todos" ? chats
-    : activeTab === "bot" ? chats.filter((c) => c.isBot)
-    : chats.filter((c) => !c.isBot);
+  const visibleChats = activeTab === "bot" ? chats.filter((c) => c.isBot) : chats;
 
   const resolvedChatId = activeChatId || chats[0]?.id || "";
   const activeChat     = chats.find((c) => c.id === resolvedChatId);
@@ -108,9 +106,9 @@ export default function WhatsAppPage() {
         <div className={`bg-surface border border-line rounded-lg shadow-sm overflow-hidden flex-col ${mobileConversation ? "hidden lg:flex" : "flex"}`}>
           <div className="p-3 border-b border-line">
             <div className="seg w-full">
-              {(["todos", "bot", "yo"] as TabFilter[]).map((t) => (
+              {(["todos", "bot"] as TabFilter[]).map((t) => (
                 <button key={t} className={`seg-item flex-1${activeTab === t ? " active" : ""}`} onClick={() => setActiveTab(t)}>
-                  {t === "todos" ? "Todos" : t === "bot" ? "Bot" : "Yo"}
+                  {t === "todos" ? "Todos" : "Bot"}
                 </button>
               ))}
             </div>
@@ -173,7 +171,6 @@ export default function WhatsAppPage() {
                   <div className="text-sm font-semibold text-ink">{activeChat.clientName ?? activeChat.clientPhone}</div>
                   <div className="text-[11px] text-ok">{activeChat.clientPhone}</div>
                 </div>
-                <button className="bg-transparent border-none cursor-pointer text-ink-3 hover:bg-bg-2 hover:text-ink rounded-md px-2 py-1 text-lg transition-colors">⋯</button>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
