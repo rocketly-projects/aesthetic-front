@@ -119,7 +119,7 @@ export default function WhatsAppPage() {
             ) : visibleChats.length === 0 ? (
               <EmptyState
                 icon={<ChatEmptyIcon />}
-                title={activeTab === "bot" ? "Sin chats del bot" : activeTab === "yo" ? "Sin chats propios" : "Sin conversaciones"}
+                title={activeTab === "bot" ? "Sin chats del bot" : "Sin conversaciones"}
                 description={activeTab === "todos" ? "Los chats de tus clientes aparecerán acá." : "No hay chats en esta categoría."}
               />
             ) : visibleChats.map((c) => {
