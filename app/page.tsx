@@ -1173,6 +1173,12 @@ export default function LandingPage() {
               >
                 El sistema simple para profesionales de la belleza. Hecho en Buenos Aires.
               </p>
+              <p
+                className="text-[12px] mt-2 m-0"
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              >
+                Responsable: Agustin Montes
+              </p>
             </div>
 
             {[
@@ -1224,7 +1230,7 @@ export default function LandingPage() {
             style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
           >
             <p className="text-[12px] m-0" style={{ color: "rgba(255,255,255,0.3)" }}>
-              © 2026 aesthetic · Todos los derechos reservados
+              © 2026 Agustin Montes · aesthetic · Todos los derechos reservados
             </p>
             <p className="text-[12px] m-0" style={{ color: "rgba(255,255,255,0.3)" }}>
               Buenos Aires, AR
