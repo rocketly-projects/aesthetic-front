@@ -6,7 +6,7 @@ import Pagination from "@/components/Pagination";
 import EmptyState, { ChatEmptyIcon } from "@/components/EmptyState";
 import { SkeletonList } from "@/components/Skeleton";
 import { statusChip } from "@/components/Chip";
-import { useGetChats, useGetMessages, useSendMessage, usePatchChat } from "@/hooks/useWhatsapp";
+import { useGetChats, useGetMessages, usePatchChat } from "@/hooks/useWhatsapp";
 import { useGetClient } from "@/hooks/useClients";
 import { useGetAppointments } from "@/hooks/useAppointments";
 import { useGetBusiness } from "@/hooks/useBusiness";
@@ -69,13 +69,11 @@ export default function WhatsAppPage() {
   const [activeChatId,      setActiveChatId]      = useState<string>("");
   const [mobileConversation, setMobileConversation] = useState(false);
   const [chatsPage,         setChatsPage]         = useState(1);
-  const [input,             setInput]             = useState("");
 
   const { data: chatsData, isLoading: chatsLoading } = useGetChats({ page: chatsPage, limit: CHATS_LIMIT });
   const chats                  = chatsData?.chats ?? [];
   const chatsTotal             = chatsData?.total;
   const patchChat               = usePatchChat();
-  const sendMessage             = useSendMessage();
 
   const visibleChats = activeTab === "todos" ? chats
     : activeTab === "bot" ? chats.filter((c) => c.isBot)
@@ -101,13 +99,6 @@ export default function WhatsAppPage() {
     if (chat && chat.unread > 0) {
       patchChat.mutate({ id, markRead: true });
     }
-  }
-
-  function handleSend() {
-    const text = input.trim();
-    if (!text || !resolvedChatId) return;
-    sendMessage.mutate({ chatId: resolvedChatId, content: text, sender: "owner" });
-    setInput("");
   }
 
   return (
@@ -199,17 +190,11 @@ export default function WhatsAppPage() {
                 ))}
               </div>
 
-              <div className="flex gap-2 px-4 py-3 border-t border-line">
-                <input
-                  className="input"
-                  placeholder="Escribí un mensaje…"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                />
-                <button onClick={handleSend} disabled={sendMessage.isPending} className="shrink-0 bg-accent text-white rounded-lg px-4 py-2 text-[13px] font-medium cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-60">
-                  Enviar
-                </button>
+              <div className="flex items-center gap-2 px-4 py-3 border-t border-line bg-bg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-ink-3 shrink-0">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p className="text-[12px] text-ink-3">Por ahora solo podés ver las conversaciones del bot. Próximamente podrás responder manualmente.</p>
               </div>
             </>
           ) : (
