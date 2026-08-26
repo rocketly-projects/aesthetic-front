@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { login, register, clearToken, googleAuth, forgotPassword, resetPassword } from "@/lib/api/auth";
 import type { LoginParams, RegisterParams, GoogleAuthParams, StoredUser } from "@/lib/api/auth";
@@ -86,12 +86,10 @@ export function useResetPassword() {
 }
 
 export function useLogout() {
-  const router      = useRouter();
-  const queryClient = useQueryClient();
-
   return () => {
     clearToken();
-    queryClient.clear();
-    router.push("/login");
+    // Full reload: abandona el panel al instante y descarta todo el estado
+    // en memoria (React Query incluido) sin re-renders intermedios
+    window.location.replace("/");
   };
 }
